@@ -1,0 +1,2 @@
+Name: Qt
+Varsion : 4.5

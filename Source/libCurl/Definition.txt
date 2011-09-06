@@ -1,0 +1,2 @@
+Name : libcurl
+Varsion : 7.21.7

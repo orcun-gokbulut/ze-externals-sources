@@ -1,0 +1,2 @@
+Name : libAngelScript
+Varsion : 2.21.1
