@@ -3,11 +3,13 @@ cd libogg
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
+xcopy /r /y /e libogg\Output\*.* ..\Output\
 
 cd libzlib
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
+xcopy /r /y /e libzlib\Output\*.* ..\Output\
 
 goto End
 

@@ -19,8 +19,8 @@ cmake -D BUILD_SHARED_LIBS:BOOL=NO  -G "Visual Studio 9 2008" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Release\zlib.lib Output\Lib\Win32\
-move Output\Lib\Win32\zlib.lib Output\Lib\Win32\libzlib.lib
+xcopy /r /y Release\zlib.lib ..\Output\Lib\Win32\
+move ..\Output\Lib\Win32\zlib.lib ..\Output\Lib\Win32\libzlib.lib
 
 :Build64
 cd ..
@@ -32,8 +32,8 @@ cmake -D BUILD_SHARED_LIBS:BOOL=NO  -G "Visual Studio 9 2008 Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Release\zlib.lib Output\Lib\Win64\
-move Output\Lib\Win64\zlib.lib Output\Lib\Win64\libzlib.lib
+xcopy /r /y Release\zlib.lib ..\Output\Lib\Win64\
+move ..\Output\Lib\Win64\zlib.lib ..\Output\Lib\Win64\libzlib.lib
 
 :CopyOutput
 @echo [ZEBuild Externals] Info : Copying output of %ProjectName%.
