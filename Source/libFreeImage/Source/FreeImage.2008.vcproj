@@ -466,19 +466,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Source\FreeImage\PluginCUT.cpp"
-					>
-				</File>
-				<File
 					RelativePath="Source\FreeImage\PluginDDS.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginEXR.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginG3.cpp"
 					>
 				</File>
 				<File
@@ -486,23 +474,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Source\FreeImage\PluginHDR.cpp"
-					>
-				</File>
-				<File
 					RelativePath="Source\FreeImage\PluginICO.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginIFF.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginJ2K.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginJP2.cpp"
 					>
 				</File>
 				<File
@@ -510,27 +482,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Source\FreeImage\PluginKOALA.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginMNG.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginPCD.cpp"
-					>
-				</File>
-				<File
 					RelativePath="Source\FreeImage\PluginPCX.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginPFM.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginPICT.cpp"
 					>
 				</File>
 				<File
@@ -538,23 +490,11 @@
 					>
 				</File>
 				<File
-					RelativePath="Source\FreeImage\PluginPNM.cpp"
-					>
-				</File>
-				<File
 					RelativePath="Source\FreeImage\PluginPSD.cpp"
 					>
 				</File>
 				<File
-					RelativePath="Source\FreeImage\PluginRAS.cpp"
-					>
-				</File>
-				<File
 					RelativePath="Source\FreeImage\PluginRAW.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginSGI.cpp"
 					>
 				</File>
 				<File
@@ -567,14 +507,6 @@
 				</File>
 				<File
 					RelativePath="Source\FreeImage\PluginWBMP.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginXBM.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Source\FreeImage\PluginXPM.cpp"
 					>
 				</File>
 				<File

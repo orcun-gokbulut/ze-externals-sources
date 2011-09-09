@@ -1,12 +1,12 @@
 :Initialization
 @echo off
 @echo [ZEBuild Externals] Info : Building externals.
+call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" 
 
 :CleanUp
 @echo [ZEBuild Externals] Info : Cleaning up externals.
 del /s /q /f Output
 rmdir /s /q Output
-del /q /f Source\zconf.h
 
 :Build
 cd Source
