@@ -41,6 +41,13 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libogg\Output\*.* ..\Output\
 
+cd libPhysX3
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libPhysX3\Output\*.* ..\Output\
+
+
 cd libUnitTestCpp
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -58,11 +65,11 @@ call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libzlib\Output\*.* ..\Output\
+cd..
 
 goto End
 
 :Error
-@echo [ZEBuild Externals] Error : Error occured while building externals. 
 exit /b 1
 
 :End
