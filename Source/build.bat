@@ -11,6 +11,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libAngelScript\Output\*.* ..\Output\
 
+cd libBullet
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libBullet\Output\*.* ..\Output\
+
 cd libCG
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
