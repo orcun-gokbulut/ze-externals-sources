@@ -1,0 +1,14 @@
+#!/bin/sh
+# WARNING: This script assumes CMake 2.8.4+ and GCC/MinGW compiler is installed and available in system PATH.
+# Copyright (C) 2011 LuaDist
+# Redistribution and use of this file is allowed according to the terms of the MIT license.
+# For details see the COPYRIGHT file distributed with LuaDist.
+# Please note that the package source code is licensed under its own license.
+
+REPO=`dirname "$(cd ${0%/*} && echo $PWD/${0##*/})"`
+DEPL=$PWD/_install
+
+echo "NOTE: This will build some LuaDist components TWO times!"
+
+mkdir -p "$DEPL/tmp/install" && cd "$DEPL/tmp/install" && cmake "$REPO" -DCMAKE_INSTALL_PREFIX="$DEPL"
+cmake --build "$DEPL/tmp/install" --target install

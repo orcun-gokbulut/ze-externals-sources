@@ -11,23 +11,27 @@ del /s /q /f Output
 rmdir /s /q Output
 del /q /f Source\zconf.h
 
-:Build
+:Build32
 @echo [ZEBuild Externals] Info : Building %ProjectName%.
 vcbuild /Clean Source\win32\VS2008\libogg_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild Source\win32\VS2008\libogg_static.sln "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Release|x64"
-if %ERRORLEVEL% NEQ 0 GOTO Error
-
-:CopyOutput
-@echo [ZEBuild Externals] Info : Copying output of %ProjectName%.
 xcopy /r /y Source\win32\VS2008\Win32\Release\libogg_static.lib Output\Lib\Win32\
 move  Output\Lib\Win32\libogg_static.lib Output\Lib\Win32\libogg.lib
+xcopy /r /y Source\include\ogg\ogg.h Output\Include\Win32\ogg\
+xcopy /r /y Source\include\ogg\os_types.h Output\Include\Win32\ogg\
+
+:Build64
+@echo [ZEBuild Externals] Info : Copying output of %ProjectName%.
+vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+if %ERRORLEVEL% NEQ 0 GOTO Error
+vcbuild Source\win32\VS2008\libogg_static.sln "Release|x64"
+if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\win32\VS2008\x64\Release\libogg_static.lib Output\Lib\Win64\
 move  Output\Lib\Win64\libogg_static.lib Output\Lib\Win64\libogg.lib
-xcopy /r /y Source\include\ogg\ogg.h Output\Include\ogg\
-xcopy /r /y Source\include\ogg\os_types.h Output\Include\ogg\
+xcopy /r /y Source\include\ogg\ogg.h Output\Include\Win64\ogg\
+xcopy /r /y Source\include\ogg\os_types.h Output\Include\Win64\ogg\
 goto End
 
 :Error

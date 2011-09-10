@@ -1,0 +1,14 @@
+--- This file is part of LuaDist project
+
+name = "md5"
+version = "1.1.2"
+
+desc = "MD5 offers basic cryptographic facilities for Lua 5.1: a hash (digest) function, and a pair crypt/decrypt."
+author = "Roberto Ierusalimschy, Marcela Ozório Suarez, Tomás Guisasola, Fábio Mascarenhas"
+license = "MIT/X11"
+url = "http://www.keplerproject.org/md5/"
+maintainer = "Peter Drahoš"
+
+depends = {
+	"lua ~> 5.1"
+}

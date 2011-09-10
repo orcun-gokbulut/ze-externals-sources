@@ -1,0 +1,14 @@
+--- This file is part of LuaDist project
+
+name = "luafilesystem"
+version = "1.5"
+
+desc = "File System Library for the Lua Programming Language"
+author = "Roberto Ierusalimschy, André Carregal, Tomás Guisasola"
+license = "Kepler"
+url = "http://www.keplerproject.org/luafilesystem/"
+maintainer = "Peter Drahoš"
+
+depends = {
+	"lua ~> 5.1"
+}

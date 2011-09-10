@@ -5,6 +5,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e lib3dsMax\Output\*.* ..\Output\
 
+cd libCurl
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libCurl\Output\*.* ..\Output\
+
 cd libDirectX
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -17,6 +23,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libFreeImage\Output\*.* ..\Output\
 
+cd libLua
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libLua\Output\*.* ..\Output\
+
 cd libogg
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -28,6 +40,12 @@ call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libUnitTestCpp\Output\*.* ..\Output\
+
+cd libVorbis
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libVorbis\Output\*.* ..\Output\
 
 cd libzlib
 call build.bat

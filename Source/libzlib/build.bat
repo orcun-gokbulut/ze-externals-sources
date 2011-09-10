@@ -15,12 +15,14 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D BUILD_SHARED_LIBS:BOOL=NO  -G "Visual Studio 9 2008" ../Source"
+cmake -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Release\zlib.lib ..\Output\Lib\Win32\
 move ..\Output\Lib\Win32\zlib.lib ..\Output\Lib\Win32\libzlib.lib
+xcopy /r /y ..\Source\zlib.h ..\Output\Include\Win32\
+xcopy /r /y .\zconf.h ..\Output\Include\Win32\
 
 :Build64
 cd ..
@@ -28,19 +30,16 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D BUILD_SHARED_LIBS:BOOL=NO  -G "Visual Studio 9 2008 Win64" ../Source"
+cmake -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Release\zlib.lib ..\Output\Lib\Win64\
 move ..\Output\Lib\Win64\zlib.lib ..\Output\Lib\Win64\libzlib.lib
+xcopy /r /y ..\Source\zlib.h ..\Output\Include\Win64\
+xcopy /r /y .\zconf.h ..\Output\Include\Win64\
 
-:CopyOutput
-@echo [ZEBuild Externals] Info : Copying output of %ProjectName%.
-cd ..
-xcopy /r /y Source\zlib.h Output\Include\
-xcopy /r /y Build\zconf.h Output\Include\
-goto End
+goto end
 
 :Error
 cd ..

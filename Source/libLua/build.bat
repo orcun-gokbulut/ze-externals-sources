@@ -1,41 +1,54 @@
 :Initialization
 @echo off
-set ProjectName=libLua
+set ProjectName=liblua
 @echo [ZEBuild Externals] Info : Starting to build external %ProjectName%.
  
 :CleanUp
 @echo [ZEBuild Externals] Info : Cleaning up %ProjectName%.
-del /s /q /f Build
-rmdir /s /q Build
 del /s /q /f Output
 rmdir /s /q Output
-del /q /f Source\zconf.h
 
-:Build
+:Build32
 @echo [ZEBuild Externals] Info : Building %ProjectName%.
-vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+del /s /q /f Build
+rmdir /s /q Build
+mkdir Build
+cd Build
+cmake -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Release|Win32"
+vcbuild liblua_static.vcproj "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\Win32\Release\libogg_static.lib Output\Lib\Win32\
-move  Output\Lib\Win32\libogg_static.lib Output\Lib\Win32\libogg.lib
+xcopy /r /y Release\liblua_static.lib ..\Output\Lib\Win32\
+move ..\Output\Lib\Win32\liblua_static.lib ..\Output\Lib\Win32\liblua.lib
+xcopy /r /y ..\Source\lua\src\lua.h ..\Output\Include\Win32\
+xcopy /r /y ..\Source\lua\src\lualib.h ..\Output\Include\Win32\
+xcopy /r /y ..\Source\lua\src\lauxlib.h ..\Output\Include\Win32\
+xcopy /r /y luaconf.h ..\Output\Include\Win32\
 
 :Build64
-vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+cd ..
+del /s /q /f Build
+rmdir /s /q Build
+mkdir Build
+cd Build
+cmake -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Release|x64"
+vcbuild liblua_static.vcproj "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\x64\Release\libogg_static.lib Output\Lib\Win64\
-move  Output\Lib\Win64\libogg_static.lib Output\Lib\Win64\libogg.lib
-xcopy /r /y Source\include\ogg\ogg.h Output\Include\ogg\
-xcopy /r /y Source\include\ogg\os_types.h Output\Include\ogg\
+xcopy /r /y Release\liblua_static.lib ..\Output\Lib\Win64\
+move ..\Output\Lib\Win64\liblua_static.lib ..\Output\Lib\Win64\liblua.lib
+xcopy /r /y ..\Source\lua\src\lua.h ..\Output\Include\Win64\
+xcopy /r /y ..\Source\lua\src\lualib.h ..\Output\Include\Win64\
+xcopy /r /y ..\Source\lua\src\lauxlib.h ..\Output\Include\Win64\
+xcopy /r /y luaconf.h ..\Output\Include\Win64\
 goto End
 
 :Error
-cd ../../..
+cd ..
 @echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
 exit /b 1
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
+cd ..
 exit /b 0
