@@ -5,6 +5,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e lib3dsMax\Output\*.* ..\Output\
 
+cd libAngelScript
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libAngelScript\Output\*.* ..\Output\
+
 cd libCG
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
