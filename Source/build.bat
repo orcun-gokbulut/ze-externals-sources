@@ -5,6 +5,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e lib3dsMax\Output\*.* ..\Output\
 
+cd libCG
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libCG\Output\*.* ..\Output\
+
 cd libCurl
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -29,7 +35,7 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libLua\Output\*.* ..\Output\
 
-cd libogg
+cd libOGG
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..

@@ -1,0 +1,2 @@
+Name : libCG
+Version : nvidia CG toolkit sdk 2011
