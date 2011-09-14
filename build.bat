@@ -3,6 +3,14 @@
 @echo [ZEBuild Externals] Info : Building externals.
 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" 
 
+set ZE_BUILD_CMAKE=%CD%\Utils\cmake\bin\cmake.exe
+@echo [ZEBuild Externals] CMake path : %ZE_BUILD_CMAKE%
+
+set ZE_BUILD_SCONS=%CD%\Utils\Win\python\Scripts\scons.bat
+@echo [ZEBuild Externals] SCons path : %ZE_BUILD_SCONS%
+
+pause
+
 :CleanUp
 @echo [ZEBuild Externals] Info : Cleaning up externals.
 del /s /q /f Output
