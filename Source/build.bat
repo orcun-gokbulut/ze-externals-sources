@@ -83,6 +83,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libVorbis\Output ..\Output\
 
+cd libvrpn
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libvrpn\Output ..\Output\
+
 cd libzlib
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
