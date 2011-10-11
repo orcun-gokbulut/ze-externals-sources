@@ -41,6 +41,12 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libFreeImage\Output ..\Output\
 
+cd libmpg123
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
+xcopy /r /y /e libmpg123\Output ..\Output\
+
 cd libLua
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
