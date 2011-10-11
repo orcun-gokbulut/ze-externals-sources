@@ -1,6 +1,6 @@
 :Initialization
 @echo off
-set ProjectName=libBullet
+set ProjectName=libAngelScript
 @echo [ZEBuild Externals] Info : Starting to build external %ProjectName%.
  
 :CleanUp
@@ -14,7 +14,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -G "Visual Studio 9 2008" ..\Source\projects\cmake
+%ZE_BUILD_CMAKE% -G "Visual Studio 9 2008" ..\Source\projects\cmake
 if %ERRORLEVEL% NEQ 0 GOTO Error
 
 vcbuild /c AngelScript.sln
@@ -36,7 +36,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -G "Visual Studio 9 2008 Win64" ..\Source\projects\cmake
+%ZE_BUILD_CMAKE% -G "Visual Studio 9 2008 Win64" ..\Source\projects\cmake
 if %ERRORLEVEL% NEQ 0 GOTO Error
 
 vcbuild /c AngelScript.sln

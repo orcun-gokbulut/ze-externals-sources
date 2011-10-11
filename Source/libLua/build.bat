@@ -14,7 +14,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild liblua_static.vcproj "Debug|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -31,7 +31,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild liblua_static.vcproj "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -44,7 +44,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild liblua_static.vcproj "Debug|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -61,7 +61,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild liblua_static.vcproj "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error

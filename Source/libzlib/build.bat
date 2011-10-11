@@ -15,7 +15,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Debug|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -30,7 +30,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -43,7 +43,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Debug|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
@@ -58,7 +58,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild zlib.sln "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error

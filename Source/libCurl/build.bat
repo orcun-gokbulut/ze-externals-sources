@@ -14,7 +14,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -G "Visual Studio 9 2008" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild /c CURL.sln 
 vcbuild CURL.sln "Debug|Win32"
@@ -31,7 +31,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -G "Visual Studio 9 2008" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild /c CURL.sln 
 vcbuild CURL.sln "Release|Win32"
@@ -47,7 +47,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D CURL_STATICLIB:BOOL=YES -D BUILD_CURL_EXE:BOOL=NO -D CMAKE_INSTALL_PREFIX:STRING=./Output -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D BUILD_CURL_EXE:BOOL=NO -D CMAKE_INSTALL_PREFIX:STRING=./Output -G "Visual Studio 9 2008 Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild /c CURL.sln 
 vcbuild CURL.sln "Debug|x64"
@@ -64,7 +64,7 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-cmake -D CURL_STATICLIB:BOOL=YES -D BUILD_CURL_EXE:BOOL=NO -D CMAKE_INSTALL_PREFIX:STRING=./Output -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D BUILD_CURL_EXE:BOOL=NO -D CMAKE_INSTALL_PREFIX:STRING=./Output -G "Visual Studio 9 2008 Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 vcbuild /c CURL.sln 
 vcbuild CURL.sln "Release|x64"
