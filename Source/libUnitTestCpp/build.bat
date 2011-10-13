@@ -24,6 +24,7 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Debug\UnitTest++.vsnet2005.lib Output\Lib\Win32\Debug\
 move  Output\Lib\Win32\Debug\UnitTest++.vsnet2005.lib Output\Lib\Win32\Debug\libUnitTestCpp.lib
 xcopy /r /y Source\src\*.h Output\Include\Win32\UnitTestCpp\
+xcopy /r /y Source\src\Win32\*.h Output\Include\Win32\UnitTestCpp\Win32\
 
 :Build32Release
 vcbuild /Clean Source\UnitTest++.vsnet2005.sln
@@ -42,8 +43,8 @@ vcbuild Source\UnitTest++.vsnet2005.sln "Debug|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\x64\Debug\UnitTest++.vsnet2005.lib Output\Lib\Win64\Debug\
 move  Output\Lib\Win64\Debug\UnitTest++.vsnet2005.lib Output\Lib\Win64\Debug\libUnitTestCpp.lib
-xcopy /r /y Source\src\*.h Output\Include\Win32\UnitTestCpp\
 xcopy /r /y Source\src\*.h Output\Include\Win64\UnitTestCpp\
+xcopy /r /y Source\src\Win32\*.h Output\Include\Win64\UnitTestCpp\Win32\
 
 :Build64Release
 vcbuild /Clean Source\UnitTest++.vsnet2005.sln

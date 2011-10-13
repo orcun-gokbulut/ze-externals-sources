@@ -15,11 +15,12 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\Source\FreeImageLib\FreeImageLib.2008.vcproj "Debug|Win32"
+vcbuild Source\FreeImage.2008.sln "Debug|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimaged.lib Output\Lib\Win32\Debug\
 move  Output\Lib\Win32\Debug\freeimaged.lib Output\Lib\Win32\Debug\libfreeimage.lib
 xcopy /r /y Source\Dist\FreeImage.h Output\Include\Win32\
+xcopy /r /y Source\Dist\freeimaged.dll Output\Dll\Win32\Debug\
 
 :Build32Release
 cd Source
@@ -27,10 +28,11 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\Source\FreeImageLib\FreeImageLib.2008.vcproj "Release|Win32"
+vcbuild Source\FreeImage.2008.sln "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win32\Release\
 move  Output\Lib\Win32\Release\freeimage.lib Output\Lib\Win32\Release\libfreeimage.lib
+xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win32\Release\
 
 :Build64Debug
 cd Source
@@ -38,11 +40,12 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\Source\FreeImageLib\FreeImageLib.2008.vcproj "Debug|x64"
+vcbuild Source\FreeImage.2008.sln "Debug|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimaged.lib Output\Lib\Win64\Debug\
 move  Output\Lib\Win64\Debug\freeimaged.lib Output\Lib\Win64\Debug\libfreeimage.lib
 xcopy /r /y Source\Dist\FreeImage.h Output\Include\Win64\
+xcopy /r /y Source\Dist\freeimaged.dll Output\Dll\Win64\Debug\
 
 :Build64Release
 cd Source
@@ -50,11 +53,11 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\Source\FreeImageLib\FreeImageLib.2008.vcproj "Release|x64"
+vcbuild Source\FreeImage.2008.sln "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\freeimage.lib Output\Lib\Win64\Release\libfreeimage.lib
-
+xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win64\Release\
 goto End
 
 :Error
