@@ -20,7 +20,7 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimaged.lib Output\Lib\Win32\Debug\
 move  Output\Lib\Win32\Debug\freeimaged.lib Output\Lib\Win32\Debug\libfreeimage.lib
 xcopy /r /y Source\Dist\FreeImage.h Output\Include\Win32\
-xcopy /r /y Source\Dist\freeimaged.dll Output\Dll\Win32\Debug\
+xcopy /r /y Source\Dist\freeimaged.dll Output\Dll\Win32\
 
 :Build32Release
 cd Source
@@ -32,7 +32,7 @@ vcbuild Source\FreeImage.2008.sln "Release|Win32"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win32\Release\
 move  Output\Lib\Win32\Release\freeimage.lib Output\Lib\Win32\Release\libfreeimage.lib
-xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win32\Release\
+xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win32\
 
 :Build64Debug
 cd Source
@@ -45,7 +45,7 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimaged.lib Output\Lib\Win64\Debug\
 move  Output\Lib\Win64\Debug\freeimaged.lib Output\Lib\Win64\Debug\libfreeimage.lib
 xcopy /r /y Source\Dist\FreeImage.h Output\Include\Win64\
-xcopy /r /y Source\Dist\freeimaged.dll Output\Dll\Win64\Debug\
+xcopy /r /y Source\Dist\freeimaged.dll Output\Dll\Win64\
 
 :Build64Release
 cd Source
@@ -57,7 +57,7 @@ vcbuild Source\FreeImage.2008.sln "Release|x64"
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\freeimage.lib Output\Lib\Win64\Release\libfreeimage.lib
-xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win64\Release\
+xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win64\
 goto End
 
 :Error
