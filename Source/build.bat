@@ -89,12 +89,6 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libQT\Output ..\Output\
 
-cd libUnitTestCpp
-call build.bat
-if %ERRORLEVEL% NEQ 0 GOTO Error
-cd ..
-xcopy /r /y /e libUnitTestCpp\Output ..\Output\
-
 cd libVorbis
 call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
