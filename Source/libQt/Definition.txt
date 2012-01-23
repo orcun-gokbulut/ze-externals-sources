@@ -1,2 +1,2 @@
 Name: Qt
-Varsion : 4.5
+Version : 4.8.0
