@@ -13,40 +13,36 @@ del /q /f Source\zconf.h
 
 :Build32Debug
 @echo [ZEBuild Externals] Info : Building %ProjectName%.
-vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+msbuild /t:clean Source\win32\VS2010\libogg_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Debug|Win32"
+msbuild Source\win32\VS2010\libogg_static.sln /p:configuration=debug /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\Win32\Debug\libogg_static.lib Output\Lib\Win32\Debug\
-move  Output\Lib\Win32\Debug\libogg_static.lib Output\Lib\Win32\Debug\libogg.lib
+xcopy /r /y Source\win32\VS2010\Win32\Debug\libogg.lib Output\Lib\Win32\Debug\
 xcopy /r /y Source\include\ogg\ogg.h Output\Include\Win32\ogg\
 xcopy /r /y Source\include\ogg\os_types.h Output\Include\Win32\ogg\
 
 :Build32Release
-vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+msbuild /t:clean Source\win32\VS2010\libogg_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Release|Win32"
+msbuild Source\win32\VS2010\libogg_static.sln /p:configuration=release /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\Win32\Release\libogg_static.lib Output\Lib\Win32\Release\
-move  Output\Lib\Win32\Release\libogg_static.lib Output\Lib\Win32\Release\libogg.lib
+xcopy /r /y Source\win32\VS2010\Win32\Release\libogg.lib Output\Lib\Win32\Release\
 
 :Build64Debug
-vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+msbuild /t:clean Source\win32\VS2010\libogg_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Debug|x64"
+msbuild Source\win32\VS2010\libogg_static.sln /p:configuration=debug /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\x64\Debug\libogg_static.lib Output\Lib\Win64\Debug\
-move  Output\Lib\Win64\Debug\libogg_static.lib Output\Lib\Win64\Debug\libogg.lib
+xcopy /r /y Source\win32\VS2010\x64\Debug\libogg.lib Output\Lib\Win64\Debug\
 xcopy /r /y Source\include\ogg\ogg.h Output\Include\Win64\ogg\
 xcopy /r /y Source\include\ogg\os_types.h Output\Include\Win64\ogg\
 
 :Build64Release
-vcbuild /Clean Source\win32\VS2008\libogg_static.sln
+msbuild /t:clean Source\win32\VS2010\libogg_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\libogg_static.sln "Release|x64"
+msbuild Source\win32\VS2010\libogg_static.sln /p:configuration=release /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\x64\Release\libogg_static.lib Output\Lib\Win64\Release\
-move  Output\Lib\Win64\Release\libogg_static.lib Output\Lib\Win64\Release\libogg.lib
+xcopy /r /y Source\win32\VS2010\x64\Release\libogg.lib Output\Lib\Win64\Release\
 
 goto End
 

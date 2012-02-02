@@ -15,7 +15,7 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\FreeImage.2008.sln "Debug|Win32"
+msbuild Source\FreeImage.2008.sln /p:configuration=debug /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimaged.lib Output\Lib\Win32\Debug\
 move  Output\Lib\Win32\Debug\freeimaged.lib Output\Lib\Win32\Debug\libfreeimage.lib
@@ -28,7 +28,7 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\FreeImage.2008.sln "Release|Win32"
+msbuild Source\FreeImage.2008.sln /p:configuration=release /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win32\Release\
 move  Output\Lib\Win32\Release\freeimage.lib Output\Lib\Win32\Release\libfreeimage.lib
@@ -40,7 +40,7 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\FreeImage.2008.sln "Debug|x64"
+msbuild Source\FreeImage.2008.sln  /p:configuration=debug /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimaged.lib Output\Lib\Win64\Debug\
 move  Output\Lib\Win64\Debug\freeimaged.lib Output\Lib\Win64\Debug\libfreeimage.lib
@@ -53,7 +53,7 @@ call Clean.bat
 cd..
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /f Source\Dist
-vcbuild Source\FreeImage.2008.sln "Release|x64"
+msbuild Source\FreeImage.2008.sln /p:configuration=release /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\freeimage.lib Output\Lib\Win64\Release\libfreeimage.lib

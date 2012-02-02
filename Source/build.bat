@@ -29,11 +29,11 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 xcopy /r /y /e libCG\Output ..\Output\
 
-cd libCurl
-call build.bat
-if %ERRORLEVEL% NEQ 0 GOTO Error
-cd ..
-xcopy /r /y /e libCurl\Output ..\Output\
+REM cd libCurl
+REM call build.bat
+REM if %ERRORLEVEL% NEQ 0 GOTO Error
+REM cd ..
+REM xcopy /r /y /e libCurl\Output ..\Output\
 
 cd libDirectX
 call build.bat

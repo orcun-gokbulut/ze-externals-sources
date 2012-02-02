@@ -13,9 +13,10 @@ del /q /f Source\zconf.h
 
 :Build32Debug
 @echo [ZEBuild Externals] Info : Building %ProjectName%.
-vcbuild /Clean Source\ports\MSVC++\2008\mpg123.sln
+del /s /q /f Source\ports\MSVC++\2008\Debug\
+msbuild /t:clean Source\ports\MSVC++\2008\mpg123.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\ports\MSVC++\2008\mpg123.sln "Debug|Win32"
+msbuild Source\ports\MSVC++\2008\mpg123.sln /p:configuration=debug /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\ports\MSVC++\2008\Debug\libmpg123.lib Output\Lib\Win32\Debug\
 xcopy /r /y Source\ports\MSVC++\2008\Debug\libmpg123.dll Output\Dll\Win32\Debug\
@@ -23,29 +24,32 @@ xcopy /r /y Source\src\libmpg123\mpg123.h.in Output\Include\Win32\
 xcopy /r /y Source\ports\MSVC++\mpg123.h Output\Include\Win32\
 
 :Build32Release
-vcbuild /Clean Source\ports\MSVC++\2008\mpg123.sln
+del /s /q /f Source\ports\MSVC++\2008\Release\
+msbuild /t:clean Source\ports\MSVC++\2008\mpg123.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\ports\MSVC++\2008\mpg123.sln "Release|Win32"
+msbuild Source\ports\MSVC++\2008\mpg123.sln /p:configuration=release /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\ports\MSVC++\2008\Release\libmpg123.lib Output\Lib\Win32\Release\
 xcopy /r /y Source\ports\MSVC++\2008\Release\libmpg123.dll Output\Dll\Win32\Release\
 
 :Build64Debug
-vcbuild /Clean Source\ports\MSVC++\2008\mpg123.sln
+del /s /q /f Source\ports\MSVC++\2008\Debug\
+msbuild /t:clean Source\ports\MSVC++\2008\mpg123.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\ports\MSVC++\2008\mpg123.sln "Debug|x64"
+msbuild Source\ports\MSVC++\2008\mpg123.sln /p:configuration=debug /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\ports\MSVC++\2008\Debug\libmpg123.lib Output\Lib\Win64\Debug\
+xcopy /r /y Source\ports\MSVC++\2008\x64\Debug_Generic_Dll\libmpg123.lib Output\Lib\Win64\Debug\
 xcopy /r /y Source\ports\MSVC++\2008\Debug\libmpg123.dll Output\Dll\Win64\Debug\
 xcopy /r /y Source\src\libmpg123\mpg123.h.in Output\Include\Win64\
 xcopy /r /y Source\ports\MSVC++\mpg123.h Output\Include\Win64\
 
 :Build64Release
-vcbuild /Clean Source\ports\MSVC++\2008\mpg123.sln
+del /s /q /f Source\ports\MSVC++\2008\Release\
+msbuild /t:clean Source\ports\MSVC++\2008\mpg123.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\ports\MSVC++\2008\mpg123.sln "Release|x64"
+msbuild Source\ports\MSVC++\2008\mpg123.sln /p:configuration=release /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\ports\MSVC++\2008\Release\libmpg123.lib Output\Lib\Win64\Release\
+xcopy /r /y Source\ports\MSVC++\2008\x64\Release_Generic_Dll\libmpg123.lib Output\Lib\Win64\Release\
 xcopy /r /y Source\ports\MSVC++\2008\Release\libmpg123.dll Output\Dll\Win64\Release\
 
 goto End

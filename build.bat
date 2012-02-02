@@ -1,1 +1,1 @@
-build_base.bat | Utils\Win\tee.exe Build.log
+build_base.bat | Tool\Win\tee.exe Build.log

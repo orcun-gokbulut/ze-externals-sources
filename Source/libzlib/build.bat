@@ -15,9 +15,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild zlib.sln "Debug|Win32"
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Debug\zlibd.lib ..\Output\Lib\Win32\Debug\
 move ..\Output\Lib\Win32\Debug\zlibd.lib ..\Output\Lib\Win32\Debug\libzlib.lib
@@ -30,9 +30,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild zlib.sln "Release|Win32"
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Release\zlib.lib ..\Output\Lib\Win32\Release\
 move ..\Output\Lib\Win32\Release\zlib.lib ..\Output\Lib\Win32\Release\libzlib.lib
@@ -43,9 +43,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild zlib.sln "Debug|x64"
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Debug\zlibd.lib ..\Output\Lib\Win64\Debug\
 move ..\Output\Lib\Win64\Debug\zlibd.lib ..\Output\Lib\Win64\Debug\libzlib.lib
@@ -58,9 +58,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D BUILD_SHARED_LIBS:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild zlib.sln "Release|x64"
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Release\zlib.lib ..\Output\Lib\Win64\Release\
 move ..\Output\Lib\Win64\Release\zlib.lib ..\Output\Lib\Win64\Release\libzlib.lib

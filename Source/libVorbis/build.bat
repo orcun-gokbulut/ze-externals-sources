@@ -13,49 +13,49 @@ del /q /f Source\zconf.h
 
 :Build32Debug
 @echo [ZEBuild Externals] Info : Building %ProjectName%.
-vcbuild /Clean Source\win32\VS2008\vorbis_static.sln
+msbuild /t:clean Source\win32\VS2010\vorbis_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\vorbis_static.sln "Debug|Win32"
+msbuild Source\win32\VS2010\vorbis_static.sln /p:configuration=debug /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\Win32\Debug\libvorbis_static.lib Output\Lib\Win32\Debug\
+xcopy /r /y Source\win32\VS2010\Win32\Debug\libvorbis_static.lib Output\Lib\Win32\Debug\
 move  Output\Lib\Win32\Debug\libvorbis_static.lib Output\Lib\Win32\Debug\libvorbis.lib
-xcopy /r /y Source\win32\VS2008\Win32\Debug\libvorbisfile_static.lib Output\Lib\Win32\Debug\
+xcopy /r /y Source\win32\VS2010\Win32\Debug\libvorbisfile_static.lib Output\Lib\Win32\Debug\
 move  Output\Lib\Win32\Debug\libvorbisfile_static.lib Output\Lib\Win32\Debug\libvorbisfile.lib
 xcopy /r /y Source\include\vorbis\codec.h Output\Include\Win32\vorbis\
 xcopy /r /y Source\include\vorbis\vorbisenc.h Output\Include\Win32\vorbis\
 xcopy /r /y Source\include\vorbis\vorbisfile.h Output\Include\Win32\vorbis\
 
 :Build32Release
-vcbuild /Clean Source\win32\VS2008\vorbis_static.sln
+msbuild /t:clean Source\win32\VS2010\vorbis_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\vorbis_static.sln "Release|Win32"
+msbuild Source\win32\VS2010\vorbis_static.sln /p:configuration=release /p:platform=win32
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\Win32\Release\libvorbis_static.lib Output\Lib\Win32\Release\
+xcopy /r /y Source\win32\VS2010\Win32\Release\libvorbis_static.lib Output\Lib\Win32\Release\
 move  Output\Lib\Win32\Release\libvorbis_static.lib Output\Lib\Win32\Release\libvorbis.lib
-xcopy /r /y Source\win32\VS2008\Win32\Release\libvorbisfile_static.lib Output\Lib\Win32\Release\
+xcopy /r /y Source\win32\VS2010\Win32\Release\libvorbisfile_static.lib Output\Lib\Win32\Release\
 move  Output\Lib\Win32\Release\libvorbisfile_static.lib Output\Lib\Win32\Release\libvorbisfile.lib
 
 :Build64Debug
-vcbuild /Clean Source\win32\VS2008\vorbis_static.sln
+msbuild /t:clean Source\win32\VS2010\vorbis_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\vorbis_static.sln "Debug|x64"
+msbuild Source\win32\VS2010\vorbis_static.sln /p:configuration=debug /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\x64\Debug\libvorbis_static.lib Output\Lib\Win64\Debug\
+xcopy /r /y Source\win32\VS2010\x64\Debug\libvorbis_static.lib Output\Lib\Win64\Debug\
 move  Output\Lib\Win64\Debug\libvorbis_static.lib Output\Lib\Win64\Debug\libvorbis.lib
-xcopy /r /y Source\win32\VS2008\x64\Debug\libvorbisfile_static.lib Output\Lib\Win64\Debug\
+xcopy /r /y Source\win32\VS2010\x64\Debug\libvorbisfile_static.lib Output\Lib\Win64\Debug\
 move  Output\Lib\Win64\Debug\libvorbisfile_static.lib Output\Lib\Win64\Debug\libvorbisfile.lib
 xcopy /r /y Source\include\vorbis\codec.h Output\Include\Win64\vorbis\
 xcopy /r /y Source\include\vorbis\vorbisenc.h Output\Include\Win64\vorbis\
 xcopy /r /y Source\include\vorbis\vorbisfile.h Output\Include\Win64\vorbis\
 
 :Build64Release
-vcbuild /Clean Source\win32\VS2008\vorbis_static.sln
+msbuild /t:clean Source\win32\VS2010\vorbis_static.sln
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild Source\win32\VS2008\vorbis_static.sln "Release|x64"
+msbuild Source\win32\VS2010\vorbis_static.sln /p:configuration=release /p:platform=x64
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Source\win32\VS2008\x64\Release\libvorbis_static.lib Output\Lib\Win64\Release\
+xcopy /r /y Source\win32\VS2010\x64\Release\libvorbis_static.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\libvorbis_static.lib Output\Lib\Win64\Release\libvorbis.lib
-xcopy /r /y Source\win32\VS2008\x64\Release\libvorbisfile_static.lib Output\Lib\Win64\Release\
+xcopy /r /y Source\win32\VS2010\x64\Release\libvorbisfile_static.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\libvorbisfile_static.lib Output\Lib\Win64\Release\libvorbisfile.lib
 goto End
 

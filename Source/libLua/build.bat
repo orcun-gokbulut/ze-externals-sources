@@ -14,9 +14,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild liblua_static.vcproj "Debug|Win32"
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Debug\liblua_static.lib ..\Output\Lib\Win32\Debug\
 move ..\Output\Lib\Win32\Debug\liblua_static.lib ..\Output\Lib\Win32\Debug\liblua.lib
@@ -31,9 +31,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild liblua_static.vcproj "Release|Win32"
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Release\liblua_static.lib ..\Output\Lib\Win32\Release\
 move ..\Output\Lib\Win32\Release\liblua_static.lib ..\Output\Lib\Win32\Release\liblua.lib
@@ -44,9 +44,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild liblua_static.vcproj "Debug|x64"
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Debug\liblua_static.lib ..\Output\Lib\Win64\Debug\
 move ..\Output\Lib\Win64\Debug\liblua_static.lib ..\Output\Lib\Win64\Debug\liblua.lib
@@ -61,9 +61,9 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "Visual Studio 9 2008 Win64" ../Source/Lua"
+%ZE_BUILD_CMAKE% -D LUA_BUILD_AS_DLL:BOOL=NO -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source/Lua"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild liblua_static.vcproj "Release|x64"
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Release\liblua_static.lib ..\Output\Lib\Win64\Release\
 move ..\Output\Lib\Win64\Release\liblua_static.lib ..\Output\Lib\Win64\Release\liblua.lib

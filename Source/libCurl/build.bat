@@ -14,14 +14,12 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -D BUILD_CURL_TESTS:BOOL=0 -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild /c CURL.sln 
-vcbuild CURL.sln "Debug|Win32"
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
+cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-del /q /s Output\include\curl\.svn
 xcopy /r /y /e Output\lib ..\Output\Lib\Win32\Debug\
 xcopy /r /y /e Output\include\curl ..\Output\Include\Win32\curl\
 
@@ -31,12 +29,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -G "Visual Studio 9 2008" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -D BUILD_CURL_TESTS:BOOL=0 -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild /c CURL.sln 
-vcbuild CURL.sln "Release|Win32"
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
+cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /s Output\include\curl\.svn
 xcopy /r /y /e Output\lib ..\Output\Lib\Win32\Release\
@@ -47,12 +44,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D BUILD_CURL_EXE:BOOL=NO -D CMAKE_INSTALL_PREFIX:STRING=./Output -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -D BUILD_CURL_TESTS:BOOL=0 -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild /c CURL.sln 
-vcbuild CURL.sln "Debug|x64"
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
+cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /s Output\include\curl\.svn
 xcopy /r /y /e Output\lib ..\Output\Lib\Win64\Debug\
@@ -64,12 +60,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D BUILD_CURL_EXE:BOOL=NO -D CMAKE_INSTALL_PREFIX:STRING=./Output -G "Visual Studio 9 2008 Win64" ../Source"
+%ZE_BUILD_CMAKE% -D CURL_STATICLIB:BOOL=YES -D CMAKE_INSTALL_PREFIX:STRING=./Output -D BUILD_CURL_EXE:BOOL=NO -D BUILD_CURL_TESTS:BOOL=0 -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source"
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild /c CURL.sln 
-vcbuild CURL.sln "Release|x64"
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
+cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /s Output\include\curl\.svn
 xcopy /r /y /e Output\lib ..\Output\Lib\Win64\Release\

@@ -14,11 +14,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "Visual Studio 9 2008" ../Source
+%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild VRPN.sln "Debug|Win32"
+cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
 xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win32\Debug\vrpn\
 move ..\Output\Lib\Win32\Debug\vrpn\vrpn.lib ..\Output\Lib\Win32\Debug\vrpn\libvrpn.lib
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win32\Debug\vrpn\
@@ -31,11 +31,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "Visual Studio 9 2008" ../Source
+%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "%ZE_BUILD_CMAKE_GENERATOR%" ../Source
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild VRPN.sln "MinSizeRel|Win32"
+cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
 xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win32\Release\vrpn\
 move ..\Output\Lib\Win32\Release\vrpn\vrpn.lib ..\Output\Lib\Win32\Release\vrpn\libvrpn.lib
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win32\Release\vrpn\
@@ -47,11 +47,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "Visual Studio 9 2008 Win64" ../Source
+%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source
+cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild VRPN.sln "Debug|x64"
+cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
 xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win64\Debug\vrpn\
 move ..\Output\Lib\Win64\Debug\vrpn\vrpn.lib ..\Output\Lib\Win64\Debug\vrpn\libvrpn.lib
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win64\Debug\vrpn\
@@ -64,11 +64,11 @@ del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
 cd Build
-%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "Visual Studio 9 2008 Win64" ../Source
+%ZE_BUILD_CMAKE% -D CMAKE_INSTALL_PREFIX:PATH="Output" -D VRPN_BUILD_CLIENTS:BOOL="0" -D VRPN_BUILD_SERVER_LIBRARY:BOOL="0" -D VRPN_BUILD_SERVERS:BOOL="0" -G "%ZE_BUILD_CMAKE_GENERATOR% Win64" ../Source
+cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild VRPN.sln "MinSizeRel|x64"
+cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-vcbuild INSTALL.vcproj
 xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win64\Release\vrpn\
 move ..\Output\Lib\Win64\Release\vrpn\vrpn.lib ..\Output\Lib\Win64\Release\vrpn\libvrpn.lib
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win64\Release\vrpn\
