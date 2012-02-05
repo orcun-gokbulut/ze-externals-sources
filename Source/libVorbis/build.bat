@@ -57,12 +57,14 @@ xcopy /r /y Source\win32\VS2010\x64\Release\libvorbis_static.lib Output\Lib\Win6
 move  Output\Lib\Win64\Release\libvorbis_static.lib Output\Lib\Win64\Release\libvorbis.lib
 xcopy /r /y Source\win32\VS2010\x64\Release\libvorbisfile_static.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\libvorbisfile_static.lib Output\Lib\Win64\Release\libvorbisfile.lib
-goto End
 
-:Error
-@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
-exit /b 1
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
 exit /b 0
+
+:Error
+@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
+exit /b 1

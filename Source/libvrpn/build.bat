@@ -24,9 +24,9 @@ move ..\Output\Lib\Win32\Debug\vrpn\vrpn.lib ..\Output\Lib\Win32\Debug\vrpn\libv
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win32\Debug\vrpn\
 move ..\Output\Lib\Win32\Debug\vrpn\quat.lib ..\Output\Lib\Win32\Debug\vrpn\libquat.lib
 xcopy /r /y Output\include\*.* ..\Output\Include\Win32\vrpn\
+cd ..
 
 :Build32Release
-cd ..
 del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
@@ -40,9 +40,9 @@ xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win32\Release\vrpn\
 move ..\Output\Lib\Win32\Release\vrpn\vrpn.lib ..\Output\Lib\Win32\Release\vrpn\libvrpn.lib
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win32\Release\vrpn\
 move ..\Output\Lib\Win32\Release\vrpn\quat.lib ..\Output\Lib\Win32\Release\vrpn\libquat.lib
+cd ..
 
 :Build64Debug
-cd ..
 del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
@@ -57,9 +57,9 @@ move ..\Output\Lib\Win64\Debug\vrpn\vrpn.lib ..\Output\Lib\Win64\Debug\vrpn\libv
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win64\Debug\vrpn\
 move ..\Output\Lib\Win64\Debug\vrpn\quat.lib ..\Output\Lib\Win64\Debug\vrpn\libquat.lib
 xcopy /r /y Output\include\*.* ..\Output\Include\Win64\vrpn\
+cd ..
 
 :Build64Release
-cd ..
 del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
@@ -73,15 +73,15 @@ xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win64\Release\vrpn\
 move ..\Output\Lib\Win64\Release\vrpn\vrpn.lib ..\Output\Lib\Win64\Release\vrpn\libvrpn.lib
 xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win64\Release\vrpn\
 move ..\Output\Lib\Win64\Release\vrpn\quat.lib ..\Output\Lib\Win64\Release\vrpn\libquat.lib
-
-goto End
-
-:Error
 cd ..
-@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
-exit /b 1
+
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
-cd ..
 exit /b 0
+
+:Error
+@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
+exit /b 1

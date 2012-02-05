@@ -25,7 +25,6 @@ rem xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win32\
 rem move  Output\Lib\Win32\freeimage.lib Output\Lib\Win32\libfreeimage.lib
 rem xcopy /r /y Source\Dist\FreeImage.dll Output\Dll\Win32\
 rem xcopy /r /y Source\Dist\FreeImage.h Output\Include\Win32\
-goto end
 
 :Build64
 xcopy /r /y /e ..\libLua\Output\Lib\Win64\liblua.lib Source\Lib\
@@ -39,12 +38,14 @@ xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win64\
 move  Output\Lib\Win64\freeimage.lib Output\Lib\Win64\libfreeimage.lib
 xcopy /r /y Source\Dist\FreeImage.dll Output\Dll\Win64\
 xcopy /r /y Source\Dist\FreeImage.h Output\Include\Win64\
-goto End
 
-:Error
-@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
-exit /b 1
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
 exit /b 0
+
+:Error
+@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
+exit /b 1

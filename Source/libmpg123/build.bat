@@ -52,13 +52,14 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\ports\MSVC++\2008\x64\Release_Generic_Dll\libmpg123.lib Output\Lib\Win64\Release\
 xcopy /r /y Source\ports\MSVC++\2008\Release\libmpg123.dll Output\Dll\Win64\Release\
 
-goto End
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
+
+:End
+@echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
+exit /b 0
 
 :Error
 cd ../../..
 @echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
 exit /b 1
-
-:End
-@echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
-exit /b 0

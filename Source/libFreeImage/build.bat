@@ -2,7 +2,7 @@
 @echo off
 set ProjectName=libFreeImage
 @echo [ZEBuild Externals] Info : Starting to build external %ProjectName%.
- 
+
 :CleanUp
 @echo [ZEBuild Externals] Info : Cleaning up %ProjectName%.
 del /s /q /f Output
@@ -58,12 +58,14 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\Dist\freeimage.lib Output\Lib\Win64\Release\
 move  Output\Lib\Win64\Release\freeimage.lib Output\Lib\Win64\Release\libfreeimage.lib
 xcopy /r /y Source\Dist\freeimage.dll Output\Dll\Win64\Release\
-goto End
 
-:Error
-@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
-exit /b 1
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
 exit /b 0
+
+:Error
+@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
+exit /b 1

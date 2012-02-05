@@ -22,10 +22,10 @@ cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win32\Release\Bullet\
 xcopy /r /y /e Output\output\include\bullet ..\Output\Include\Win32\Bullet\
+cd ..
 
 :Build32Debug
 @echo [ZEBuild Externals] Info : Building %ProjectName%.
-cd ..
 del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
@@ -37,9 +37,9 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win32\Debug\Bullet\
+cd ..
 
 :Build64Release
-cd ..
 del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
@@ -52,9 +52,9 @@ cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win64\Release\Bullet\
 xcopy /r /y /e Output\output\include\bullet ..\Output\Include\Win64\Bullet\
+cd ..
 
 :Build64Debug
-cd ..
 del /s /q /f Build
 rmdir /s /q Build
 mkdir Build
@@ -66,14 +66,15 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win64\Debug\Bullet\
-goto End
-
-:Error
 cd ..
-@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
-exit /b 1
+
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
-cd ..
 exit /b 0
+
+:Error
+@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
+exit /b 1

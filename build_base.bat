@@ -14,19 +14,16 @@ rmdir /s /q Output
 
 :Build
 cd Source
-call build.bat
+call build_source.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 
-:Gather
-xcopy /r /y /e Source\lib*\Output\*.* Output\
-goto End
+:End
+@echo [ZEBuild Externals] Success : Externals is build successfully.
+pause
+exit /b 0
 
 :Error
 @echo [ZEBuild Externals] Error : Error occured while building externals. 
 pause
 exit /b 1
-
-:End
-@echo [ZEBuild Externals] Success : Externals is build successfully.
-pause

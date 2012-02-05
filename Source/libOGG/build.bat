@@ -44,13 +44,13 @@ msbuild Source\win32\VS2010\libogg_static.sln /p:configuration=release /p:platfo
 if %ERRORLEVEL% NEQ 0 GOTO Error
 xcopy /r /y Source\win32\VS2010\x64\Release\libogg.lib Output\Lib\Win64\Release\
 
-goto End
-
-:Error
-cd ../../..
-@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
-exit /b 1
+:CopyOutput
+xcopy /r /y /e Output ..\..\Output\
 
 :End
 @echo [ZEBuild Externals] Success : %ProjectName% build external is completed successfully.
 exit /b 0
+
+:Error
+@echo [ZEBuild Externals] Error : Error occured while building %ProjectName%. 
+exit /b 1

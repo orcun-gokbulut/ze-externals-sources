@@ -162,11 +162,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\lib\analysis.c" />
     <ClCompile Include="..\..\..\lib\bitrate.c" />
+    <ClCompile Include="..\..\..\lib\bitwise.c" />
     <ClCompile Include="..\..\..\lib\block.c" />
     <ClCompile Include="..\..\..\lib\codebook.c" />
     <ClCompile Include="..\..\..\lib\envelope.c" />
     <ClCompile Include="..\..\..\lib\floor0.c" />
     <ClCompile Include="..\..\..\lib\floor1.c" />
+    <ClCompile Include="..\..\..\lib\framing.c" />
     <ClCompile Include="..\..\..\lib\info.c" />
     <ClCompile Include="..\..\..\lib\lookup.c" />
     <ClCompile Include="..\..\..\lib\lpc.c" />
