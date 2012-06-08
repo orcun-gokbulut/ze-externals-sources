@@ -20,10 +20,10 @@ cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Lib\Win32\Debug\
-move ..\Output\Lib\Win32\Debug\OpenAL32.lib ..\Output\Lib\Win32\Debug\libOpenAL.lib
-xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\DLL\Win32\Debug\
-xcopy /r /y /e Output\include\AL ..\Output\Include\Win32\AL\
+xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Windows\x86\Lib\Debug\
+move ..\Output\Windows\x86\Lib\Debug\OpenAL32.lib ..\Output\Windows\x86\Lib\Debug\libOpenAL.lib
+xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\Windows\x86\Dll\Debug\
+xcopy /r /y /e Output\include\AL ..\Output\Windows\x86\Include\AL\
 cd ..
 
 :Build32
@@ -37,10 +37,10 @@ cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Lib\Win32\Release\
-move ..\Output\Lib\Win32\Release\OpenAL32.lib ..\Output\Lib\Win32\Release\libOpenAL.lib
-xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\DLL\Win32\Release\
-xcopy /r /y /e Output\include\AL ..\Output\Include\Win32\AL\
+xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Windows\x86\Lib\Release\
+move ..\Output\Windows\x86\Lib\Release\OpenAL32.lib ..\Output\Windows\x86\Lib\Release\libOpenAL.lib
+xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\Windows\x86\Dll\Release\
+xcopy /r /y /e Output\include\AL ..\Output\Windows\x86\Include\AL\
 cd ..
 
 :Build64Debug
@@ -54,11 +54,11 @@ cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Lib\Win64\Debug\
-move ..\Output\Lib\Win64\Debug\OpenAL32.lib ..\Output\Lib\Win64\Debug\libOpenAL.lib
-xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\DLL\Win64\Debug\
-move ..\Output\DLL\Win64\Debug\OpenAL32.dll ..\Output\DLL\Win64\Debug\OpenAL64.dll
-xcopy /r /y /e Output\include\AL ..\Output\Include\Win64\AL\
+xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Windows\x64\Lib\Debug\
+move ..\Output\Windows\x64\Lib\Debug\OpenAL32.lib ..\Output\Windows\x64\Lib\Debug\libOpenAL.lib
+xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\Windows\x64\Dll\Debug\
+move ..\Output\Windows\x64\Dll\Debug\OpenAL32.dll ..\Output\Windows\x64\Dll\Debug\OpenAL64.dll
+xcopy /r /y /e Output\include\AL ..\Output\Windows\x64\Include\AL\
 cd ..
 
 :Build64Release
@@ -72,10 +72,10 @@ cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Lib\Win64\Release\
-move ..\Output\Lib\Win64\Release\OpenAL32.lib ..\Output\Lib\Win64\Release\libOpenAL.lib
-xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\DLL\Win64\Release\
-move ..\Output\DLL\Win64\Release\OpenAL32.dll ..\Output\DLL\Win64\Release\OpenAL64.dll
+xcopy /r /y /e Output\lib\OpenAL32.lib ..\Output\Windows\x64\Lib\Release\
+move ..\Output\Windows\x64\Lib\Release\OpenAL32.lib ..\Output\Windows\x64\Lib\Release\libOpenAL.lib
+xcopy /r /y /e Output\bin\OpenAL32.dll ..\Output\Windows\x64\Dll\Release\
+move ..\Output\Windows\x64\Dll\Release\OpenAL32.dll ..\Output\Windows\x64\Dll\Release\OpenAL64.dll
 cd ..
 
 :CopyOutput

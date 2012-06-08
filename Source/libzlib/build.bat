@@ -19,10 +19,10 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Debug\zlibd.lib ..\Output\Lib\Win32\Debug\
-move ..\Output\Lib\Win32\Debug\zlibd.lib ..\Output\Lib\Win32\Debug\libzlib.lib
-xcopy /r /y ..\Source\zlib.h ..\Output\Include\Win32\
-xcopy /r /y .\zconf.h ..\Output\Include\Win32\
+xcopy /r /y Debug\zlibd.lib ..\Output\Windows\x86\Lib\Debug\
+move ..\Output\Windows\x86\Lib\Debug\zlibd.lib ..\Output\Windows\x86\Lib\Debug\libzlib.lib
+xcopy /r /y ..\Source\zlib.h ..\Output\Windows\x86\Include\
+xcopy /r /y .\zconf.h ..\Output\Windows\x86\Include\
 cd ..
 
 :Build32Release
@@ -34,8 +34,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Release\zlib.lib ..\Output\Lib\Win32\Release\
-move ..\Output\Lib\Win32\Release\zlib.lib ..\Output\Lib\Win32\Release\libzlib.lib
+xcopy /r /y Release\zlib.lib ..\Output\Windows\x86\Lib\Release\
+move ..\Output\Windows\x86\Lib\Release\zlib.lib ..\Output\Windows\x86\Lib\Release\libzlib.lib
 cd ..
 
 :Build64Debug
@@ -47,10 +47,10 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Debug\zlibd.lib ..\Output\Lib\Win64\Debug\
-move ..\Output\Lib\Win64\Debug\zlibd.lib ..\Output\Lib\Win64\Debug\libzlib.lib
-xcopy /r /y ..\Source\zlib.h ..\Output\Include\Win64\
-xcopy /r /y .\zconf.h ..\Output\Include\Win64\
+xcopy /r /y Debug\zlibd.lib ..\Output\Windows\x64\Lib\Debug\
+move ..\Output\Windows\x64\Lib\Debug\zlibd.lib ..\Output\Windows\x64\Lib\Debug\libzlib.lib
+xcopy /r /y ..\Source\zlib.h ..\Output\Windows\x64\Include\
+xcopy /r /y .\zconf.h ..\Output\Windows\x64\Include\
 cd ..
 
 :Build64Release
@@ -62,8 +62,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Release\zlib.lib ..\Output\Lib\Win64\Release\
-move ..\Output\Lib\Win64\Release\zlib.lib ..\Output\Lib\Win64\Release\libzlib.lib
+xcopy /r /y Release\zlib.lib ..\Output\Windows\x64\Lib\Release\
+move ..\Output\Windows\x64\Lib\Release\zlib.lib ..\Output\Windows\x64\Lib\Release\libzlib.lib
 cd ..
 
 :CopyOutput

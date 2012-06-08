@@ -18,12 +18,12 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Debug\liblua_static.lib ..\Output\Lib\Win32\Debug\
-move ..\Output\Lib\Win32\Debug\liblua_static.lib ..\Output\Lib\Win32\Debug\liblua.lib
-xcopy /r /y ..\Source\lua\src\lua.h ..\Output\Include\Win32\
-xcopy /r /y ..\Source\lua\src\lualib.h ..\Output\Include\Win32\
-xcopy /r /y ..\Source\lua\src\lauxlib.h ..\Output\Include\Win32\
-xcopy /r /y luaconf.h ..\Output\Include\Win32\
+xcopy /r /y Debug\liblua_static.lib ..\Output\Windows\x86\Lib\Debug\
+move ..\Output\Windows\x86\Lib\Debug\liblua_static.lib ..\Output\Windows\x86\Lib\Debug\liblua.lib
+xcopy /r /y ..\Source\lua\src\lua.h ..\Output\Windows\x86\Include\
+xcopy /r /y ..\Source\lua\src\lualib.h ..\Output\Windows\x86\Include\
+xcopy /r /y ..\Source\lua\src\lauxlib.h ..\Output\Windows\x86\Include\
+xcopy /r /y luaconf.h ..\Output\Windows\x86\Include\
 cd ..
 
 :Build32Release
@@ -35,8 +35,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Release\liblua_static.lib ..\Output\Lib\Win32\Release\
-move ..\Output\Lib\Win32\Release\liblua_static.lib ..\Output\Lib\Win32\Release\liblua.lib
+xcopy /r /y Release\liblua_static.lib ..\Output\Windows\x86\Lib\Release\
+move ..\Output\Windows\x86\Lib\Release\liblua_static.lib ..\Output\Windows\x86\Lib\Release\liblua.lib
 cd ..
 
 :Build64Debug
@@ -48,12 +48,12 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Debug\liblua_static.lib ..\Output\Lib\Win64\Debug\
-move ..\Output\Lib\Win64\Debug\liblua_static.lib ..\Output\Lib\Win64\Debug\liblua.lib
-xcopy /r /y ..\Source\lua\src\lua.h ..\Output\Include\Win64\
-xcopy /r /y ..\Source\lua\src\lualib.h ..\Output\Include\Win64\
-xcopy /r /y ..\Source\lua\src\lauxlib.h ..\Output\Include\Win64\
-xcopy /r /y luaconf.h ..\Output\Include\Win64\
+xcopy /r /y Debug\liblua_static.lib ..\Output\Windows\x64\Lib\Debug\
+move ..\Output\Windows\x64\Lib\Debug\liblua_static.lib ..\Output\Windows\x64\Lib\Debug\liblua.lib
+xcopy /r /y ..\Source\lua\src\lua.h ..\Output\Windows\x64\Include\
+xcopy /r /y ..\Source\lua\src\lualib.h ..\Output\Windows\x64\Include\
+xcopy /r /y ..\Source\lua\src\lauxlib.h ..\Output\Windows\x64\Include\
+xcopy /r /y luaconf.h ..\Output\Windows\x64\Include\
 cd ..
 
 :Build64Release
@@ -65,8 +65,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Release\liblua_static.lib ..\Output\Lib\Win64\Release\
-move ..\Output\Lib\Win64\Release\liblua_static.lib ..\Output\Lib\Win64\Release\liblua.lib
+xcopy /r /y Release\liblua_static.lib ..\Output\Windows\x64\Lib\Release\
+move ..\Output\Windows\x64\Lib\Release\liblua_static.lib ..\Output\Windows\x64\Lib\Release\liblua.lib
 cd ..
 
 :CopyOutput

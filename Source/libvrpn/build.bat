@@ -19,11 +19,11 @@ cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win32\Debug\vrpn\
-move ..\Output\Lib\Win32\Debug\vrpn\vrpn.lib ..\Output\Lib\Win32\Debug\vrpn\libvrpn.lib
-xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win32\Debug\vrpn\
-move ..\Output\Lib\Win32\Debug\vrpn\quat.lib ..\Output\Lib\Win32\Debug\vrpn\libquat.lib
-xcopy /r /y Output\include\*.* ..\Output\Include\Win32\vrpn\
+xcopy /r /y Output\lib\vrpn.lib ..\Output\Windows\x86\Lib\Debug\vrpn\
+move ..\Output\Windows\x86\Lib\Debug\vrpn\vrpn.lib ..\Output\Windows\x86\Lib\Debug\vrpn\libvrpn.lib
+xcopy /r /y Output\lib\quat.lib ..\Output\Windows\x86\Lib\Debug\vrpn\
+move ..\Output\Windows\x86\Lib\Debug\vrpn\quat.lib ..\Output\Windows\x86\Lib\Debug\vrpn\libquat.lib
+xcopy /r /y Output\include\*.* ..\Output\Windows\x86\Include\vrpn\
 cd ..
 
 :Build32Release
@@ -36,10 +36,10 @@ cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win32\Release\vrpn\
-move ..\Output\Lib\Win32\Release\vrpn\vrpn.lib ..\Output\Lib\Win32\Release\vrpn\libvrpn.lib
-xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win32\Release\vrpn\
-move ..\Output\Lib\Win32\Release\vrpn\quat.lib ..\Output\Lib\Win32\Release\vrpn\libquat.lib
+xcopy /r /y Output\lib\vrpn.lib ..\Output\Windows\x86\Lib\Release\vrpn\
+move ..\Output\Windows\x86\Lib\\Release\vrpn\vrpn.lib ..\Output\Windows\x86\Lib\Release\vrpn\libvrpn.lib
+xcopy /r /y Output\lib\quat.lib ..\Output\Windows\x86\Lib\Release\vrpn\
+move ..\Output\Windows\x86\Lib\Release\vrpn\quat.lib ..\Output\Windows\x86\Lib\Release\vrpn\libquat.lib
 cd ..
 
 :Build64Debug
@@ -52,11 +52,11 @@ cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win64\Debug\vrpn\
-move ..\Output\Lib\Win64\Debug\vrpn\vrpn.lib ..\Output\Lib\Win64\Debug\vrpn\libvrpn.lib
-xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win64\Debug\vrpn\
-move ..\Output\Lib\Win64\Debug\vrpn\quat.lib ..\Output\Lib\Win64\Debug\vrpn\libquat.lib
-xcopy /r /y Output\include\*.* ..\Output\Include\Win64\vrpn\
+xcopy /r /y Output\lib\vrpn.lib ..\Output\Windows\x64\Lib\Debug\vrpn\
+move ..\Output\Windows\x64\Lib\Debug\vrpn\vrpn.lib ..\Output\Windows\x64\Lib\Debug\vrpn\libvrpn.lib
+xcopy /r /y Output\lib\quat.lib ..\Output\Windows\x64\Lib\Debug\vrpn\
+move ..\Output\Windows\x64\Lib\Debug\vrpn\quat.lib ..\Output\Windows\x64\Lib\Debug\vrpn\libquat.lib
+xcopy /r /y Output\include\*.* ..\Output\Windows\x64\Include\vrpn\
 cd ..
 
 :Build64Release
@@ -69,10 +69,10 @@ cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y Output\lib\vrpn.lib ..\Output\Lib\Win64\Release\vrpn\
-move ..\Output\Lib\Win64\Release\vrpn\vrpn.lib ..\Output\Lib\Win64\Release\vrpn\libvrpn.lib
-xcopy /r /y Output\lib\quat.lib ..\Output\Lib\Win64\Release\vrpn\
-move ..\Output\Lib\Win64\Release\vrpn\quat.lib ..\Output\Lib\Win64\Release\vrpn\libquat.lib
+xcopy /r /y Output\lib\vrpn.lib ..\Output\Windows\x64\Lib\Release\vrpn\
+move ..\Output\Windows\x64\Lib\Release\vrpn\vrpn.lib ..\Output\Windows\x64\Lib\Release\vrpn\libvrpn.lib
+xcopy /r /y Output\lib\quat.lib ..\Output\Windows\x64\Lib\Release\vrpn\
+move ..\Output\Windows\x64\Lib\Release\vrpn\quat.lib ..\Output\Windows\x64\Lib\Release\vrpn\libquat.lib
 cd ..
 
 :CopyOutput
