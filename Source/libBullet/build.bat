@@ -20,8 +20,8 @@ cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win32\Release\Bullet\
-xcopy /r /y /e Output\output\include\bullet ..\Output\Include\Win32\Bullet\
+xcopy /r /y /e Output\lib\*.lib ..\Output\Windows\x86\Lib\Release\Bullet\
+xcopy /r /y /e Output\output\include\bullet ..\Output\Windows\x86\Include\Bullet\
 cd ..
 
 :Build32Debug
@@ -36,7 +36,7 @@ cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win32\Debug\Bullet\
+xcopy /r /y /e Output\lib\*.lib ..\Output\Windows\x86\Lib\Debug\Bullet\
 cd ..
 
 :Build64Release
@@ -50,8 +50,8 @@ cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win64\Release\Bullet\
-xcopy /r /y /e Output\output\include\bullet ..\Output\Include\Win64\Bullet\
+xcopy /r /y /e Output\lib\*.lib ..\Output\Windows\x64\Lib\Release\Bullet\
+xcopy /r /y /e Output\output\include\bullet ..\Output\Windows\x64\Include\Bullet\
 cd ..
 
 :Build64Debug
@@ -65,7 +65,7 @@ cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --target install
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib\*.lib ..\Output\Lib\Win64\Debug\Bullet\
+xcopy /r /y /e Output\lib\*.lib ..\Output\Windows\x64\Lib\Debug\Bullet\
 cd ..
 
 :CopyOutput

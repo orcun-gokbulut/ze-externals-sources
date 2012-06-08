@@ -20,14 +20,14 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y lib\Release\Angelscript.lib ..\Output\Lib\Win32\Release\
-move ..\Output\Lib\Win32\Release\Angelscript.lib ..\Output\Lib\Win32\Release\libAngelscript.lib
-xcopy /r /y ..\Source\include\angelscript.h ..\Output\Include\Win32\
+xcopy /r /y lib\Release\Angelscript.lib ..\Output\Windows\x86\Lib\Release\
+move ..\Output\Windows\Lib\x86\Release\Angelscript.lib ..\Output\Windows\x86\Lib\Release\libAngelscript.lib
+xcopy /r /y ..\Source\include\angelscript.h ..\Output\Windows\x86\Include\
 
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y lib\Debug\Angelscript.lib ..\Output\Lib\Win32\Debug\
-move ..\Output\Lib\Win32\Debug\Angelscript.lib ..\Output\Lib\Win32\Debug\libAngelscript.lib
+xcopy /r /y lib\Debug\Angelscript.lib ..\Output\Windows\x86\Lib\Debug\
+move ..\Output\Windows\Lib\x86\Debug\Angelscript.lib ..\Output\Windows\x86\Lib\Debug\libAngelscript.lib
 cd ..
 
 :Build64
@@ -41,14 +41,14 @@ if %ERRORLEVEL% NEQ 0 GOTO Error
 
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y lib\Release\Angelscript.lib ..\Output\Lib\Win64\Release\
-move ..\Output\Lib\Win64\Release\Angelscript.lib ..\Output\Lib\Win64\Release\libAngelscript.lib
-xcopy /r /y ..\Source\include\angelscript.h ..\Output\Include\Win64\
+xcopy /r /y lib\Release\Angelscript.lib ..\Output\Windows\x64\Lib\Release\
+move ..\Output\Windows\Lib\x64\Release\Angelscript.lib ..\Output\Windows\x64\Lib\Release\libAngelscript.lib
+xcopy /r /y ..\Source\include\angelscript.h ..\Output\Windows\x64\Include\
 
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y lib\Debug\Angelscript.lib ..\Output\Lib\Win64\Debug\
-move ..\Output\Lib\Win64\Debug\Angelscript.lib ..\Output\Lib\Win64\Debug\libAngelscript.lib
+xcopy /r /y lib\Debug\Angelscript.lib ..\Output\Windows\x64\Lib\Debug\
+move ..\Output\Windows\Lib\x64\Debug\Angelscript.lib ..\Output\Windows\x64\Lib\Debug\libAngelscript.lib
 cd ..
 
 :CopyOutput
