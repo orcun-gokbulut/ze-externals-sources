@@ -150,6 +150,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\amigaos.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\asyn-ares.c
 # End Source File
 # Begin Source File
@@ -190,7 +194,27 @@ SOURCE=.\curl_gethostname.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\curl_gssapi.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\curl_memrchr.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm_core.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm_msgs.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm_wb.c
 # End Source File
 # Begin Source File
 
@@ -307,10 +331,6 @@ SOURCE=.\http_negotiate.c
 # Begin Source File
 
 SOURCE=.\http_negotiate_sspi.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\http_ntlm.c
 # End Source File
 # Begin Source File
 
@@ -538,6 +558,10 @@ SOURCE=.\wildcard.c
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\amigaos.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\arpa_telnet.h
 # End Source File
 # Begin Source File
@@ -582,6 +606,10 @@ SOURCE=.\curl_gethostname.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\curl_gssapi.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\curl_hmac.h
 # End Source File
 # Begin Source File
@@ -603,6 +631,22 @@ SOURCE=.\curl_memory.h
 # Begin Source File
 
 SOURCE=.\curl_memrchr.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm_core.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm_msgs.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\curl_ntlm_wb.h
 # End Source File
 # Begin Source File
 
@@ -695,10 +739,6 @@ SOURCE=.\http.h
 # Begin Source File
 
 SOURCE=.\http_negotiate.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\http_ntlm.h
 # End Source File
 # Begin Source File
 

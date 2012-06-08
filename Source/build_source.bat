@@ -24,10 +24,10 @@ call build.bat
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cd ..
 
-REM cd libCurl
-REM call build.bat
-REM if %ERRORLEVEL% NEQ 0 GOTO Error
-REM cd ..
+cd libCurl
+call build.bat
+if %ERRORLEVEL% NEQ 0 GOTO Error
+cd ..
 
 cd libDirectX
 call build.bat

@@ -56,7 +56,8 @@ p.roffit {
 <p class="level0"><a name="CURLINFOEFFECTIVEURL"></a><span class="nroffip">CURLINFO_EFFECTIVE_URL</span> 
 <p class="level1">Pass a pointer to a char pointer to receive the last used effective URL. 
 <p class="level0"><a name="CURLINFORESPONSECODE"></a><span class="nroffip">CURLINFO_RESPONSE_CODE</span> 
-<p class="level1">Pass a pointer to a long to receive the last received HTTP or FTP code. This option was known as CURLINFO_HTTP_CODE in libcurl 7.10.7 and earlier. This will be zero if no server response code has been received. Note that a proxy's CONNECT response should be read with <a class="emphasis" href="#CURLINFOHTTPCONNECTCODE">CURLINFO_HTTP_CONNECTCODE</a> and not this. 
+<p class="level1">Pass a pointer to a long to receive the last received HTTP, FTP or SMTP response code. This option was previously known as CURLINFO_HTTP_CODE in libcurl 7.10.7 and earlier. The value will be zero if no server response code has been received. Note that a proxy's CONNECT response should be read with <a class="emphasis" href="#CURLINFOHTTPCONNECTCODE">CURLINFO_HTTP_CONNECTCODE</a> and not this. 
+<p class="level1">Support for SMTP responses added in 7.25.0. 
 <p class="level0"><a name="CURLINFOHTTPCONNECTCODE"></a><span class="nroffip">CURLINFO_HTTP_CONNECTCODE</span> 
 <p class="level1">Pass a pointer to a long to receive the last received proxy response code to a CONNECT request. 
 <p class="level0"><a name="CURLINFOFILETIME"></a><span class="nroffip">CURLINFO_FILETIME</span> 

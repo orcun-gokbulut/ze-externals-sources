@@ -18,10 +18,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-cmake --build . --config debug --target install
-if %ERRORLEVEL% NEQ 0 GOTO Error
-xcopy /r /y /e Output\lib ..\Output\Lib\Win32\Debug\
-xcopy /r /y /e Output\include\curl ..\Output\Include\Win32\curl\
+xcopy /r /y /e lib\Debug ..\Output\Windows\x86\Lib\Debug\
+xcopy /r /y /e ..\Source\include\curl\* ..\Output\Windows\x86\Include\curl\
 cd..
 
 :Build32Release
@@ -33,10 +31,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-cmake --build . --config release --target install
-if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /s Output\include\curl\.svn
-xcopy /r /y /e Output\lib ..\Output\Lib\Win32\Release\
+xcopy /r /y /e lib\Release ..\Output\Windows\x86\Lib\Release\
 cd ..
 
 :Build64Debug
@@ -48,11 +44,9 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config debug --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-cmake --build . --config debug --target install
-if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /s Output\include\curl\.svn
-xcopy /r /y /e Output\lib ..\Output\Lib\Win64\Debug\
-xcopy /r /y /e Output\include\curl ..\Output\Include\Win64\curl\
+xcopy /r /y /e lib\Debug ..\Output\Windows\x64\Lib\Debug\
+xcopy /r /y /e ..\Source\include\curl\* ..\Output\Windows\x64\Include\curl\
 cd ..
 
 :Build64Release
@@ -64,10 +58,8 @@ cd Build
 if %ERRORLEVEL% NEQ 0 GOTO Error
 cmake --build . --config release --clean-first
 if %ERRORLEVEL% NEQ 0 GOTO Error
-cmake --build . --config release --target install
-if %ERRORLEVEL% NEQ 0 GOTO Error
 del /q /s Output\include\curl\.svn
-xcopy /r /y /e Output\lib ..\Output\Lib\Win64\Release\
+xcopy /r /y /e lib\Release ..\Output\Windows\x64\Lib\Release\
 cd ..
 
 :CopyOutput

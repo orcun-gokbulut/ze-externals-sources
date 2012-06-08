@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -32,7 +32,7 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
 # $(top_builddir)/src is for curl's generated src/curl_config.h file
 # $(top_srcdir)/lib is for libcurl's lib/setup.h and other "borrowed" files
-# $(top_srcdir)/src is for curl's src/setup.h and "curl-private" files
+# $(top_srcdir)/src is for curl's src/tool_setup.h and "curl-private" files
 
 INCLUDES = -I$(top_builddir)/include/curl \
            -I$(top_builddir)/include      \
@@ -43,6 +43,11 @@ INCLUDES = -I$(top_builddir)/include/curl \
            -I$(top_srcdir)/src
 
 bin_PROGRAMS = curl
+
+# Mostly for Windows build targets, when using static libcurl
+if USE_CPPFLAG_CURL_STATICLIB
+AM_CPPFLAGS = -DCURL_STATICLIB
+endif
 
 include Makefile.inc
 
@@ -58,9 +63,9 @@ CLEANFILES = hugehelp.c
 NROFF=env LC_ALL=C @NROFF@ @MANOPT@ # figured out by the configure script
 
 EXTRA_DIST = mkhelp.pl makefile.dj Makefile.vc6 Makefile.b32 Makefile.m32 \
-	curl_config.h.in macos/curl.mcp.xml.sit.hqx			  \
+	macos/curl.mcp.xml.sit.hqx                                        \
 	macos/MACINSTALL.TXT macos/src/curl_GUSIConfig.cpp vc6curlsrc.dsp \
-	macos/src/macos_main.cpp config-amigaos.h makefile.amiga curl.rc  \
+	macos/src/macos_main.cpp makefile.amiga curl.rc                   \
 	Makefile.netware Makefile.inc Makefile.Watcom vc6curlsrc.dsw      \
 	CMakeLists.txt
 
@@ -75,7 +80,7 @@ if USE_MANUAL
 if HAVE_LIBZ
 # This generates the hugehelp.c file in both uncompressed and compressed formats
 $(HUGE): $(README) $(MANPAGE)  mkhelp.pl
-	echo '#include "setup.h"' > $(HUGE)
+	echo '#include "tool_setup.h"' > $(HUGE)
 	echo '#ifndef HAVE_LIBZ' >> $(HUGE)
 	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) $(README) >> $(HUGE)
 	echo '#else' >> $(HUGE)
@@ -84,7 +89,7 @@ $(HUGE): $(README) $(MANPAGE)  mkhelp.pl
 else # HAVE_LIBZ
 # This generates the hugehelp.c file uncompressed only
 $(HUGE): $(README) $(MANPAGE)  mkhelp.pl
-	echo '#include "setup.h"' > $(HUGE)
+	echo '#include "tool_setup.h"' > $(HUGE)
 	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) $(README) >> $(HUGE)
 endif
 

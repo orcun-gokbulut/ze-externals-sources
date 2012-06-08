@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -27,6 +27,7 @@
 #  ifdef __VMS
      typedef int intptr_t;
 #  endif
+#  include <stdint.h>
 #  include <unistd.h>
 #endif
 #include <sys/types.h>
@@ -87,12 +88,16 @@ static curlioerr my_ioctl(CURL *handle, curliocmd cmd, void *userp)
 static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   size_t retcode;
+  curl_off_t nread;
 
   intptr_t fd = (intptr_t)stream;
 
   retcode = read(fd, ptr, size * nmemb);
 
-  fprintf(stderr, "*** We read %d bytes from file\n", retcode);
+  nread = (curl_off_t)retcode;
+
+  fprintf(stderr, "*** We read %" CURL_FORMAT_CURL_OFF_T
+          " bytes from file\n", nread);
 
   return retcode;
 }

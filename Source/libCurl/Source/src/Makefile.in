@@ -47,7 +47,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = curl$(EXEEXT)
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/Makefile.inc $(srcdir)/curl_config.h.in
+	$(srcdir)/Makefile.inc
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/curl-compilers.m4 \
@@ -59,21 +59,36 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/curl-compilers.m4 \
 	$(top_srcdir)/m4/curl-system.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/xc-translit.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/m4/xc-translit.m4 \
+	$(top_srcdir)/m4/zz50-xc-ovr.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/lib/curl_config.h curl_config.h \
+CONFIG_HEADER = $(top_builddir)/lib/curl_config.h \
 	$(top_builddir)/include/curl/curlbuild.h
 CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = main.$(OBJEXT) hugehelp.$(OBJEXT) urlglob.$(OBJEXT) \
-	writeout.$(OBJEXT) writeenv.$(OBJEXT) getpass.$(OBJEXT) \
-	homedir.$(OBJEXT) curlutil.$(OBJEXT) os-specific.$(OBJEXT) \
-	xattr.$(OBJEXT)
+am__objects_1 = hugehelp.$(OBJEXT) tool_binmode.$(OBJEXT) \
+	tool_bname.$(OBJEXT) tool_cb_dbg.$(OBJEXT) \
+	tool_cb_hdr.$(OBJEXT) tool_cb_prg.$(OBJEXT) \
+	tool_cb_rea.$(OBJEXT) tool_cb_see.$(OBJEXT) \
+	tool_cb_wrt.$(OBJEXT) tool_cfgable.$(OBJEXT) \
+	tool_convert.$(OBJEXT) tool_dirhie.$(OBJEXT) \
+	tool_doswin.$(OBJEXT) tool_easysrc.$(OBJEXT) \
+	tool_formparse.$(OBJEXT) tool_getparam.$(OBJEXT) \
+	tool_getpass.$(OBJEXT) tool_help.$(OBJEXT) \
+	tool_helpers.$(OBJEXT) tool_homedir.$(OBJEXT) \
+	tool_libinfo.$(OBJEXT) tool_main.$(OBJEXT) \
+	tool_mfiles.$(OBJEXT) tool_msgs.$(OBJEXT) \
+	tool_operate.$(OBJEXT) tool_operhlp.$(OBJEXT) \
+	tool_panykey.$(OBJEXT) tool_paramhlp.$(OBJEXT) \
+	tool_parsecfg.$(OBJEXT) tool_setopt.$(OBJEXT) \
+	tool_sleep.$(OBJEXT) tool_urlglob.$(OBJEXT) \
+	tool_util.$(OBJEXT) tool_vms.$(OBJEXT) tool_writeenv.$(OBJEXT) \
+	tool_writeout.$(OBJEXT) tool_xattr.$(OBJEXT)
 am__objects_2 = strtoofft.$(OBJEXT) strdup.$(OBJEXT) rawstr.$(OBJEXT) \
 	nonblock.$(OBJEXT)
 am__objects_3 =
@@ -114,6 +129,7 @@ CCDEPMODE = @CCDEPMODE@
 
 # This might hold -Werror
 CFLAGS = @CFLAGS@ @CURL_CFLAG_EXTRAS@
+CFLAG_CURL_SYMBOL_HIDING = @CFLAG_CURL_SYMBOL_HIDING@
 CONFIGURE_OPTIONS = @CONFIGURE_OPTIONS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -144,6 +160,10 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
+DOING_CURL_SYMBOL_HIDING_FALSE = @DOING_CURL_SYMBOL_HIDING_FALSE@
+DOING_CURL_SYMBOL_HIDING_TRUE = @DOING_CURL_SYMBOL_HIDING_TRUE@
+DOING_NATIVE_WINDOWS_FALSE = @DOING_NATIVE_WINDOWS_FALSE@
+DOING_NATIVE_WINDOWS_TRUE = @DOING_NATIVE_WINDOWS_TRUE@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -159,7 +179,7 @@ HAVE_LDAP_SSL = @HAVE_LDAP_SSL@
 HAVE_LIBZ = @HAVE_LIBZ@
 HAVE_LIBZ_FALSE = @HAVE_LIBZ_FALSE@
 HAVE_LIBZ_TRUE = @HAVE_LIBZ_TRUE@
-HAVE_PK11_CREATEGENERICOBJECT = @HAVE_PK11_CREATEGENERICOBJECT@
+HAVE_NSS_INITCONTEXT = @HAVE_NSS_INITCONTEXT@
 HAVE_SSLEAY_SRP = @HAVE_SSLEAY_SRP@
 IDN_ENABLED = @IDN_ENABLED@
 INSTALL_DATA = @INSTALL_DATA@
@@ -219,18 +239,21 @@ SHELL = @SHELL@
 SONAME_BUMP_FALSE = @SONAME_BUMP_FALSE@
 SONAME_BUMP_TRUE = @SONAME_BUMP_TRUE@
 SSL_ENABLED = @SSL_ENABLED@
-STATICLIB_FALSE = @STATICLIB_FALSE@
-STATICLIB_TRUE = @STATICLIB_TRUE@
 STRIP = @STRIP@
 SUPPORT_FEATURES = @SUPPORT_FEATURES@
 SUPPORT_PROTOCOLS = @SUPPORT_PROTOCOLS@
 TEST_SERVER_LIBS = @TEST_SERVER_LIBS@
 USE_ARES = @USE_ARES@
 USE_AXTLS = @USE_AXTLS@
+USE_CPPFLAG_BUILDING_LIBCURL_FALSE = @USE_CPPFLAG_BUILDING_LIBCURL_FALSE@
+USE_CPPFLAG_BUILDING_LIBCURL_TRUE = @USE_CPPFLAG_BUILDING_LIBCURL_TRUE@
+USE_CPPFLAG_CURL_STATICLIB_FALSE = @USE_CPPFLAG_CURL_STATICLIB_FALSE@
+USE_CPPFLAG_CURL_STATICLIB_TRUE = @USE_CPPFLAG_CURL_STATICLIB_TRUE@
 USE_CYASSL = @USE_CYASSL@
 USE_EMBEDDED_ARES_FALSE = @USE_EMBEDDED_ARES_FALSE@
 USE_EMBEDDED_ARES_TRUE = @USE_EMBEDDED_ARES_TRUE@
 USE_GNUTLS = @USE_GNUTLS@
+USE_GNUTLS_NETTLE = @USE_GNUTLS_NETTLE@
 USE_LIBRTMP = @USE_LIBRTMP@
 USE_LIBSSH2 = @USE_LIBSSH2@
 USE_MANUAL_FALSE = @USE_MANUAL_FALSE@
@@ -241,6 +264,9 @@ USE_POLARSSL = @USE_POLARSSL@
 USE_SSLEAY = @USE_SSLEAY@
 USE_WINDOWS_SSPI = @USE_WINDOWS_SSPI@
 VERSION = @VERSION@
+VERSIONED_FLAVOUR = @VERSIONED_FLAVOUR@
+VERSIONED_SYMBOLS_FALSE = @VERSIONED_SYMBOLS_FALSE@
+VERSIONED_SYMBOLS_TRUE = @VERSIONED_SYMBOLS_TRUE@
 VERSIONNUM = @VERSIONNUM@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -297,7 +323,7 @@ target_alias = @target_alias@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -324,7 +350,7 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
 # $(top_builddir)/src is for curl's generated src/curl_config.h file
 # $(top_srcdir)/lib is for libcurl's lib/setup.h and other "borrowed" files
-# $(top_srcdir)/src is for curl's src/setup.h and "curl-private" files
+# $(top_srcdir)/src is for curl's src/tool_setup.h and "curl-private" files
 INCLUDES = -I$(top_builddir)/include/curl \
            -I$(top_builddir)/include      \
            -I$(top_srcdir)/include        \
@@ -334,6 +360,9 @@ INCLUDES = -I$(top_builddir)/include/curl \
            -I$(top_srcdir)/src
 
 
+# Mostly for Windows build targets, when using static libcurl
+@USE_CPPFLAG_CURL_STATICLIB_TRUE@AM_CPPFLAGS = -DCURL_STATICLIB
+
 # libcurl has sources that provide functions named curlx_* that aren't part of
 # the official API, but we re-use the code here to avoid duplication.
 CURLX_ONES = $(top_srcdir)/lib/strtoofft.c \
@@ -341,13 +370,84 @@ CURLX_ONES = $(top_srcdir)/lib/strtoofft.c \
 	$(top_srcdir)/lib/rawstr.c \
 	$(top_srcdir)/lib/nonblock.c
 
-CURL_CFILES = main.c hugehelp.c urlglob.c writeout.c writeenv.c \
-	getpass.c homedir.c curlutil.c os-specific.c xattr.c
+CURL_CFILES = hugehelp.c \
+	tool_binmode.c \
+	tool_bname.c \
+	tool_cb_dbg.c \
+	tool_cb_hdr.c \
+	tool_cb_prg.c \
+	tool_cb_rea.c \
+	tool_cb_see.c \
+	tool_cb_wrt.c \
+	tool_cfgable.c \
+	tool_convert.c \
+	tool_dirhie.c \
+	tool_doswin.c \
+	tool_easysrc.c \
+	tool_formparse.c \
+	tool_getparam.c \
+	tool_getpass.c \
+	tool_help.c \
+	tool_helpers.c \
+	tool_homedir.c \
+	tool_libinfo.c \
+	tool_main.c \
+	tool_mfiles.c \
+	tool_msgs.c \
+	tool_operate.c \
+	tool_operhlp.c \
+	tool_panykey.c \
+	tool_paramhlp.c \
+	tool_parsecfg.c \
+	tool_setopt.c \
+	tool_sleep.c \
+	tool_urlglob.c \
+	tool_util.c \
+	tool_vms.c \
+	tool_writeenv.c \
+	tool_writeout.c \
+	tool_xattr.c
 
-CURL_HFILES = hugehelp.h setup.h config-win32.h config-mac.h \
-	config-riscos.h urlglob.h version.h os-specific.h \
-	writeout.h writeenv.h getpass.h homedir.h curlutil.h \
-	xattr.h
+CURL_HFILES = hugehelp.h \
+	tool_binmode.h \
+	tool_bname.h \
+	tool_cb_dbg.h \
+	tool_cb_hdr.h \
+	tool_cb_prg.h \
+	tool_cb_rea.h \
+	tool_cb_see.h \
+	tool_cb_wrt.h \
+	tool_cfgable.h \
+	tool_convert.h \
+	tool_dirhie.h \
+	tool_doswin.h \
+	tool_easysrc.h \
+	tool_formparse.h \
+	tool_getparam.h \
+	tool_getpass.h \
+	tool_help.h \
+	tool_helpers.h \
+	tool_homedir.h \
+	tool_libinfo.h \
+	tool_main.h \
+	tool_mfiles.h \
+	tool_msgs.h \
+	tool_operate.h \
+	tool_operhlp.h \
+	tool_panykey.h \
+	tool_paramhlp.h \
+	tool_parsecfg.h \
+	tool_sdecls.h \
+	tool_setopt.h \
+	tool_setup.h \
+	tool_sleep.h \
+	tool_urlglob.h \
+	tool_util.h \
+	tool_version.h \
+	tool_vms.h \
+	tool_writeenv.h \
+	tool_writeout.h \
+	tool_xattr.h
 
 curl_SOURCES = $(CURL_CFILES) $(CURLX_ONES) $(CURL_HFILES)
 curl_LDADD = $(top_builddir)/lib/libcurl.la @CURL_LIBS@
@@ -355,9 +455,9 @@ curl_DEPENDENCIES = $(top_builddir)/lib/libcurl.la
 BUILT_SOURCES = hugehelp.c
 CLEANFILES = hugehelp.c
 EXTRA_DIST = mkhelp.pl makefile.dj Makefile.vc6 Makefile.b32 Makefile.m32 \
-	curl_config.h.in macos/curl.mcp.xml.sit.hqx			  \
+	macos/curl.mcp.xml.sit.hqx                                        \
 	macos/MACINSTALL.TXT macos/src/curl_GUSIConfig.cpp vc6curlsrc.dsp \
-	macos/src/macos_main.cpp config-amigaos.h makefile.amiga curl.rc  \
+	macos/src/macos_main.cpp makefile.amiga curl.rc                   \
 	Makefile.netware Makefile.inc Makefile.Watcom vc6curlsrc.dsw      \
 	CMakeLists.txt
 
@@ -365,7 +465,7 @@ MANPAGE = $(top_srcdir)/docs/curl.1
 README = $(top_srcdir)/docs/MANUAL
 MKHELP = $(top_srcdir)/src/mkhelp.pl
 HUGE = hugehelp.c
-all: $(BUILT_SOURCES) curl_config.h
+all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
@@ -399,23 +499,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-
-curl_config.h: stamp-h2
-	@if test ! -f $@; then \
-	  rm -f stamp-h2; \
-	  $(MAKE) stamp-h2; \
-	else :; fi
-
-stamp-h2: $(srcdir)/curl_config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h2
-	cd $(top_builddir) && $(SHELL) ./config.status src/curl_config.h
-$(srcdir)/curl_config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
-	cd $(top_srcdir) && $(AUTOHEADER)
-	rm -f stamp-h2
-	touch $@
-
-distclean-hdr:
-	-rm -f curl_config.h stamp-h2
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -454,20 +537,47 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/curlutil.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getpass.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/homedir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hugehelp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nonblock.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/os-specific.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rawstr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strdup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strtoofft.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/urlglob.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writeenv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writeout.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xattr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_binmode.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_bname.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cb_dbg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cb_hdr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cb_prg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cb_rea.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cb_see.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cb_wrt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_cfgable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_convert.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_dirhie.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_doswin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_easysrc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_formparse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_getparam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_getpass.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_help.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_helpers.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_homedir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_libinfo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_mfiles.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_msgs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_operate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_operhlp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_panykey.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_paramhlp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_parsecfg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_setopt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_sleep.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_urlglob.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_util.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_vms.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_writeenv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_writeout.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tool_xattr.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -566,11 +676,11 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES) curl_config.h.in $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS) curl_config.h.in $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -582,11 +692,11 @@ TAGS:  $(HEADERS) $(SOURCES) curl_config.h.in $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES) curl_config.h.in $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS) curl_config.h.in $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -636,7 +746,7 @@ check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
 @CURLDEBUG_FALSE@all-local:
-all-am: Makefile $(PROGRAMS) curl_config.h all-local
+all-am: Makefile $(PROGRAMS) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -676,7 +786,7 @@ distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags
+	distclean-libtool distclean-tags
 
 dvi: dvi-am
 
@@ -720,12 +830,12 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libtool ctags distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
@@ -736,7 +846,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
 # This generates the hugehelp.c file in both uncompressed and compressed formats
 @HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@$(HUGE): $(README) $(MANPAGE)  mkhelp.pl
-@HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@	echo '#include "setup.h"' > $(HUGE)
+@HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@	echo '#include "tool_setup.h"' > $(HUGE)
 @HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@	echo '#ifndef HAVE_LIBZ' >> $(HUGE)
 @HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) $(README) >> $(HUGE)
 @HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@	echo '#else' >> $(HUGE)
@@ -744,7 +854,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 @HAVE_LIBZ_TRUE@@USE_MANUAL_TRUE@	echo '#endif /* HAVE_LIBZ */' >> $(HUGE)
 # This generates the hugehelp.c file uncompressed only
 @HAVE_LIBZ_FALSE@@USE_MANUAL_TRUE@$(HUGE): $(README) $(MANPAGE)  mkhelp.pl
-@HAVE_LIBZ_FALSE@@USE_MANUAL_TRUE@	echo '#include "setup.h"' > $(HUGE)
+@HAVE_LIBZ_FALSE@@USE_MANUAL_TRUE@	echo '#include "tool_setup.h"' > $(HUGE)
 @HAVE_LIBZ_FALSE@@USE_MANUAL_TRUE@	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) $(README) >> $(HUGE)
 
 # built-in manual has been disabled, make a blank file

@@ -113,6 +113,9 @@ if(MSVC)
     # Ugly workaround to remove the "/debug" or "/release" in each output
     set_target_properties(${LIB_NAME} PROPERTIES PREFIX "../")
     set_target_properties(${LIB_NAME} PROPERTIES IMPORT_PREFIX "../")
+    if (${CMAKE_SIZEOF_VOID_P} EQUAL 8)
+		set_target_properties(${LIB_NAME} PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
+	endif()
   endif()
 endif()
 

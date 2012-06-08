@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -146,17 +146,22 @@ void Curl_pgrsDone(struct connectdata *conn)
   data->progress.speeder_c = 0; /* reset the progress meter display */
 }
 
-/* reset all times except redirect */
-void Curl_pgrsResetTimes(struct SessionHandle *data)
+/* reset all times except redirect, and reset the known transfer sizes */
+void Curl_pgrsResetTimesSizes(struct SessionHandle *data)
 {
   data->progress.t_nslookup = 0.0;
   data->progress.t_connect = 0.0;
   data->progress.t_pretransfer = 0.0;
   data->progress.t_starttransfer = 0.0;
+
+  Curl_pgrsSetDownloadSize(data, 0);
+  Curl_pgrsSetUploadSize(data, 0);
 }
 
 void Curl_pgrsTime(struct SessionHandle *data, timerid timer)
 {
+  struct timeval now = Curl_tvnow();
+
   switch(timer) {
   default:
   case TIMER_NONE:
@@ -164,35 +169,38 @@ void Curl_pgrsTime(struct SessionHandle *data, timerid timer)
     break;
   case TIMER_STARTSINGLE:
     /* This is set at the start of a single fetch */
-    data->progress.t_startsingle = Curl_tvnow();
+    data->progress.t_startsingle = now;
+    break;
+
+  case TIMER_STARTACCEPT:
+    data->progress.t_acceptdata = Curl_tvnow();
     break;
 
   case TIMER_NAMELOOKUP:
     data->progress.t_nslookup =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_CONNECT:
     data->progress.t_connect =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_APPCONNECT:
     data->progress.t_appconnect =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_PRETRANSFER:
     data->progress.t_pretransfer =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_STARTTRANSFER:
     data->progress.t_starttransfer =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_POSTRANSFER:
     /* this is the normal end-of-transfer thing */
     break;
   case TIMER_REDIRECT:
-    data->progress.t_redirect =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.start);
+    data->progress.t_redirect = Curl_tvdiff_secs(now, data->progress.start);
     break;
   }
 }
@@ -201,6 +209,8 @@ void Curl_pgrsStartNow(struct SessionHandle *data)
 {
   data->progress.speeder_c = 0; /* reset the progress meter display */
   data->progress.start = Curl_tvnow();
+  /* clear all bits except HIDE and HEADERS_OUT */
+  data->progress.flags &= PGRS_HIDE|PGRS_HEADERS_OUT;
 }
 
 void Curl_pgrsSetDownloadCounter(struct SessionHandle *data, curl_off_t size)

@@ -97,6 +97,10 @@ p.roffit {
 <p class="level1">libcurl was built with support for SSPI. This is only available on Windows and makes libcurl use Windows-provided functions for NTLM authentication. It also allows libcurl to use the current user and the current user's password without the app having to pass them on. (Added in 7.13.2) 
 <p class="level0"><a name="CURLVERSIONCONV"></a><span class="nroffip">CURL_VERSION_CONV</span> 
 <p class="level1">libcurl was built with support for character conversions, as provided by the CURLOPT_CONV_* callbacks. (Added in 7.15.4) 
+<p class="level0"><a name="CURLVERSIONTLSAUTHSRP"></a><span class="nroffip">CURL_VERSION_TLSAUTH_SRP</span> 
+<p class="level1">libcurl was built with support for TLS-SRP. (Added in 7.21.4) 
+<p class="level0"><a name="CURLVERSIONNTLMWB"></a><span class="nroffip">CURL_VERSION_NTLM_WB</span> 
+<p class="level1">libcurl was built with support for NTLM delegation to a winbind helper. (Added in 7.22.0) 
 <p class="level0"><span Class="emphasis">ssl_version</span> is an ASCII string for the OpenSSL version used. If libcurl has no SSL support, this is NULL. 
 <p class="level0"><span Class="emphasis">ssl_version_num</span> is the numerical OpenSSL version value as defined by the OpenSSL project. If libcurl has no SSL support, this is 0. 
 <p class="level0"><span Class="emphasis">libz_version</span> is an ASCII string (there is no numerical version). If libcurl has no libz support, this is NULL. 

@@ -1,8 +1,5 @@
 /* lib/curl_config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* when building libcurl itself */
-#undef BUILDING_LIBCURL
-
 /* Location of default ca bundle */
 #undef CURL_CA_BUNDLE
 
@@ -39,6 +36,9 @@
 /* to disable LDAPS */
 #undef CURL_DISABLE_LDAPS
 
+/* to disable --libcurl C code generation option */
+#undef CURL_DISABLE_LIBCURL_OPTION
+
 /* to disable POP3 */
 #undef CURL_DISABLE_POP3
 
@@ -63,17 +63,11 @@
 /* to disable verbose strings */
 #undef CURL_DISABLE_VERBOSE_STRINGS
 
-/* to make a symbol visible */
+/* Definition to make a library symbol externally visible. */
 #undef CURL_EXTERN_SYMBOL
-
-/* to enable hidden symbols */
-#undef CURL_HIDDEN_SYMBOLS
 
 /* Use Windows LDAP implementation */
 #undef CURL_LDAP_WIN
-
-/* when not building a shared library */
-#undef CURL_STATICLIB
 
 /* your Entropy Gathering Daemon socket pathname */
 #undef EGD_SOCKET
@@ -382,9 +376,6 @@
 /* Define to 1 if you have the `ldap_url_parse' function. */
 #undef HAVE_LDAP_URL_PARSE
 
-/* Define to 1 if you have the `gcrypt' library (-lgcrypt). */
-#undef HAVE_LIBGCRYPT
-
 /* Define to 1 if you have the <libgen.h> header file. */
 #undef HAVE_LIBGEN_H
 
@@ -469,6 +460,9 @@
 /* Define to 1 if NI_WITHSCOPEID exists and works. */
 #undef HAVE_NI_WITHSCOPEID
 
+/* if you have the NSS_InitContext function */
+#undef HAVE_NSS_INITCONTEXT
+
 /* if you have an old MIT gssapi library, lacking GSS_C_NT_HOSTBASED_SERVICE
    */
 #undef HAVE_OLD_GSSMIT
@@ -505,9 +499,6 @@
 
 /* Define to 1 if you have the `pipe' function. */
 #undef HAVE_PIPE
-
-/* if you have the function PK11_CreateGenericObject */
-#undef HAVE_PK11_CREATEGENERICOBJECT
 
 /* Define to 1 if you have a working poll function. */
 #undef HAVE_POLL
@@ -599,6 +590,9 @@
 /* Define to 1 if you have the socket function. */
 #undef HAVE_SOCKET
 
+/* Define to 1 if you have the socketpair function. */
+#undef HAVE_SOCKETPAIR
+
 /* Define to 1 if you have the <socket.h> header file. */
 #undef HAVE_SOCKET_H
 
@@ -607,6 +601,9 @@
 
 /* if you have the function SRP_Calc_client_key */
 #undef HAVE_SSLEAY_SRP
+
+/* Define to 1 if you have the `SSLv2_client_method' function. */
+#undef HAVE_SSLV2_CLIENT_METHOD
 
 /* Define to 1 if you have the `SSL_get_shutdown' function. */
 #undef HAVE_SSL_GET_SHUTDOWN
@@ -725,6 +722,9 @@
 /* Define to 1 if you have the <sys/utime.h> header file. */
 #undef HAVE_SYS_UTIME_H
 
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
 /* Define to 1 if you have the <sys/xattr.h> header file. */
 #undef HAVE_SYS_XATTR_H
 
@@ -795,9 +795,6 @@
    */
 #undef LT_OBJDIR
 
-/* Define to 1 if you are building a native Windows target. */
-#undef NATIVE_WINDOWS
-
 /* Define to 1 if you need the lber.h header file even with ldap.h */
 #undef NEED_LBER_H
 
@@ -812,6 +809,12 @@
 
 /* Define to 1 if _THREAD_SAFE preprocessor symbol must be defined. */
 #undef NEED_THREAD_SAFE
+
+/* Define to enable NTLM delegation to winbind's ntlm_auth helper. */
+#undef NTLM_WB_ENABLED
+
+/* Define absolute filename for winbind's ntlm_auth helper. */
+#undef NTLM_WB_FILE
 
 /* cpu-machine-OS */
 #undef OS
@@ -968,6 +971,9 @@
 
 /* if GnuTLS is enabled */
 #undef USE_GNUTLS
+
+/* if GnuTLS uses nettle as crypto backend */
+#undef USE_GNUTLS_NETTLE
 
 /* if librtmp is in use */
 #undef USE_LIBRTMP

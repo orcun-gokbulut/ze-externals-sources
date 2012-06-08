@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
+#include "server_setup.h"
 
 /* Purpose
  *
@@ -79,10 +80,6 @@
  * if no signal was being ignored or handled at all.  Enjoy it!
  */
 
-#define CURL_NO_OLDIES
-
-#include "setup.h" /* portability help from the lib directory */
-
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
 #endif
@@ -123,6 +120,7 @@
 const char *serverlogfile = DEFAULT_LOGFILE;
 
 static bool verbose = FALSE;
+static bool bind_only = FALSE;
 #ifdef ENABLE_IPV6
 static bool use_ipv6 = FALSE;
 #endif
@@ -807,6 +805,12 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
     }
   }
 
+  /* bindonly option forces no listening */
+  if(bind_only) {
+    logmsg("instructed to bind port without listening");
+    return sock;
+  }
+
   /* start accepting connections */
   rc = listen(sock, 5);
   if(0 != rc) {
@@ -875,6 +879,10 @@ int main(int argc, char *argv[])
 #endif
       arg++;
     }
+    else if(!strcmp("--bindonly", argv[arg])) {
+      bind_only = TRUE;
+      arg++;
+    }
     else if(!strcmp("--port", argv[arg])) {
       arg++;
       if(argc>arg) {
@@ -923,6 +931,7 @@ int main(int argc, char *argv[])
            " --pidfile [file]\n"
            " --ipv4\n"
            " --ipv6\n"
+           " --bindonly\n"
            " --port [port]\n"
            " --connect [port]\n"
            " --addr [address]");
@@ -950,6 +959,7 @@ int main(int argc, char *argv[])
     error = SOCKERRNO;
     logmsg("Error creating socket: (%d) %s",
            error, strerror(error));
+    write_stdout("FAIL\n", 5);
     goto sockfilt_cleanup;
   }
 
@@ -985,6 +995,7 @@ int main(int argc, char *argv[])
       error = SOCKERRNO;
       logmsg("Error connecting to port %hu: (%d) %s",
              connectport, error, strerror(error));
+      write_stdout("FAIL\n", 5);
       goto sockfilt_cleanup;
     }
     logmsg("====> Client connect");
@@ -993,8 +1004,10 @@ int main(int argc, char *argv[])
   else {
     /* passive daemon style */
     sock = sockdaemon(sock, &port);
-    if(CURL_SOCKET_BAD == sock)
+    if(CURL_SOCKET_BAD == sock) {
+      write_stdout("FAIL\n", 5);
       goto sockfilt_cleanup;
+    }
     msgsock = CURL_SOCKET_BAD; /* no stream socket yet */
   }
 
@@ -1002,12 +1015,16 @@ int main(int argc, char *argv[])
 
   if(connectport)
     logmsg("Connected to port %hu", connectport);
+  else if(bind_only)
+    logmsg("Bound without listening on port %hu", port);
   else
     logmsg("Listening on port %hu", port);
 
   wrotepidfile = write_pidfile(pidname);
-  if(!wrotepidfile)
+  if(!wrotepidfile) {
+    write_stdout("FAIL\n", 5);
     goto sockfilt_cleanup;
+  }
 
   do {
     juggle_again = juggle(&msgsock, sock, &mode);

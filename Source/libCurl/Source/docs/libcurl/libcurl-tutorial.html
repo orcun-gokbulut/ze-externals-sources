@@ -116,7 +116,7 @@ p.roffit {
 <p class="level0">If you then want to transfer another file, the handle is ready to be used again. Mind you, it is even preferred that you re-use an existing handle if you intend to make another transfer. libcurl will then attempt to re-use the previous connection. 
 <p class="level0">For some protocols, downloading a file can involve a complicated process of logging in, setting the transfer mode, changing the current directory and finally transferring the file data. libcurl takes care of all that complication for you. Given simply the URL to a file, libcurl will take care of all the details needed to get the file moved from one machine to another. 
 <p class="level0"><a name="Multi-threading"></a><h2 class="nroffsh">Multi-threading Issues</h2>
-<p class="level0">The first basic rule is that you must <span Class="bold">never</span> share a libcurl handle (be it easy or multi or whatever) between multiple threads. Only use one handle in one thread at a time. 
+<p class="level0">The first basic rule is that you must <span Class="bold">never</span> simultaneously share a libcurl handle (be it easy or multi or whatever) between multiple threads. Only use one handle in one thread at any time. You can pass the handles around among threads, but you must never use a single handle from more than one thread at any given time. 
 <p class="level0">libcurl is completely thread safe, except for two issues: signals and SSL/TLS handlers. Signals are used for timing out name resolves (during DNS lookup) - when built without c-ares support and not on Windows. 
 <p class="level0">If you are accessing HTTPS or FTPS URLs in a multi-threaded manner, you are then of course using the underlying SSL library multi-threaded and those libs might have their own requirements on this issue. Basically, you need to provide one or two functions to allow it to function properly. For all details, see this: 
 <p class="level0">OpenSSL 
@@ -298,9 +298,6 @@ p.roffit {
 <p class="level0"><a name="Host"></a><span class="nroffip">Host</span> 
 <p class="level1">This header is required by HTTP 1.1 and even many 1.0 servers and should be the name of the server we want to talk to. This includes the port number if anything but default. 
 <p class="level1">
-<p class="level0"><a name="Pragma"></a><span class="nroffip">Pragma</span> 
-<p class="level1">"no-cache". Tells a possible proxy to not grab a copy from the cache but to fetch a fresh one. 
-<p class="level1">
 <p class="level0"><a name="Accept"></a><span class="nroffip">Accept</span> 
 <p class="level1">"*/*". 
 <p class="level1">
@@ -459,7 +456,7 @@ p.roffit {
 <p class="level0">To use this interface, you are better off if you first understand the basics of how to use the easy interface. The multi interface is simply a way to make multiple transfers at the same time by adding up multiple easy handles into a "multi stack". 
 <p class="level0">You create the easy handles you want and you set all the options just like you have been told above, and then you create a multi handle with <a class="emphasis" href="./curl_multi_init.html">curl_multi_init(3)</a> and add all those easy handles to that multi handle with <a class="emphasis" href="./curl_multi_add_handle.html">curl_multi_add_handle(3)</a>. 
 <p class="level0">When you've added the handles you have for the moment (you can still add new ones at any time), you start the transfers by calling <a class="emphasis" href="./curl_multi_perform.html">curl_multi_perform(3)</a>. 
-<p class="level0"><a class="emphasis" href="./curl_multi_perform.html">curl_multi_perform(3)</a> is asynchronous. It will only execute as little as possible and then return back control to your program. It is designed to never block. If it returns CURLM_CALL_MULTI_PERFORM you better call it again soon, as that is a signal that it still has local data to send or remote data to receive. 
+<p class="level0"><a class="emphasis" href="./curl_multi_perform.html">curl_multi_perform(3)</a> is asynchronous. It will only execute as little as possible and then return back control to your program. It is designed to never block. 
 <p class="level0">The best usage of this interface is when you do a select() on all possible file descriptors or sockets to know when to call libcurl again. This also makes it easy for you to wait and respond to actions on your own application's sockets/handles. You figure out what to select() for by using <a class="emphasis" href="./curl_multi_fdset.html">curl_multi_fdset(3)</a>, that fills in a set of fd_set variables for you with the particular file descriptors libcurl uses for the moment. 
 <p class="level0">When you then call select(), it'll return when one of the file handles signal action and you then call <a class="emphasis" href="./curl_multi_perform.html">curl_multi_perform(3)</a> to allow libcurl to do what it wants to do. Take note that libcurl does also feature some time-out code so we advise you to never use very long timeouts on select() before you call <a class="emphasis" href="./curl_multi_perform.html">curl_multi_perform(3)</a>, which thus should be called unconditionally every now and then even if none of its file descriptors have signaled ready. Another precaution you should use: always call <a class="emphasis" href="./curl_multi_fdset.html">curl_multi_fdset(3)</a> immediately before the select() call since the current set of file descriptors may change when calling a curl function. 
 <p class="level0">If you want to stop the transfer of one of the easy handles in the stack, you can use <a class="emphasis" href="./curl_multi_remove_handle.html">curl_multi_remove_handle(3)</a> to remove individual easy handles. Remember that easy handles should be <a class="emphasis" href="./curl_easy_cleanup.html">curl_easy_cleanup(3)</a>ed. 
@@ -469,9 +466,10 @@ p.roffit {
 <p class="level0">
 <p class="level0">&nbsp;[ seeding, passwords, keys, certificates, ENGINE, ca certs ] 
 <p class="level0"><a name="Sharing"></a><h2 class="nroffsh">Sharing Data Between Easy Handles</h2>
-<p class="level0">
-<p class="level0">&nbsp;[ fill in ] 
-<p class="level0"><a name="Footnotes"></a><h2 class="nroffsh">Footnotes</h2>
+<p class="level0">You can share some data between easy handles when the easy interface is used, and some data is share automatically when you use the multi interface. 
+<p class="level0">When you add easy handles to a multi handle, these easy handles will automatically share a lot of the data that otherwise would be kept on a per-easy handle basis when the easy interface is used. 
+<p class="level0">The DNS cache is shared between handles within a multi handle, making subsequent name resolvings faster and the connection pool that is kept to better allow persistent connections and connection re-use is shared. If you're using the easy interface, you can still share these between specific easy handles by using the share interface, see <span Class="emphasis">libcurl-share(3)</span>. 
+<p class="level0">Some things are never shared automatically, not within multi handles, like for example cookies so the only way to share that is with the share interface. <a name="Footnotes"></a><h2 class="nroffsh">Footnotes</h2>
 <p class="level0">
 <p class="level0">
 <p class="level0"><a name="1"></a><span class="nroffip">[1]</span> 
