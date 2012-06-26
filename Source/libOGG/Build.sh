@@ -23,6 +23,9 @@ ErrorCheck
 Copy output/lib/libogg.a "../Output/$ZE_BUILD_PLATFORM/$ZE_BUILD_ARCH/Lib"
 Copy output/include/ogg/ogg.h "../Output/$ZE_BUILD_PLATFORM/$ZE_BUILD_ARCH/Include/ogg"
 Copy output/include/ogg/os_types.h "../Output/$ZE_BUILD_PLATFORM/$ZE_BUILD_ARCH/Include/ogg"
+Copy output/include/ogg/config_types.h "../Output/$ZE_BUILD_PLATFORM/$ZE_BUILD_ARCH/Include/ogg"
+
+Copy output/include/ogg "../../libVorbis/Source/lib"
 
 cd ..
 
