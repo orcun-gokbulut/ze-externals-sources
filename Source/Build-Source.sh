@@ -33,7 +33,7 @@ source Build.sh
 ErrorCheck
 cd ..
 
-cd libVorbis
+cd libOGG
 source Build.sh
 ErrorCheck
 cd ..
@@ -43,7 +43,7 @@ source Build.sh
 ErrorCheck
 cd ..
 
-cd libOGG
+cd libVorbis
 source Build.sh
 ErrorCheck
 cd ..
