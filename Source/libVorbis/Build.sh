@@ -13,7 +13,7 @@ echo [ZEBuild Externals] Info : Building $ProjectName.
 Remove Build
 mkdir Build
 cd Build
-sh ../Source/configure --prefix="$PWD/output"
+sh ../Source/configure --prefix="$PWD/output" --with-ogg-libraries="$PWD/../../libOGG/Build/output/lib" --with-ogg-includes="$PWD/../../libOGG/Build/output/Include/ogg" --disable-oggtest
 ErrorCheck
 make
 make install
