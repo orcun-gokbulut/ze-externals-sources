@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -63,7 +63,7 @@ static asQWORD CallX64(const asQWORD *args, const asQWORD *floatArgs, const int 
 
 		"# Make sure the stack pointer is 16byte aligned so the\n"
 		"# whole program optimizations will work properly\n"
-		"# TODO: optimize: Can this be optimized with fewer instructions?\n"
+		"# TODO: runtime optimize: Can this be optimized with fewer instructions?\n"
 		"mov %%rsp,%%rsi\n"
 		"sub %%rdi,%%rsi\n"
 		"and $0x8,%%rsi\n"
@@ -171,7 +171,7 @@ static asQWORD GetReturnedDouble()
 
 asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
 {
-	asCScriptEngine *engine = context->engine;
+	asCScriptEngine *engine = context->m_engine;
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
 
 	asQWORD  retQW             = 0;
@@ -213,7 +213,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	{
 		// Get the true function pointer from the virtual function table
 		vftable = *(void***)obj;
-		func = vftable[size_t(func)>>3];
+		func = vftable[asPWORD(func)>>3];
 	}
 
 	// Move the arguments to the buffer
@@ -292,9 +292,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		allArgBuffer[paramSize++] = (asQWORD)obj;
 	}
 
-	context->isCallingSystemFunction = true;
-	retQW = CallX64(allArgBuffer, floatArgBuffer, paramSize*8, (size_t)func);
-	context->isCallingSystemFunction = false;
+	retQW = CallX64(allArgBuffer, floatArgBuffer, paramSize*8, (asPWORD)func);
 
 	// If the return is a float value we need to get the value from the FP register
 	if( sysFunc->hostReturnFloat )

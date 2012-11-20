@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -41,6 +41,7 @@
 #include "as_gc.h"
 #include "as_scriptengine.h"
 #include "as_scriptobject.h"
+#include "as_texts.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -53,10 +54,17 @@ asCGarbageCollector::asCGarbageCollector()
 	numDestroyed    = 0;
 	numNewDestroyed = 0;
 	numDetected     = 0;
+	isProcessing    = false;
 }
 
 void asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 {
+	if( obj == 0 || objType == 0 )
+	{
+		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_GC_RECEIVED_NULL_PTR);
+		return;
+	}
+
 	engine->CallObjectMethod(obj, objType->beh.addref);
 	asSObjTypePair ot = {obj, objType, 0};
 
@@ -67,24 +75,31 @@ void asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 	if( engine->ep.autoGarbageCollect && gcNewObjects.GetLength() )
 	{
 		// If the GC is already processing in another thread, then don't try this again
-		// TODO: What if it is already processing in this thread?
 		if( TRYENTERCRITICALSECTION(gcCollecting) )
 		{
-			// TODO: The number of iterations should be dynamic, and increase 
-			//       if the number of objects in the garbage collector grows high
-
-			// Run one step of DetectGarbage
-			if( gcOldObjects.GetLength() )
+			// Skip this if the GC is already running in this thread
+			if( !isProcessing )
 			{
-				IdentifyGarbageWithCyclicRefs();
-				DestroyOldGarbage();
-			}
+				isProcessing = true;
 
-			// Run a few steps of DestroyGarbage
-			int iter = (int)gcNewObjects.GetLength();
-			if( iter > 10 ) iter = 10;
-			while( iter-- > 0 )
-				DestroyNewGarbage();
+				// TODO: The number of iterations should be dynamic, and increase 
+				//       if the number of objects in the garbage collector grows high
+
+				// Run one step of DetectGarbage
+				if( gcOldObjects.GetLength() )
+				{
+					IdentifyGarbageWithCyclicRefs();
+					DestroyOldGarbage();
+				}
+
+				// Run a few steps of DestroyGarbage
+				int iter = (int)gcNewObjects.GetLength();
+				if( iter > 10 ) iter = 10;
+				while( iter-- > 0 )
+					DestroyNewGarbage();
+
+				isProcessing = false;
+			}
 
 			LEAVECRITICALSECTION(gcCollecting);
 		}
@@ -100,9 +115,17 @@ void asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 int asCGarbageCollector::GarbageCollect(asDWORD flags)
 {
 	// If the GC is already processing in another thread, then don't enter here again
-	// TODO: What if it is already processing in this thread?
 	if( TRYENTERCRITICALSECTION(gcCollecting) )
 	{
+		// If the GC is already processing in this thread, then don't enter here again
+		if( isProcessing ) 
+		{	
+			LEAVECRITICALSECTION(gcCollecting);
+			return 1;
+		}
+
+		isProcessing = true;
+
 		bool doDetect  = (flags & asGC_DETECT_GARBAGE)  || !(flags & asGC_DESTROY_GARBAGE);
 		bool doDestroy = (flags & asGC_DESTROY_GARBAGE) || !(flags & asGC_DETECT_GARBAGE);
 
@@ -122,19 +145,18 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 				destroyOldState = destroyGarbage_init;
 			}
 
-			int r = 1;
 			unsigned int count = (unsigned int)(gcNewObjects.GetLength() + gcOldObjects.GetLength());
 			for(;;)
 			{
 				// Detect all garbage with cyclic references
 				if( doDetect )
-					while( (r = IdentifyGarbageWithCyclicRefs()) == 1 );
+					while( IdentifyGarbageWithCyclicRefs() == 1 ) {}
 
 				// Now destroy all known garbage
 				if( doDestroy )
 				{
-					while( (r = DestroyNewGarbage()) == 1 );
-					while( (r = DestroyOldGarbage()) == 1 );
+					while( DestroyNewGarbage() == 1 ) {}
+					while( DestroyOldGarbage() == 1 ) {}
 				}
 
 				// Run another iteration if any garbage was destroyed
@@ -147,6 +169,7 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 			// Take the opportunity to clear unused types as well
 			engine->ClearUnusedTypes();
 
+			isProcessing = false;
 			LEAVECRITICALSECTION(gcCollecting);
 			return 0;
 		}
@@ -164,6 +187,7 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 				IdentifyGarbageWithCyclicRefs();
 		}
 
+		isProcessing = false;
 		LEAVECRITICALSECTION(gcCollecting);
 	}
 	
@@ -365,6 +389,27 @@ int asCGarbageCollector::DestroyNewGarbage()
 	UNREACHABLE_RETURN;
 }
 
+int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
+{
+	int items = 0;
+	for( asUINT n = 0; n < gcOldObjects.GetLength(); n++ )
+	{
+		asSObjTypePair gcObj = GetOldObjectAtIdx(n);
+
+		// Report the object as not being properly destroyed
+		asCString msg;
+		msg.Format(TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.type->name.AddressOf());
+		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+
+		// Release the reference that the GC holds if the release functions is still available
+		if( gcObj.type->beh.release && engine->scriptFunctions[gcObj.type->beh.release] )
+			engine->CallObjectMethod(gcObj.obj, gcObj.type->beh.release);
+
+		items++;
+	}
+	return items;
+}
+
 int asCGarbageCollector::DestroyOldGarbage()
 {
 	for(;;)
@@ -395,7 +440,24 @@ int asCGarbageCollector::DestroyOldGarbage()
 			if( ++destroyOldIdx < gcOldObjects.GetLength() )
 			{
 				asSObjTypePair gcObj = GetOldObjectAtIdx(destroyOldIdx);
-				if( engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount) == 1 )
+
+				if( gcObj.type->beh.gcGetRefCount == 0 )
+				{
+					// If circular references are formed with registered types that hasn't 
+					// registered the GC behaviours, then the engine may be forced to free
+					// the object type before the actual object instance. In this case we
+					// will be forced to skip the destruction of the objects, so as not to 
+					// crash the application.
+					asCString msg;
+					msg.Format(TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.type->name.AddressOf());
+					engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+
+					// Just remove the object, as we will not bother to destroy it
+					numDestroyed++;
+					RemoveOldObjectAtIdx(destroyOldIdx);
+					destroyOldIdx--;
+				}
+				else if( engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount) == 1 )
 				{
 					// Release the object immediately
 
@@ -510,7 +572,11 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 			{
 				// Add the gc count for this object
 				asSObjTypePair gcObj = GetOldObjectAtIdx(detectIdx);
-				int refCount = engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount);
+	
+				int refCount = 0;
+				if( gcObj.type->beh.gcGetRefCount )
+					refCount = engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount);
+
 				if( refCount > 1 )
 				{
 					asSIntTypePair it = {refCount-1, gcObj.type};
@@ -727,7 +793,6 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 				}
 			}
 		}
-		break;
 		} // switch
 	}
 
