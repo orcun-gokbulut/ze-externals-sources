@@ -1,4 +1,8 @@
-import os, sys, optparse, subprocess, distutils
+import os
+import sys
+import subprocess
+import optparse
+import datetime
 
 class ZEBuildException:
     def __init__(self, ErrorText):
@@ -25,21 +29,23 @@ class ZEBuild:
     
     @staticmethod
     def CopyDirectory(SourceDirectory, DestinationDirectory):
-        try:
+        '''try:
             SourceDirectory = os.path.normpath(SourceDirectory)
             DestinationDirectory = os.path.normpath(DestinationDirectory)
             distutils.dir_util.copy_tree(os.path.normpath(SourceDirectory), DestinationDirectory)
         except:
             raise ZEBuildException("Can not copy directory. Source Directory Name : " + SourceDirectory + ", Destination Directory : " + DestinationDirectory)
-        
+        '''
+        pass
+    
     @staticmethod
     def RemoveDirectory(DirectoryName):
-        #try:
+        try:
             DirectoryName = os.path.normpath(DirectoryName)
             if(os.path.isdir(DirectoryName)):
                os.removedirs(DirectoryName)
-        #except:
-        #    raise ZEBuildException("Can not remove directory. Directory Name : " + DirectoryName)
+        except:
+            raise ZEBuildException("Can not remove directory. Directory Name : " + DirectoryName)
 
     @staticmethod
     def SetWorkingDirectory(DirectoryName):
@@ -62,7 +68,13 @@ class ZEBuild:
 
     @staticmethod
     def Output(Level, Text):
-        print(ZEBuild.OutputStr(Level, Text))
+        OutputText = ZEBuild.OutputStr(Level, Text)
+        
+        if (ZEBuild.CurrentLibrary != None and ZEBuild.CurrentLibrary.LogFile != None and ZEBuild.CurrentLibrary.LogFile.closed == False):
+            ZEBuild.CurrentLibrary.LogFile.write(OutputText + "\n")
+            ZEBuild.CurrentLibrary.LogFile.flush()
+        
+        print(OutputText)
 
     @staticmethod
     def Error(Text):
@@ -75,27 +87,50 @@ class ZEBuild:
     @staticmethod
     def Log(Text):
         ZEBuild.Output("Log", Text)
+
+    @staticmethod
+    def Call(Command, Arguments):
+        if (ZEBuild.CurrentLibrary != None and ZEBuild.CurrentLibrary.LogFile != None and ZEBuild.CurrentLibrary.LogFile.closed != True):
+            ReturnValue = subprocess.call(Command + " " + Arguments, shell=True, stdout = ZEBuild.CurrentLibrary.LogFile, stderr = ZEBuild.CurrentLibrary.LogFile)
+            ZEBuild.CurrentLibrary.LogFile.flush()
+            return ReturnValue
+        else:
+            return subprocess.call(Command + " " + Arguments, shell=True)
+
+    @staticmethod
+    def CMake(SourceDirectory, Parameters):
+        ParameterString = ""
+        if (Parameters != None):
+            for Parameter in Parameters:
+                ParameterString += "-D" + Parameter.Name + ":" + Parameter.Type + "=\"" + Parameter.Value + "\" "
+        
+        Arguments = " -G \"" + ZEBuild.Platform.CMakeGenerator + "\" " + ParameterString + " \"" + SourceDirectory + "\""
+
+        ReturnValue = ZEBuild.Call("cmake", Arguments)
+        if (ReturnValue != 0):
+            raise ZEBuildException("CMake configure failed.")
     
     @staticmethod
-    def CMake(Library, Parameters):
-        for Parameter in Parameters:
-            ParameterString += "-D" + Parameter.Name + ":" + Parameter.Type + "=" + Parameter.Value + " "
-            
-        ReturnValue = subprocess.call("cmake -G \"" + ZEBuild.CMakeGeneratorName + "\"" + ParameterString + " \"" + Library.SourceDirectory + "\"")
+    def CMakeBuild(BuildDirectory, Debug):
+        ConfigurationText = ""
+        if (Debug != None):
+            ConfigurationText = " --config Debug" if Debug else " --config Release"
+        Arguments = " --build \"" + BuildDirectory + "\"" + ConfigurationText
+
+        ReturnValue = ZEBuild.Call("cmake", Arguments)
         if (ReturnValue != 0):
-            raise ZEBuildException(Library, "CMake configure failed.")
-    
-    @staticmethod
-    def CMakeBuild(Library, Debug):
-        ReturnValue = subprocess.call("cmake --build \"" + Library.BinaryDirectory + "\"" + " --config Debug" if Debug else "")
-        if (ReturnValue != 0):
-            raise ZEBuildException(Library, "CMake build failed.")
+            raise ZEBuildException("CMake build failed.")
   
     @staticmethod
-    def CMakeInstall(Library, Debug):
-        ReturnValue = subprocess.call("cmake --build \"" + Library.BinaryDirectory + "\" --target install " + " --config Debug" if Debug else "")
+    def CMakeInstall(BuildDirectory, Debug):
+        ConfigurationText = ""
+        if (Debug != None):
+            ConfigurationText = " --config Debug" if Debug else " --config Release"  
+        Arguments = " --build \"" + BuildDirectory + "\" --target install " + ConfigurationText
+
+        ReturnValue = ZEBuild.Call("cmake", Arguments)
         if (ReturnValue != 0):
-            raise ZEBuildException(Library, "CMake build failed.")    
+            raise ZEBuildException("CMake build failed.")
 
     @staticmethod
     def BuildLibrary(Library):
@@ -111,15 +146,13 @@ class ZECMakeParameter:
     def __getparameters__():
         return [Name, Type, Value] 
 
-class ZELibrary: 
+class ZELibrary:
+    LogFile = None
     def Clean(self):
         ZEBuild.Log("Cleaning.")
 
         ZEBuild.RemoveDirectory(self.OutputDirectory)
-        ZEBuild.CreateDirectory(self.OutputDirectory)
-        
-        ZEBuild.RemoveDirectory(self.LogDirectory)
-        ZEBuild.CreateDirectory(self.LogDirectory)      
+        ZEBuild.CreateDirectory(self.OutputDirectory)     
 
         ZEBuild.RemoveDirectory(self.BuildDirectory)
         ZEBuild.CreateDirectory(self.BuildDirectory)
@@ -137,29 +170,41 @@ class ZELibrary:
         ZEBuild.Log("Generating CMakeLists.txt file.")
         
     def Build(self):
-        ZEBuild.Log("Building platform library " + self.Name)
-        
-        if (ZEBuild.Platform.MultiConfiguration == False):
-            self.Clean()
-            self.Configure(False)
-            self.Compile(False)
-            self.Gather(False)
-            self.GenerateCMakeList()
-        else:
-            ZEBuild.Log("Building debug configuration.")
-            self.Clean()
-            self.Configure(True)
-            self.Compile(True)
-            self.Gather(True)
+        try:
+            ZEBuild.CreateDirectory(self.LogDirectory)
+            self.LogFile = open(self.LogDirectory + "/Build-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log", "w")
             
-            ZEBuild.Log("Building release configuration.")
-            self.Clean()
-            self.Configure(False)
-            self.Compile(False)
-            self.Gather(False)
+            ZEBuild.Log("Building platform library " + self.Name)          
 
-            self.GenerateCMakeList()
-        
+            if (ZEBuild.Platform.MultiConfiguration == False):
+                self.Clean()
+                self.Configure(False)
+                self.Compile(False)
+                self.Gather(False)
+                self.GenerateCMakeList()
+            else:
+                ZEBuild.Log("Building debug configuration.")
+                self.Clean()
+                self.Configure(True)
+                self.Compile(True)
+                self.Gather(True)
+                
+                ZEBuild.Log("Building release configuration.")
+                self.Clean()
+                self.Configure(False)
+                self.Compile(False)
+                self.Gather(False)
+    
+                self.GenerateCMakeList()
+        except ZEBuildException as e:
+            ZEBuild.Error(e.ErrorText)
+            raise ZEBuildException("Building library has failed.")
+        except Exception as e:
+            ZEBuild.Error("Unknown Exception occured: " + e.message)
+            raise ZEBuildException("Building library has failed.")
+        finally:
+            self.LogFile.close()
+
     def __init__(self, Name, ExtraLibraries):
         self.Name = Name
         self.RootDirectory = os.getcwd();
@@ -171,15 +216,16 @@ class ZELibrary:
         
   
 def Main():
-    ZEBuild.Log("ZEBuild System v0.1")    
+    ZEBuild.Log("ZEBuild System v0.1")
     ZEBuild.Log("Initializing...")
+    
     parser = optparse.OptionParser()
     parser.add_option("-p", "--platform", dest="platform", action="store", type="string",
                       help="Platform name (Windows, Linux, Unix, MacOS, PS3, xBox360, iPhone, iPhoneSimulator, Android)")
     parser.add_option("-a", "--architecture", dest="architecture", action="store", type="string",
                       help="Architecture name (x86, x64, PPC, ARM)")
     parser.add_option("-c", "--cmake_generator", dest="cmake_generator", action="store", type="string",
-                      help="CMake generator name. (Visual Studio 20XX, NMake, Unix Makefiles, XCode)")
+                      help="CMake generator name. (VS20XX, NMake, Make, XCode)")
     (Options, args) = parser.parse_args()
     
     ZEBuild.Platform = ZEPlatform()
@@ -208,9 +254,9 @@ def Main():
                     ZEBuild.CurrentLibrary = None
         except ZEBuildException as e:
             ZEBuild.Error(e.ErrorText)
-        '''except Exception as e:
-            ZEBuild.Error("Unknown Exception occured: " + e.message)'''
+        except Exception as e:
+            ZEBuild.Error("Unknown Exception occured: " + e.message)
     
     
-if __name__ == '__main__':
+if (__name__ == "__main__"):
     Main()

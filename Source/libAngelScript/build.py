@@ -5,6 +5,7 @@ class AngleScriptLibrary(ZELibrary):
 
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
+        ZEBuild.CMake("c:\\fsd", None)
         print("Configure***")
 
     def Compile(self, Debug):
