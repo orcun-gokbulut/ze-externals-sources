@@ -64,6 +64,13 @@ class ZEBuild:
             raise ZEBuildException("Can not remove directory. Directory Name : " + DirectoryName)
 
     @staticmethod
+    def IsDirectoryExists(DirectoryName):
+	if os.path.exists(os.path.normpath(DirectoryName)):
+	    return True
+	else:
+	    return False
+
+    @staticmethod
     def SetWorkingDirectory(DirectoryName):
         try:
             DirectoryName = os.path.normpath(DirectoryName)
@@ -279,7 +286,7 @@ def Main():
     ZEBuild.Platform.Architecture = Options.architecture
     ZEBuild.Platform.CMakeGenerator = Options.cmake_generator
     
-    if (ZEBuild.Platform.CMakeGenerator[:6] == "Visual" or ZEBuild.Platform.CMakeGenerator == "XCode"):
+    if (ZEBuild.Platform.CMakeGenerator[:6] == "Visual" or ZEBuild.Platform.CMakeGenerator == "Xcode"):
         ZEBuild.Platform.MultiConfiguration = True
     else:
         ZEBuild.Platform.MultiConfiguration = False
