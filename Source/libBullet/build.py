@@ -20,19 +20,19 @@ class BulletLibrary(ZELibrary):
     def Compile(self, Debug):
         ZELibrary.Compile(self, Debug)
         ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
-            
+
     def Gather(self, Debug):
         ZEBuild.CMakeInstall(self.BuildDirectory, Debug)
         ZELibrary.Gather(self, Debug)
         if (Debug != None):
             if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
                 ZEBuild.CopyDirectory(self.BuildDirectory + "/output/output/include/bullet/", self.OutputDirectory + "/Include")
-            
+
             if ZEBuild.Platform.MultiConfiguration:
                 ZEBuild.CopyDirectory(self.BuildDirectory + "/output/lib", self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
             else:
                 ZEBuild.CopyDirectory(self.BuildDirectory + "/output/lib", self.OutputDirectory + "/Lib")
-            
+
     def GenerateCMakeList(self):
         ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
 
