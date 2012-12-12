@@ -18,17 +18,16 @@ class zLibLibrary(ZELibrary):
     def Gather(self, Debug):
         ZELibrary.Gather(self, Debug)
         if (Debug != None):
+            if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
+                ZEBuild.CreateDirectory(self.OutputDirectory + "/Include")
+                ZEBuild.CopyFile(self.SourceDirectory + "/zlib.h", self.OutputDirectory + "/Include" + "/zlib.h")
+                ZEBuild.CopyFile(self.BuildDirectory + "/zconf.h", self.OutputDirectory + "/Include" + "/zconf.h")
+            
             if ZEBuild.Platform.MultiConfiguration:
-                if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
-                    ZEBuild.CreateDirectory(self.OutputDirectory + "/Include")  
-                    ZEBuild.CopyFile(self.SourceDirectory + "/zlib.h", self.OutputDirectory + "/Include" + "/zlib.h")
-                    ZEBuild.CopyFile(self.BuildDirectory + "/zconf.h", self.OutputDirectory + "/Include" + "/zconf.h")
-                
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
 
                 VprnFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + (("/zlibd.lib" if Debug else "/zlib.lib") if ZEBuild.Platform.Platform == "Windows" else "/libz.a")
                 VprnFileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/zlib.lib" if ZEBuild.Platform.Platform == "Windows" else "/zlib.a")
-                
             else:
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
 

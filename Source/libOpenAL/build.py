@@ -22,24 +22,30 @@ class OpenALLibrary(ZELibrary):
             if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
                 ZEBuild.CopyDirectory(self.SourceDirectory + "/include/AL", self.OutputDirectory + "/Include")
 
-            if ZEBuild.Platform.MultiConfiguration:
+            if ZEBuild.Platform.Platform == "Windows":
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Dll" + ("/Debug" if Debug else "/Release"))
 
-                LibFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + ("/OpenAL32.lib" if ZEBuild.Platform.Platform == "Windows" else "/OpenAL32.a")
-                LibFileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/libOpenAL32.lib" if ZEBuild.Platform.Platform == "Windows" else "/libOpenAL32.a")
+                LibFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + "/OpenAL32.lib"
+                LibFileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + "/libOpenAL32.lib"
                 
-                DllFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + ("/OpenAL32.dll" if ZEBuild.Platform.Platform == "Windows" else "/OpenAL32.so")
-                DllFileDestination = self.OutputDirectory + "/Dll" + ("/Debug" if Debug else "/Release") + ("/OpenAL32.dll" if ZEBuild.Platform.Platform == "Windows" else "/OpenAL32.so")
-            else:
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Dll")
-
-                LibFileSource = self.BuildDirectory + "/lib/libOpenAL32.a"
-                LibFileDestination = self.OutputDirectory + "/Lib/libOpenAL32.a"
-
-            ZEBuild.CopyFile(LibFileSource, LibFileDestination)
-            ZEBuild.CopyFile(DllFileSource, DllFileDestination)
+                DllFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + "/OpenAL32.dll"
+                DllFileDestination = self.OutputDirectory + "/Dll" + ("/Debug" if Debug else "/Release") + "/OpenAL32.dll"
+                
+                ZEBuild.CopyFile(LibFileSource, LibFileDestination)
+                ZEBuild.CopyFile(DllFileSource, DllFileDestination)
+                
+            elif ZEBuild.Platform.Platform == "MacOS":
+                if ZEBuild.Platform.CMakeGenerator == "Xcode":
+                    ZEBuild.CreateDirectory(self.OutputDirectory + "/Dll" + ("/Debug" if Debug else "/Release"))
+                    FileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + "/libopenal.dylib"
+                    FileDestination = self.OutputDirectory + "/Dll" + ("/Debug" if Debug else "/Release") +"/libOpenAL.dylib"
+                elif ZEBuild.Platform.CMakeGenerator == "Unix Makefiles":
+                    ZEBuild.CreateDirectory(self.OutputDirectory + "/Dll")
+                    FileSource = self.BuildDirectory + "/libopenal.1.13.0.dylib"
+                    FileDestination = self.OutputDirectory + "/Dll/libOpenAL.dylib"
+                    
+                ZEBuild.CopyFile(FileSource, FileDestination)
 
     def GenerateCMakeList(self):
         ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
