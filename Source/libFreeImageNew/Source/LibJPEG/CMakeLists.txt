@@ -1,7 +1,5 @@
 list(APPEND Temp
 	LibJPEG/cderror.h
-	LibJPEG/cdjpeg.c
-	LibJPEG/cdjpeg.h
 	LibJPEG/jaricom.c
 	LibJPEG/jcapimin.c
 	LibJPEG/jcapistd.c
