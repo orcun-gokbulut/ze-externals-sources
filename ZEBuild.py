@@ -18,6 +18,7 @@ class ZEPlatform:
 
 class ZEBuild:
     CurrentLibrary = None
+    OutputDirectoryPrefix = None
 
     @staticmethod
     def CopyFile(SourcePath, DestinationPath):
@@ -129,6 +130,8 @@ class ZEBuild:
                 ParameterString += "-D" + Parameter.Name + ":" + Parameter.Type + "=\"" + Parameter.Value + "\" "
 
         Arguments = " -G \"" + ZEBuild.Platform.CMakeGenerator + "\" " + ParameterString + " \"" + SourceDirectory + "\""
+        if (ZEBuild.Platform.Platform == "Linux"):
+            Arguments += " -DCMAKE_TOOLCHAIN_FILE=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ("x86" if ZEBuild.Platform.Architecture == "x86" else "x64") + ".cmake"
 
         ReturnValue = ZEBuild.Call("cmake", Arguments)
         if (ReturnValue != 0):
@@ -256,15 +259,18 @@ class ZELibrary:
     def __init__(self, Name, ExtraLibraries):
         self.Name = Name
         self.RootDirectory = os.getcwd();
-        self.OutputDirectory = self.RootDirectory + "/Output"
+        if (ZEBuild.OutputDirectory != None):
+            self.OutputDirectory = ZEBuild.OutputDirectory + "/" + self.Name
+        else:
+            self.OutputDirectory = self.RootDirectory + "/Output"
         self.LogDirectory = self.RootDirectory  + "/Log"
         self.BuildDirectory = self.RootDirectory  + "/Build"
         self.SourceDirectory = self.RootDirectory  + "/Source"
 
-        os.path.normpath(self.OutputDirectory)
-        os.path.normpath(self.LogDirectory)
-        os.path.normpath(self.BuildDirectory)
-        os.path.normpath(self.SourceDirectory)
+        self.OutputDirectory = os.path.normpath(self.OutputDirectory)
+        self.LogDirectory = os.path.normpath(self.LogDirectory)
+        self.BuildDirectory = os.path.normpath(self.BuildDirectory)
+        self.SourceDirectory = os.path.normpath(self.SourceDirectory)
 
         self.ExtraLibraries = ExtraLibraries
 
@@ -274,23 +280,30 @@ def Main():
     ZEBuild.Log("Initializing...")
 
     parser = optparse.OptionParser()
-    parser.add_option("-p", "--platform", dest="platform", action="store", type="string",
+    parser.add_option("-p", "--platform", dest="Platform", action="store", type="string",
                       help="Platform name (Windows, Linux, Unix, MacOS, PS3, xBox360, iPhone, iPhoneSimulator, Android)")
-    parser.add_option("-a", "--architecture", dest="architecture", action="store", type="string",
+    parser.add_option("-a", "--architecture", dest="Architecture", action="store", type="string",
                       help="Architecture name (x86, x64, PPC, ARM)")
-    parser.add_option("-c", "--cmake_generator", dest="cmake_generator", action="store", type="string",
+    parser.add_option("-c", "--cmake-generator", dest="CMakeGenerator", action="store", type="string",
                       help="CMake generator name. (VS20XX, NMake, Make, XCode)")
+    parser.add_option("-o", "--output-directory", dest="OutputDirectory", action="store", type="string",
+                      help="Combined output directory path.")
     (Options, args) = parser.parse_args()
 
     ZEBuild.Platform = ZEPlatform()
-    ZEBuild.Platform.Platform = Options.platform
-    ZEBuild.Platform.Architecture = Options.architecture
-    ZEBuild.Platform.CMakeGenerator = Options.cmake_generator
+    ZEBuild.Platform.Platform = Options.Platform
+    ZEBuild.Platform.Architecture = Options.Architecture
+    ZEBuild.Platform.CMakeGenerator = Options.CMakeGenerator
+    ZEBuild.OutputDirectory = Options.OutputDirectory
+    if (ZEBuild.OutputDirectory != None):
+        ZEBuild.OutputDirectory = os.path.abspath(ZEBuild.OutputDirectory)
 
     if (ZEBuild.Platform.CMakeGenerator[:6] == "Visual" or ZEBuild.Platform.CMakeGenerator == "Xcode"):
         ZEBuild.Platform.MultiConfiguration = True
     else:
         ZEBuild.Platform.MultiConfiguration = False
+
+    ZEBuild.RootDirectory = ZEBuild.GetWorkingDirectory()
 
     DirectoryBase = os.getcwd()
     DirectoryList = os.listdir(os.getcwd() + "/Source")
@@ -308,8 +321,8 @@ def Main():
                     ZEBuild.CurrentLibrary = None
         except ZEBuildException as e:
             ZEBuild.Error(e.ErrorText)
-        except Exception as e:
-            ZEBuild.Error("Unknown Exception occured: " + e.message)
+        '''except Exception as e:
+            ZEBuild.Error("Unknown Exception occured: " + e.message)'''
 
 
 if (__name__ == "__main__"):
