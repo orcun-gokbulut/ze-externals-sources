@@ -19,20 +19,20 @@ class FreeImageLibrary(ZELibrary):
     def Gather(self, Debug):
         ZELibrary.Gather(self, Debug)
         if (Debug != None):
-
             if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
-                ZEBuild.CopyDirectory(self.BuildDirectory + "/Include", self.OutputDirectory + "/Include")
+                ZEBuild.CreateDirectory(self.OutputDirectory + "/Include")
+                ZEBuild.CopyFile(self.SourceDirectory + "/FreeImage.h", self.OutputDirectory + "/Include/FreeImage.h")
 
             if ZEBuild.Platform.MultiConfiguration:
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
 
                 FileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + ("/libFreeImage.lib" if ZEBuild.Platform.Platform == "Windows" else "/liblibFreeImage.a")
-                FileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/libFreeImage.lib" if ZEBuild.Platform.Platform == "Windows" else "/liblibFreeImage.a")
+                FileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/libFreeImage.lib" if ZEBuild.Platform.Platform == "Windows" else "/libFreeImage.a")
             else:
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
 
-                FileSource = self.BuildDirectory + "liblibFreeImage.a"
-                FileDestination = self.OutputDirectory + "/Lib/liblibFreeImage.a"
+                FileSource = self.BuildDirectory + "/liblibFreeImage.a"
+                FileDestination = self.OutputDirectory + "/Lib/libFreeImage.a"
 
             ZEBuild.CopyFile(FileSource, FileDestination)
 
