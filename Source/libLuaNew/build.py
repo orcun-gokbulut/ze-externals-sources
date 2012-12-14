@@ -33,7 +33,7 @@ class LuaLibrary(ZELibrary):
                 if ZEBuild.Platform.CMakeGenerator == "Xcode":
                     ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
 
-                    LibFileSource = self.BuildDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + "/liblua.a"
+                    LibFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + "/liblua.a"
                     LibFileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + "/libLua.a"
                     
                 elif ZEBuild.Platform.CMakeGenerator == "Unix Makefiles":
