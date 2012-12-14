@@ -21,12 +21,26 @@ class FreeTypeLibrary(ZELibrary):
             if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
                 ZEBuild.CopyDirectory(self.SourceDirectory + "/include", self.OutputDirectory + "/Include")
 
-            if ZEBuild.Platform.Platform == "Windows" or ZEBuild.Platform.Platform == "MacOS":
+            if ZEBuild.Platform.Platform == "Windows":
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
 
-                FileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + ("/libfreetype.lib" if ZEBuild.Platform.Platform == "Windows" else "/libfreetype.a")
-                FileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/libFreeType.lib" if ZEBuild.Platform.Platform == "Windows" else "/libFreeType.a")
-            else:
+                FileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + "/libfreetype.lib"
+                FileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + "/libFreeType.lib"
+                
+            elif ZEBuild.Platform.Platform == "MacOS":
+                if ZEBuild.Platform.CMakeGenerator == "Xcode":
+                    ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
+
+                    FileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + "/libfreetype.a"
+                    FileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + "/libFreeType.a"
+                    
+                else:
+                    ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
+
+                    FileSource = self.BuildDirectory + "/libfreetype.a"
+                    FileDestination = self.OutputDirectory + "/Lib/libFreeType.a"
+                    
+            elif ZEBuild.Platform.Platform == "Linux":
                 ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
 
                 FileSource = self.BuildDirectory + "/libfreetype.a"
