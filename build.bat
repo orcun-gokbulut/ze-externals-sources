@@ -1,1 +1,0 @@
-build_base.bat | Tool\Win\tee.exe Build.log
