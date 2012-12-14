@@ -35,4 +35,4 @@ add_subdirectory(FreeImageToolkit)
 add_library(libFreeImage ${Sources})
 
 install(TARGETS libFreeImage DESTINATION Lib)
-install(FILES Freeimage.h DESTINATION Include)
+install(FILES FreeImage.h DESTINATION Include)
