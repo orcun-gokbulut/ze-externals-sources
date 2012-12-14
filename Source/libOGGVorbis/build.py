@@ -14,7 +14,6 @@ class OGGVorbisLibrary(ZELibrary):
     def Compile(self, Debug):
         ZELibrary.Compile(self, Debug)
         ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
-        ZEBuild.CMakeInstall(self.BuildDirectory, Debug)
 
     def Gather(self, Debug):
         ZELibrary.Gather(self, Debug)
