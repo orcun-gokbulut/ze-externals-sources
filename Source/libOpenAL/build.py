@@ -44,6 +44,13 @@ class OpenALLibrary(ZELibrary):
                     ZEBuild.CreateDirectory(self.OutputDirectory + "/Dll")
                     FileSource = self.BuildDirectory + "/libopenal.1.13.0.dylib"
                     FileDestination = self.OutputDirectory + "/Dll/libOpenAL.dylib"
+
+                ZEBuild.CopyFile(FileSource, FileDestination)
+
+            elif ZEBuild.Platform.Platform == "Linux":
+                ZEBuild.CreateDirectory(self.OutputDirectory + "/Dll")
+                FileSource = self.BuildDirectory + "/libopenal.so.1.13.0"
+                FileDestination = self.OutputDirectory + "/Dll/libOpenAL.so"
                     
                 ZEBuild.CopyFile(FileSource, FileDestination)
 
