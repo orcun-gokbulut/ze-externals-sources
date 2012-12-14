@@ -1,2 +1,0 @@
-Name : Template
-Version : 1.0
