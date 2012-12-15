@@ -1,7 +1,4 @@
-class VprnLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libVRPN(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -21,6 +18,7 @@ class VprnLibrary(ZELibrary):
     def Compile(self, Debug):
         ZELibrary.Compile(self, Debug)
         ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
+
     def Gather(self, Debug):
         ZELibrary.Gather(self, Debug)
         if (Debug != None):
@@ -48,8 +46,4 @@ class VprnLibrary(ZELibrary):
             ZEBuild.CopyFile(VprnFileSource, VprnFileDestination)
             ZEBuild.CopyFile(QuatFileSource, QuatFileDestination)
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
-
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(VprnLibrary("Vprn", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libVRPN("libVRPN", ""))

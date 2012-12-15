@@ -1,7 +1,4 @@
-class zLibLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libZLib(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -15,6 +12,7 @@ class zLibLibrary(ZELibrary):
     def Compile(self, Debug):
         ZELibrary.Compile(self, Debug)
         ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
+
     def Gather(self, Debug):
         ZELibrary.Gather(self, Debug)
         if (Debug != None):
@@ -35,9 +33,5 @@ class zLibLibrary(ZELibrary):
                 VprnFileDestination = self.OutputDirectory + "/Lib/zLib.a"
                 
             ZEBuild.CopyFile(VprnFileSource, VprnFileDestination)
-            
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
 
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(zLibLibrary("zLib", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libZLib("libZLib", ""))
