@@ -1,33 +1,21 @@
 class libBullet(ZELibrary):
-    def Configure(self, Debug):
-        ZELibrary.Configure(self, Debug)
-        if (Debug != None):
-            Parameter = [ZECMakeParameter("CMAKE_INSTALL_PREFIX", "PATH", "./output"),
-                         ZECMakeParameter("INSTALL_LIBS", "BOOL", "1"),
-                         ZECMakeParameter("BUILD_MINICL_OPENCL_DEMOS", "BOOL", "NO"),
-                         ZECMakeParameter("BUILD_DEMOS", "BOOL", "NO"),
-                         ZECMakeParameter("BUILD_EXTRAS", "BOOL", "NO"),
-                         ZECMakeParameter("BUILD_CPU_DEMOS", "BOOL", "NO"),
-                         ZECMakeParameter("CMAKE_BUILD_TYPE", "STRING", "Debug" if Debug else "Release"),]
-        else:
-            Parameter = None
-        ZEBuild.SetWorkingDirectory(ZEBuild.CurrentLibrary.BuildDirectory)
-        ZEBuild.CMake(self.SourceDirectory, Parameter)
+    def Configure(self, Configuration):
+        ZELibrary.Configure(self, Configuration)
+        Parameter = [ZECMakeParameter("INSTALL_LIBS", "BOOL", "1"),
+                     ZECMakeParameter("BUILD_MINICL_OPENCL_DEMOS", "BOOL", "NO"),
+                     ZECMakeParameter("BUILD_DEMOS", "BOOL", "NO"),
+                     ZECMakeParameter("BUILD_EXTRAS", "BOOL", "NO"),
+                     ZECMakeParameter("BUILD_CPU_DEMOS", "BOOL", "NO")]
 
-    def Compile(self, Debug):
-        ZELibrary.Compile(self, Debug)
-        ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
+        ZEBuild.CMake(self, "", Parameter)
 
-    def Gather(self, Debug):
-        ZELibrary.Gather(self, Debug)
-        ZEBuild.CMakeInstall(self.BuildDirectory, Debug)
-        if (Debug != None):
-            if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
-                ZEBuild.CopyDirectory(self.BuildDirectory + "/output/output/include/bullet/", self.OutputDirectory + "/Include")
+    def Compile(self, Configuration):
+        ZELibrary.Compile(self, Configuration)
+        ZEBuild.CMakeBuild(self, Configuration)
 
-            if ZEBuild.Platform.MultiConfiguration:
-                ZEBuild.CopyDirectory(self.BuildDirectory + "/output/lib", self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
-            else:
-                ZEBuild.CopyDirectory(self.BuildDirectory + "/output/lib", self.OutputDirectory + "/Lib")
+    def Gather(self, Configuration):
+        ZELibrary.Gather(self, Configuration)
+        ZEBuild.CMakeInstall(self, Configuration)
+        ZEBuild.CopyInstallToOutput(self, Configuration, "include/bullet", "lib")
 
 ZEBuild.BuildLibrary(libBullet("libBullet", ""))
