@@ -1,7 +1,4 @@
-class TinyXMLLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libTinyXML(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         Parameter = ""
@@ -45,9 +42,5 @@ class TinyXMLLibrary(ZELibrary):
                 FileDestination = self.OutputDirectory + "/Lib/libTinyXml.a"
 
             ZEBuild.CopyFile(FileSource, FileDestination)
-            
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
 
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(TinyXMLLibrary("TinyXML", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libTinyXML("libTinyXML", ""))

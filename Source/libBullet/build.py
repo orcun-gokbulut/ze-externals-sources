@@ -1,7 +1,4 @@
-class BulletLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libBullet(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -22,8 +19,8 @@ class BulletLibrary(ZELibrary):
         ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
 
     def Gather(self, Debug):
-        ZEBuild.CMakeInstall(self.BuildDirectory, Debug)
         ZELibrary.Gather(self, Debug)
+        ZEBuild.CMakeInstall(self.BuildDirectory, Debug)
         if (Debug != None):
             if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
                 ZEBuild.CopyDirectory(self.BuildDirectory + "/output/output/include/bullet/", self.OutputDirectory + "/Include")
@@ -33,8 +30,4 @@ class BulletLibrary(ZELibrary):
             else:
                 ZEBuild.CopyDirectory(self.BuildDirectory + "/output/lib", self.OutputDirectory + "/Lib")
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
-
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(BulletLibrary("Bullet", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libBullet("libBullet", ""))

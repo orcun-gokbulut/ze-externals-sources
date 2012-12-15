@@ -1,7 +1,4 @@
-class FreeTypeLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libFreeType(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -48,8 +45,4 @@ class FreeTypeLibrary(ZELibrary):
 
             ZEBuild.CopyFile(FileSource, FileDestination)
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
-
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(FreeTypeLibrary("FreeType", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libFreeType("libFreeType", ""))

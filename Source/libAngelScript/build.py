@@ -1,7 +1,4 @@
-class AngleScriptLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libAngelScript(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -35,8 +32,4 @@ class AngleScriptLibrary(ZELibrary):
 
             ZEBuild.CopyFile(FileSource, FileDestination)
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
-
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(AngleScriptLibrary("AngelScript", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libAngelScript("libAngelScript", ""))

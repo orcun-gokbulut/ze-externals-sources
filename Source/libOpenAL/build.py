@@ -1,7 +1,4 @@
-class OpenALLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libOpenAL(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -54,8 +51,4 @@ class OpenALLibrary(ZELibrary):
                     
                 ZEBuild.CopyFile(FileSource, FileDestination)
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
-
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(OpenALLibrary("OpenAL", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libOpenAL("libOpenAL", ""))

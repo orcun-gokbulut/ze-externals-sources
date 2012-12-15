@@ -1,7 +1,4 @@
-class OGGVorbisLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libOGGVorbis(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -42,8 +39,4 @@ class OGGVorbisLibrary(ZELibrary):
             ZEBuild.CopyFile(OggFileSource, OggFileDestination)
             ZEBuild.CopyFile(VorbisFileSource, VorbisFileDestination)
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
-
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(OGGVorbisLibrary("OGGVorbis", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libOGGVorbis("libOGGVorbis", ""))

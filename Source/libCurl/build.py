@@ -1,7 +1,4 @@
-class CurlLibrary(ZELibrary):
-    def Clean(self):
-        ZELibrary.Clean(self)
-
+class libCurl(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
         if (Debug != None):
@@ -21,7 +18,6 @@ class CurlLibrary(ZELibrary):
     def Gather(self, Debug):
         ZELibrary.Gather(self, Debug)
         if (Debug != None):
-
             if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
                 ZEBuild.CopyDirectory(self.SourceDirectory + "/include/curl/", self.OutputDirectory + "/Include")
                 ZEBuild.CopyDirectory(self.BuildDirectory + "/include/curl/", self.OutputDirectory + "/Include/curl")
@@ -39,8 +35,5 @@ class CurlLibrary(ZELibrary):
 
             ZEBuild.CopyFile(FileSource, FileDestination)
 
-    def GenerateCMakeList(self):
-        ZEBuild.GenerateCMakeList(self.OutputDirectory, "2.8", "", True)
 
-#Usage : ZEBuild.BuildLibrary(ClassName([LibraryName], [[ExtraLib],[ExtraLib],[ExtraLib]]
-ZEBuild.BuildLibrary(CurlLibrary("Curl", "SampleExtraLib.lib"))
+ZEBuild.BuildLibrary(libCurl("libCurl", ""))
