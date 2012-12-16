@@ -1,4 +1,4 @@
 class libATICompress(ZEPrebuildLibrary):
     pass
 
-ZEBuild.BuildLibrary(libATICompress("libATICompress", ""))
+ZEBuildDriver.BuildLibrary(libATICompress("libATICompress", ""))

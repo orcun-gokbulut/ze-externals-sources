@@ -7,15 +7,15 @@ class libBullet(ZELibrary):
                      ZECMakeParameter("BUILD_EXTRAS", "BOOL", "NO"),
                      ZECMakeParameter("BUILD_CPU_DEMOS", "BOOL", "NO")]
 
-        ZEBuild.CMake(self, "", Parameter)
+        ZECMake.Configure(self, "", Parameter)
 
     def Compile(self, Configuration):
         ZELibrary.Compile(self, Configuration)
-        ZEBuild.CMakeBuild(self, Configuration)
+        ZECMake.Build(self, Configuration)
 
     def Gather(self, Configuration):
         ZELibrary.Gather(self, Configuration)
-        ZEBuild.CMakeInstall(self, Configuration)
-        ZEBuild.CopyInstallToOutput(self, Configuration, "include/bullet", "lib")
+        ZECMake.Install(self, Configuration)
+        ZEOperations.CopyInstallToOutput(self, Configuration, "include/bullet", "lib")
 
 ZEBuild.BuildLibrary(libBullet("libBullet", ""))

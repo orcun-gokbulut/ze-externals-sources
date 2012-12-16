@@ -1,4 +1,4 @@
 class libCG(ZEPrebuildLibrary):
     pass
 
-ZEBuild.BuildLibrary(libCG("libCG", ""))
+ZEBuildDriver.BuildLibrary(libCG("libCG", ""))

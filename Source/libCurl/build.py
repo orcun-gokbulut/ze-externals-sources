@@ -1,5 +1,5 @@
-class libCurl(ZELibrary):
-    def Configure(self, Debug):
+class libCurl(ZELibrary):   
+    def Configure(self, Configuration):
         ZELibrary.Configure(self, Configuration)
         Parameters = [ZECMakeParameter("CURL_STATICLIB", "BOOL", "YES"),
                      ZECMakeParameter("BUILD_CURL_EXE", "BOOL", "NO"),
@@ -16,32 +16,26 @@ class libCurl(ZELibrary):
                      ZECMakeParameter("CURL_DISABLE_LDAP", "BOOL", "YES"),
                      ZECMakeParameter("CURL_DISABLE_LDAPS", "BOOL", "YES")]
 
-        ZEBuild.CMake(self, "", Parameters)
+        ZECMake.Configure(self, "", Parameters)
 
     def Compile(self, Configuration):
         ZELibrary.Compile(self, Configuration)
-        ZEBuild.CMakeBuild(self, Configuration)
+        ZECMake.Build(self, Configuration)
 
     def Gather(self, Configuration):
-        ZELibrary.Gather(self, Configuration
-        ZEBuild.CMakeInstall(self, Configuration)
+        ZELibrary.Gather(self, Configuration)
         
-        if (Configuration != ZEBuild.CONFIG_NONE):
-            ZEBuild.CopyDirectory(self.SourceDirectory + "/include/curl/", self.OutputDirectory + "/Include")
-            ZEBuild.CopyDirectory(self.BuildDirectory + "/include/curl/", self.OutputDirectory + "/Include")
+        if (Configuration == ZEBuild.CONFIG_NONE):
+            ZEOperations.CopyDirectory(self.SourceDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
+            ZEOperations.CopyDirectory(self.BuildDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
+            ZEOperations.CopyFile("/lib/libcurl" + ZEPlatform.LibExtension, self.OutputDirectory + "/Lib/libCurl" + ZEPlatform.LibExtension)
+        elif (Configuration == ZEBuild.CONFIG_DEBUG):
+            ZEOperations.CreateDirectory(self.OutputDirectory + "/Lib/Debug")
+            ZEOperations.CopyFile(self.BuildDirectory + "/lib/Debug/libcurl" + ZEPlatform.LibExtension, self.OutputDirectory + "/Lib/Debug/libCurl" + ZEPlatform.LibExtension)
+        elif (Configuration == ZEBuild.CONFIG_RELEASE):
+            ZEOperations.CopyDirectory(self.SourceDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
+            ZEOperations.CopyDirectory(self.BuildDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
+            ZEOperations.CreateDirectory(self.OutputDirectory + "/Lib/Release")
+            ZEOperations.CopyFile(self.BuildDirectory + "/lib/Release/libcurl" + ZEPlatform.LibExtension, self.OutputDirectory + "/Lib/Release/libCurl" + ZEPlatform.LibExtension)
 
-            if ZEBuild.Platform.MultiConfiguration:
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
-
-                FileSource = self.BuildDirectory + "/lib" + ("/Debug" if Debug else "/Release") + ("/libcurl.lib" if ZEBuild.Platform.Platform == "Windows" else "/libcurl.a")
-                FileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/libCurl.lib" if ZEBuild.Platform.Platform == "Windows" else "/libCurl.a")
-            else:
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
-
-                FileSource = self.BuildDirectory + "/lib/libcurl.a"
-                FileDestination = self.OutputDirectory + "/Lib/libCurl.a"
-
-            ZEBuild.CopyFile(FileSource, FileDestination)
-
-
-ZEBuild.BuildLibrary(libCurl("libCurl", ""))
+ZEBuildDriver.BuildLibrary(libCurl("libCurl", ""))
