@@ -9,6 +9,7 @@ class libLua(ZELibrary):
 
     def Gather(self, Configuration):
         ZELibrary.Gather(self, Configuration)
+        ZECMake.Install(self, Configuration)
         ZEOperations.CopyInstallToOutputAuto(self, Configuration)
 
 ZEBuildDriver.BuildLibrary(libLua("libLua", ""))

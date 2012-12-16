@@ -6,15 +6,10 @@ set(LIBRARY_OUTPUT_PATH lib/${CMAKE_BUILD_TYPE})
 
 include_directories(./)
 
-file(
-	GLOB_RECURSE
-	source_files
-	*.h
-	*.cpp
-)
+file(GLOB_RECURSE source_files *.h *.cpp)
 
-add_library(
-	tinyxml
-	STATIC
-	${source_files}
-)
+add_library(libTinyXML STATIC ${source_files})
+set_target_properties(libTinyXML PROPERTIES PREFIX "")
+
+install(TARGETS libTinyXML DESTINATION Lib)
+install(FILES tinystr.h tinyxml.h DESTINATION Include)

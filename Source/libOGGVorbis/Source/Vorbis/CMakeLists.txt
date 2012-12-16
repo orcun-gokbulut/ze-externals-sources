@@ -51,6 +51,8 @@ add_library(libVorbis
 	vorbisfile.c
 	window.c
 	window.h)
+	
+set_target_properties(libVorbis PROPERTIES PREFIX "")
 
 install(TARGETS libVorbis DESTINATION Lib)
 install(FILES vorbis/codec.h vorbis/vorbisenc.h vorbis/vorbisfile.h DESTINATION Include/vorbis)

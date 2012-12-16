@@ -8,7 +8,7 @@ def Main():
 
     ZEBuildDriver.ParseArguments()
     #ZEBuildDriver.ScanAndBuild()
-    ZEBuildDriver.ScanDirectory(ZEBuild.RootDirectory + "/Source/libAngelScript")
+    ZEBuildDriver.ScanDirectory(ZEBuild.RootDirectory + "/Source/libFreeType")
 
 if (__name__ == "__main__"):
     Main()

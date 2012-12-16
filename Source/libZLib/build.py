@@ -1,37 +1,16 @@
 class libZLib(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
-        if (Debug != None):
-            Parameter = [ZECMakeParameter("CMAKE_BUILD_TYPE", "STRING", "Debug" if Debug else "Release"),
-                         ZECMakeParameter("BUILD_SHARED_LIBS", "BOOL", "NO")]
-        else:
-            Parameter = None
-        ZEBuild.SetWorkingDirectory(ZEBuild.CurrentLibrary.BuildDirectory)
-        ZEBuild.CMake(self.SourceDirectory, Parameter)
+        Parameters = [ZECMakeParameter("BUILD_SHARED_LIBS", "BOOL", "NO")]
+        ZECMake.Configure(self, "", Parameters)
 
-    def Compile(self, Debug):
-        ZELibrary.Compile(self, Debug)
-        ZEBuild.CMakeBuild(self.BuildDirectory, Debug)
+    def Compile(self, Configuration):
+        ZELibrary.Compile(self, Configuration)
+        ZECMake.Build(self, Configuration)
 
-    def Gather(self, Debug):
-        ZELibrary.Gather(self, Debug)
-        if (Debug != None):
-            if not ZEBuild.IsDirectoryExists(self.OutputDirectory + "/Include"):
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Include")
-                ZEBuild.CopyFile(self.SourceDirectory + "/zlib.h", self.OutputDirectory + "/Include" + "/zlib.h")
-                ZEBuild.CopyFile(self.BuildDirectory + "/zconf.h", self.OutputDirectory + "/Include" + "/zconf.h")
-            
-            if ZEBuild.Platform.MultiConfiguration:
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release"))
+    def Gather(self, Configuration):
+        ZELibrary.Gather(self, Configuration)
+        ZECMake.Install(self, Configuration)
+        ZEOperations.CopyInstallToOutput(self, Configuration, "include", "lib")
 
-                VprnFileSource = self.BuildDirectory + ("/Debug" if Debug else "/Release") + (("/zlibd.lib" if Debug else "/zlib.lib") if ZEBuild.Platform.Platform == "Windows" else "/libz.a")
-                VprnFileDestination = self.OutputDirectory + "/Lib" + ("/Debug" if Debug else "/Release") + ("/zlib.lib" if ZEBuild.Platform.Platform == "Windows" else "/zlib.a")
-            else:
-                ZEBuild.CreateDirectory(self.OutputDirectory + "/Lib")
-
-                VprnFileSource = self.BuildDirectory + "/libz.a"
-                VprnFileDestination = self.OutputDirectory + "/Lib/zLib.a"
-                
-            ZEBuild.CopyFile(VprnFileSource, VprnFileDestination)
-
-ZEBuild.BuildLibrary(libZLib("libZLib", ""))
+ZEBuildDriver.BuildLibrary(libZLib("libZLib", ""))

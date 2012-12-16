@@ -76,7 +76,7 @@ class ZEBuildDriver:
             CurrentDirectory = DirectoryBase + "/Source/" + Directory
             try:
                 if (os.path.isdir(CurrentDirectory)):
-                    ZEBuild.ScanDirectory(CurrentDirectory)
+                    ZEBuildDriver.ScanDirectory(CurrentDirectory)
 
             except ZEBuildException as e:
                 ZELog.Error(e.ErrorText)

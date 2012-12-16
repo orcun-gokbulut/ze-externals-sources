@@ -8,5 +8,7 @@ add_library(libOGG
 	ogg/ogg.h
 	ogg/os_types.h)
 
+set_target_properties(libOGG PROPERTIES PREFIX "")
+
 install(TARGETS libOGG DESTINATION Lib)
 install(FILES ogg/ogg.h ogg/os_types.h DESTINATION Include/ogg)

@@ -9,6 +9,7 @@ class libOpenAL(ZELibrary):
 
     def Gather(self, Configuration):
         ZELibrary.Gather(self, Configuration)
+        ZECMake.Install(self, Configuration)
         ZEOperations.CopyInstallToOutput(self, Configuration, "include", "lib", "bin")
 
 ZEBuildDriver.BuildLibrary(libOpenAL("libOpenAL", ""))

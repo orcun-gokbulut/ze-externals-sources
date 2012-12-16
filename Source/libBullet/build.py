@@ -18,4 +18,4 @@ class libBullet(ZELibrary):
         ZECMake.Install(self, Configuration)
         ZEOperations.CopyInstallToOutput(self, Configuration, "include/bullet", "lib")
 
-ZEBuild.BuildLibrary(libBullet("libBullet", ""))
+ZEBuildDriver.BuildLibrary(libBullet("libBullet", ""))

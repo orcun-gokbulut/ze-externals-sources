@@ -64,7 +64,6 @@ set(Sources
 	src/ltablib.c
 	src/ltm.c
 	src/ltm.h
-	src/lua.c
 	src/lua.h
 	src/lua.hpp
 	src/luaconf.h
