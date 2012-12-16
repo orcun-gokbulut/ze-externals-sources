@@ -33,6 +33,7 @@ add_subdirectory(ZLib)
 add_subdirectory(FreeImageToolkit)
 
 add_library(libFreeImage ${Sources})
+set_target_properties(libFreeImage PROPERTIES PREFIX "")
 
 install(TARGETS libFreeImage DESTINATION Lib)
 install(FILES FreeImage.h DESTINATION Include)

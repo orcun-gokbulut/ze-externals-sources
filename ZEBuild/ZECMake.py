@@ -19,15 +19,15 @@ class ZECMake:
             for Parameter in Parameters:
                 ParameterString += "-D" + Parameter.Name + ":" + Parameter.Type + "=\"" + Parameter.Value + "\" "
 
-	ParameterString += "-DCMAKE_INSTALL_PREFIX=\"" + ZEBuild.CurrentLibrary.InstallDirectory + "\" "
-	
-	if (ZEPlatform.Platform == "Linux"):
-	    ParameterString += " -DCMAKE_TOOLCHAIN_FILE=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ZEPlatform.Architecture + ".cmake"
-	
-	FullSourceDirectory = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory)
+        ParameterString += "-DCMAKE_INSTALL_PREFIX=\"" + ZEBuild.CurrentLibrary.InstallDirectory + "\" "
+
+        if (ZEPlatform.Platform == "Linux"):
+            ParameterString += " -DCMAKE_TOOLCHAIN_FILE=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ZEPlatform.Architecture + ".cmake"
+
+        FullSourceDirectory = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory)
         Arguments = " -G \"" + ZEPlatform.CMakeGenerator + "\" " + ParameterString + " \"" + FullSourceDirectory + "\""
 
-	ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
+        ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
 
         ReturnValue = ZEOperations.Call("cmake", Arguments)
         if (ReturnValue != 0):
@@ -37,16 +37,16 @@ class ZECMake:
     def Build(Library, Configuration):
         ConfigurationText = ""        
 
-	ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
+        ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
 
         if (Configuration == ZEBuild.CONFIG_NONE):
             ConfigurationText = ""
-	elif (Configuration == ZEBuild.CONFIG_DEBUG):
-	    ConfigurationText = "--config Debug"
-	elif (Configuration == ZEBuild.CONFIG_RELEASE):
-	    ConfigurationText = "--config Release"
-	    
-	Arguments = " --build \"" + Library.BuildDirectory + "\" " + ConfigurationText
+        elif (Configuration == ZEBuild.CONFIG_DEBUG):
+            ConfigurationText = "--config Debug"
+        elif (Configuration == ZEBuild.CONFIG_RELEASE):
+            ConfigurationText = "--config Release"
+
+        Arguments = " --build \"" + Library.BuildDirectory + "\" " + ConfigurationText
         ReturnValue = ZEOperations.Call("cmake", Arguments)
         if (ReturnValue != 0):
             raise ZEBuildException("CMake build failed.")
@@ -55,15 +55,15 @@ class ZECMake:
     def Install(Library, Configuration):
         ConfigurationText = ""
 
-	ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
+        ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
 
-	if (Configuration == ZEBuild.CONFIG_NONE):
+        if (Configuration == ZEBuild.CONFIG_NONE):
             ConfigurationText = ""
-	elif (Configuration == ZEBuild.CONFIG_DEBUG):
-	    ConfigurationText = "--config Debug"
-	elif (Configuration == ZEBuild.CONFIG_RELEASE):
-	    ConfigurationText = "--config Release"
-	    
+        elif (Configuration == ZEBuild.CONFIG_DEBUG):
+            ConfigurationText = "--config Debug"
+        elif (Configuration == ZEBuild.CONFIG_RELEASE):
+            ConfigurationText = "--config Release"
+
         Arguments = " --build \"" + Library.BuildDirectory + "\" --target install " + ConfigurationText
 
         ReturnValue = ZEOperations.Call("cmake", Arguments)
@@ -80,6 +80,6 @@ class ZECMake:
                         "\tARCHITECTURE " + ZEPlatform.Architecture + " " + 
                         ("\tSYSTEM_LIBS " + SystemLibs) if SystemLibs != "" else "" + " " +
                         ("\tCOMBINABLE)" if Combinable != False else "") + 
-	                ")")
+                        ")")
         CMakeList.flush()
         CMakeList.close()

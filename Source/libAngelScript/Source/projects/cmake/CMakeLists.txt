@@ -111,5 +111,7 @@ if(MSVC)
         set_target_properties(libAngelScript PROPERTIES COMPILE_FLAGS "/MP")
 endif(MSVC)
 
+set_target_properties(libAngelScript PROPERTIES PREFIX "")
+
 install(TARGETS libAngelScript DESTINATION Lib)
 install(FILES ../../include/angelscript.h DESTINATION Include)
