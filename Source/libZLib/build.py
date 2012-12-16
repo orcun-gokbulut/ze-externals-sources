@@ -1,7 +1,9 @@
 class libZLib(ZELibrary):
     def Configure(self, Debug):
         ZELibrary.Configure(self, Debug)
-        Parameters = [ZECMakeParameter("BUILD_SHARED_LIBS", "BOOL", "NO")]
+        Parameters = [
+            ZECMakeParameter("BUILD_SHARED_LIBS", "BOOL", "NO"),
+            ZECMakeParameter("LIBRARY_OUTPUT_PATH", "PATH", self.InstallDirectory + "/Temp")]
         ZECMake.Configure(self, "", Parameters)
 
     def Compile(self, Configuration):

@@ -7,8 +7,7 @@ def Main():
     ZELog.Log("Initializing...")
 
     ZEBuildDriver.ParseArguments()
-    #ZEBuildDriver.ScanAndBuild()
-    ZEBuildDriver.ScanDirectory(ZEBuild.RootDirectory + "/Source/libFreeType")
-
+    ZEBuildDriver.ScanAndBuild()
+    
 if (__name__ == "__main__"):
     Main()

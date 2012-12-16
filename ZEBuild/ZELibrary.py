@@ -50,7 +50,7 @@ class ZELibrary:
     def Build(self):
         try:
             ZEOperations.CreateDirectory(self.LogDirectory)
-            self.LogFile = open(self.LogDirectory + "/Build-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log", "w")
+            self.LogFile = open(self.LogDirectory + "/" + self.Name + "-build-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log", "w")
 
             ZELog.Log("Building platform library " + self.Name)          
 
@@ -98,13 +98,10 @@ class ZELibrary:
     def __init__(self, Name, ExtraLibraries):
         self.Name = Name
         self.RootDirectory = os.getcwd();
-        if (ZEBuild.OutputDirectory != None):
-            self.OutputDirectory = os.path.normpath(ZEBuild.OutputDirectory + "/" + self.Name)
-        else:
-            self.OutputDirectory = os.path.normpath(self.RootDirectory + "/Output")
-        self.LogDirectory = os.path.normpath(self.RootDirectory  + "/Log")
-        self.BuildDirectory = os.path.normpath(self.RootDirectory  + "/Build")
-        self.SourceDirectory = os.path.normpath(self.RootDirectory  + "/Source")
+        self.SourceDirectory = self.RootDirectory + "/Source"
+        self.LogDirectory = os.path.normpath(ZEBuild.RootDirectory + "/Log/" + self.Name)
+        self.OutputDirectory = os.path.normpath(ZEBuild.OutputDirectory + "/" + self.Name)
+        self.BuildDirectory = os.path.normpath(ZEBuild.RootDirectory + "/Build/" + self.Name)
         self.InstallDirectory = os.path.normpath(self.BuildDirectory + "/ZEInstall")
 
         self.ExtraLibraries = ExtraLibraries

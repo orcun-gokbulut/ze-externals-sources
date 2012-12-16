@@ -28,8 +28,7 @@ class ZEBuildDriver:
         ZEPlatform.Architecture = Options.Architecture
         ZEPlatform.CMakeGenerator = Options.CMakeGenerator
         ZEBuild.OutputDirectory = Options.OutputDirectory
-        if (ZEBuild.OutputDirectory != None):
-            ZEBuild.OutputDirectory = os.path.abspath(ZEBuild.OutputDirectory)
+        
         ZEPlatform.PlatformString = ZEPlatform.Platform + "-" + ZEPlatform.Architecture
 
         if (ZEPlatform.CMakeGenerator[:6] == "Visual" or ZEPlatform.CMakeGenerator == "Xcode"):
@@ -38,6 +37,10 @@ class ZEBuildDriver:
             ZEPlatform.MultiConfiguration = False
 
         ZEBuild.RootDirectory = ZEOperations.GetWorkingDirectory()
+        if (ZEBuild.OutputDirectory != None):
+            ZEBuild.OutputDirectory = os.path.abspath(ZEBuild.OutputDirectory)
+        else:
+            ZEBuild.OutputDirectory = ZEBuild.RootDirectory + "/Output"
 
         if (ZEPlatform.Platform == "Windows"):
             ZEPlatform.LibExtension = ".lib"

@@ -23,6 +23,8 @@ class ZECMake:
 
         if (ZEPlatform.Platform == "Linux"):
             ParameterString += " -DCMAKE_TOOLCHAIN_FILE=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ZEPlatform.Architecture + ".cmake"
+        elif (ZEPlatform.Platform == "MacOSX"):
+            ParameterString += " -CMAKE_OSX_ARCHITECTURE=x86_64;i386"
 
         FullSourceDirectory = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory)
         Arguments = " -G \"" + ZEPlatform.CMakeGenerator + "\" " + ParameterString + " \"" + FullSourceDirectory + "\""
