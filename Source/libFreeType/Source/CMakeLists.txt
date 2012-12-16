@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(FreeType2)
+project(libFreeType2)
 
 add_definitions(-DFT2_BUILD_LIBRARY)
 add_definitions("-DFT_CONFIG_MODULES_H=<ftmodule.h>")
@@ -74,4 +74,6 @@ include_directories("src/raster")
 include_directories("src/psaux")
 include_directories("src/psnames")
 
-add_library(freetype STATIC ${BASE_SRCS})
+add_library(libFreeType STATIC ${BASE_SRCS})
+install(TARGETS libFreeType DESTINATION Lib)
+install(DIRECTORY include/ DESTINATION Include)

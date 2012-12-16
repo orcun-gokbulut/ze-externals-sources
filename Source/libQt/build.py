@@ -1,4 +1,4 @@
 class libQt(ZEPrebuildLibrary):
     pass
 
-ZEBuild.BuildLibrary(libQt("libQt", ""))
+ZEBuildDriver.BuildLibrary(libQt("libQt", ""))
