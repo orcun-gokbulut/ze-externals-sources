@@ -15,21 +15,25 @@ class ZEBuildDriver:
 
         parser = optparse.OptionParser()
         parser.add_option("-p", "--platform", dest="Platform", action="store", type="string",
-                          help="Platform name (Windows, Linux, Unix, MacOS, PS3, xBox360, iPhone, iPhoneSimulator, Android)")
+                          help="Platform name (Windows, Linux, MacOSX, PS3, XBox360, iOS, iOS-Simulator, Android) [Mandatory]")
         parser.add_option("-a", "--architecture", dest="Architecture", action="store", type="string",
-                          help="Architecture name (x86, x64, PPC, ARM)")
+                          help="Architecture name (x86, x64) [Madatory. For only Windows and Linux]")
         parser.add_option("-c", "--cmake-generator", dest="CMakeGenerator", action="store", type="string",
-                          help="CMake generator name. (VS20XX, NMake, Make, XCode)")
+                          help="CMake generator name. (Look at generators section of the cmake --help command ouput) [Optional. Uses system default.]")
+        parser.add_option("-s", "--sdk-root", dest="SDKRoot", action="store", type="string",
+                  help="Platform SDK root path. [Optional For MacOSX. Mandatory For iOS and iOS-Simulator. For only MacOSX, iOS and iOS-Simulator]")
         parser.add_option("-o", "--output-directory", dest="OutputDirectory", action="store", type="string",
-                          help="Combined output directory path.")
+                          help="Output directory path. (For Expl: Output/Windows-x86 or SomeRepositoryFolder/Apple/iPhone)")
         (Options, args) = parser.parse_args()
 
         ZEPlatform.Platform = Options.Platform
         ZEPlatform.Architecture = Options.Architecture
-        ZEPlatform.CMakeGenerator = Options.CMakeGenerator
+        ZEPlatform.CMakeGenerator = Options.CMakeGenerator        
         ZEBuild.OutputDirectory = Options.OutputDirectory
         
-        ZEPlatform.PlatformString = ZEPlatform.Platform + "-" + ZEPlatform.Architecture
+        ZEPlatform.PlatformString = ZEPlatform.Platform
+        if (Platform.Architecture != None):
+            ZEPlatform.Architecture += "-" + ZEPlatform.Architecture
 
         if (ZEPlatform.CMakeGenerator[:6] == "Visual" or ZEPlatform.CMakeGenerator == "Xcode"):
             ZEPlatform.MultiConfiguration = True
@@ -50,7 +54,7 @@ class ZEBuildDriver:
             ZEPlatform.LibExtension = ".a"
             ZEPlatform.DLLExpension = ".so"
             ZEPlatform.BinExtension = ""
-        elif (ZEPlatform.Platform == "MacOS" or ZEPlatform.Platform == "iPhone" or ZEPlatform.Platform == "iPhone-Simulator"):
+        elif (ZEPlatform.Platform == "MacOS" or ZEPlatform.Platform == "iOS" or ZEPlatform.Platform == "iOS-Simulator"):
             ZEPlatform.LibExtension = ".a"
             ZEPlatform.DLLExpension = ".dynlib"
             ZEPlatform.BinExtension = ""

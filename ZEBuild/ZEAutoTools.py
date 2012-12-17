@@ -11,6 +11,15 @@ class ZEAutoTools:
             for Parameter in Parameters:
                 ParameterString += Parameter + " "
 
+        if (ZEPlatform.Platform == "Linux"):
+            if (ZEPlatform.Architecture == "x86"):
+                Architectures = "-m32"
+            elif(ZEPlatform.Architecture == "x64"):
+                Architectures = "-m64"
+
+            Parameters += "CFLAGS=\"" + Architectures  +  "\" "
+            "CXXFLAGS=\"" + Architectures + "\" "
+
         ConfigureScriptPath = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory + "/configure")
 
         ReturnValue = ZEOperations.Call("chmod", "+x " + ConfigureScriptPath)
@@ -18,7 +27,7 @@ class ZEAutoTools:
             raise ZEBuildException("Can not change configure scripts permision.")
 
         ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
-        
+
         ReturnValue = ZEOperations.Call(ConfigureScriptPath, ParameterString)
         if (ReturnValue != 0):
             raise ZEBuildException("Configure script failed.")
@@ -26,7 +35,35 @@ class ZEAutoTools:
     @staticmethod
     def Build(Library, Configuration):
         ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
-        ReturnValue = ZEOperations.Call("make", "")
+
+        Parameters = ""        
+        if (ZEPlatform.Platform == "MacOSX" or ZEPlatform.Platform == "iOS" or ZEPlatform.Platform == "iOS-Simulator"):
+            if (ZEPlatform.SDKRoot != None):
+                SysRoot += "-syslibroot " + ZEPlatform.SDKRoot + " "
+            else:
+                SysRoot = ""
+
+            if (ZEPlatform.Platform == "MacOSX"):
+                Architectures = "-arch i386 -arch x86_64"
+            elif (ZEPlatform.Platform == "iOS"):
+                Architectures = "-arch armv6 -arch armv7"
+            elif (ZEPlatform.Platform == "iOS-Simulator"):
+                Architectures = "-arch i386"
+
+            Parameters = "CFLAGS=\"" + Architectures + " " + SysRoot +  "\" "
+            "CXXFLAGS=\"" + Architectures + " " + SysRoot +  "\" "
+            "LDFLAGS=\"" + Architectures + " " + SysRoot +  "\""
+
+        elif (ZEPlatform.Platform == "Linux"):
+            if (ZEPlatform.Architecture == "x86"):
+                Architectures = "-m32"
+            elif(ZEPlatform.Architecture == "x64"):
+                Architectures = "-m64"
+
+            Parameters = "CFLAGS=\"" + Architectures  +  "\" "
+            "CXXFLAGS=\"" + Architectures + "\" "
+
+        ReturnValue = ZEOperations.Call("make", Parameters)
         if (ReturnValue != 0):
             raise ZEBuildException("Make failed.")
 

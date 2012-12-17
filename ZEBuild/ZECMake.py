@@ -21,13 +21,27 @@ class ZECMake:
 
         ParameterString += "-DCMAKE_INSTALL_PREFIX=\"" + ZEBuild.CurrentLibrary.InstallDirectory + "\" "
 
-        if (ZEPlatform.Platform == "Linux"):
-            ParameterString += " -DCMAKE_TOOLCHAIN_FILE=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ZEPlatform.Architecture + ".cmake"
-        elif (ZEPlatform.Platform == "MacOSX"):
-            ParameterString += " -CMAKE_OSX_ARCHITECTURE=x86_64;i386"
+        if (ZEPlatform.Platform == "MacOSX" or ZEPlatform.Platform == "iOS" or ZEPlatform.Platform == "iOS-Simulator"):
+            if (ZEPlatform.Platform == "MacOSX"):
+                Architectures = "i386;x86_64"
+            elif (ZEPlatform.Platform == "iOS"):
+                Architectures = "armv6;armv7"
+            elif (ZEPlatform.Platform == "iOS-Simulator"):
+                Architectures = "i386"
+
+            ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"x86_64;i386\""
+            if (ZEPlatform.SDKRoot != None):
+                ParameterString += " -DCMAKE_OSX_SYSROOT:STRING=\"" + ZEBuild.SDKRoot + "\""
+
+        elif (ZEPlatform.Platform == "Linux"):
+            ParameterString += " -DCMAKE_TOOLCHAIN_FILE:STRING=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ZEPlatform.Architecture + ".cmake"
 
         FullSourceDirectory = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory)
-        Arguments = " -G \"" + ZEPlatform.CMakeGenerator + "\" " + ParameterString + " \"" + FullSourceDirectory + "\""
+        Arguments = ""
+        if (ZEPlatform.CMakeGenerator != None):
+            Arguments += "-G \"" + ZEPlatform.CMakeGenerator + "\" "
+
+        Arguments += ParameterString + " \"" + FullSourceDirectory + "\""
 
         ZEOperations.SetWorkingDirectory(Library.BuildDirectory)
 
