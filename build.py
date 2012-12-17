@@ -7,7 +7,7 @@ def Main():
     ZELog.Log("Initializing...")
 
     ZEBuildDriver.ParseArguments()
-    #ZEBuildDriver.ScanAndBuild()
-    ZEBuildDriver.ScanDirectory(ZEBuild.RootDirectory + "/Source/libCurlNew")
+    ZEBuildDriver.ScanAndBuild()
+    #ZEBuildDriver.ScanDirectory(ZEBuild.RootDirectory + "/Source/libCurl")
 if (__name__ == "__main__"):
     Main()

@@ -34,7 +34,7 @@ class ZEBuildDriver:
         
         ZEPlatform.PlatformString = ZEPlatform.Platform
         if (ZEPlatform.Architecture != None):
-            ZEPlatform.Architecture += "-" + ZEPlatform.Architecture
+            ZEPlatform.PlatformString += "-" + ZEPlatform.Architecture
 
         if (ZEPlatform.CMakeGenerator[:6] == "Visual" or ZEPlatform.CMakeGenerator == "Xcode"):
             ZEPlatform.MultiConfiguration = True
