@@ -31,6 +31,7 @@ class libCurl(ZELibrary):
                 "--enable-symbol-hiding",
                 "--disable-ares",
                 "--disable-dependency",
+                "--disable-dependency-tracking",
                 "--enable-http",
                 "--enable-ftp",
                 "--disable-file",

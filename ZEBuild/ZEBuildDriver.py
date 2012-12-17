@@ -28,11 +28,12 @@ class ZEBuildDriver:
 
         ZEPlatform.Platform = Options.Platform
         ZEPlatform.Architecture = Options.Architecture
-        ZEPlatform.CMakeGenerator = Options.CMakeGenerator        
+        ZEPlatform.CMakeGenerator = Options.CMakeGenerator
+        ZEPlatform.SDKRoot = Options.SDKRoot
         ZEBuild.OutputDirectory = Options.OutputDirectory
         
         ZEPlatform.PlatformString = ZEPlatform.Platform
-        if (Platform.Architecture != None):
+        if (ZEPlatform.Architecture != None):
             ZEPlatform.Architecture += "-" + ZEPlatform.Architecture
 
         if (ZEPlatform.CMakeGenerator[:6] == "Visual" or ZEPlatform.CMakeGenerator == "Xcode"):
@@ -56,7 +57,7 @@ class ZEBuildDriver:
             ZEPlatform.BinExtension = ""
         elif (ZEPlatform.Platform == "MacOS" or ZEPlatform.Platform == "iOS" or ZEPlatform.Platform == "iOS-Simulator"):
             ZEPlatform.LibExtension = ".a"
-            ZEPlatform.DLLExpension = ".dynlib"
+            ZEPlatform.DLLExpension = ".dylib"
             ZEPlatform.BinExtension = ""
 
     @staticmethod

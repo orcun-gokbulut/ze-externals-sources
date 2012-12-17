@@ -8,12 +8,12 @@ class ZEPrebuildLibrary(ZELibrary):
         ZELibrary.Check(self)
         DirectoryList = os.listdir(self.SourceDirectory)
         for Directory in DirectoryList:
-	    if (os.path.isdir(self.SourceDirectory + "/" + Directory)):
-		if (Directory == ZEPlatform.PlatformString):
-		    return
-        
+            if (os.path.isdir(self.SourceDirectory + "/" + Directory)):
+                if (Directory == ZEPlatform.PlatformString):
+                    return
+
         raise ZEBuildException("Prebuild library " + self.Name + " does not have " + ZEPlatform.PlatformString + " platform support.")
 
     def Gather(self, Configuration):
-	if (Configuration == ZEBuild.CONFIG_NONE or Configuration == ZEBuild.CONFIG_RELEASE):
-	    ZEOperations.CopyDirectory(self.SourceDirectory + "/" + ZEPlatform.PlatformString, self.OutputDirectory)
+        if (Configuration == ZEBuild.CONFIG_NONE or Configuration == ZEBuild.CONFIG_RELEASE):
+            ZEOperations.CopyDirectory(self.SourceDirectory + "/" + ZEPlatform.PlatformString, self.OutputDirectory)

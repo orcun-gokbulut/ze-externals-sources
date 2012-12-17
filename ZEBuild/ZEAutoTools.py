@@ -17,7 +17,7 @@ class ZEAutoTools:
             elif(ZEPlatform.Architecture == "x64"):
                 Architectures = "-m64"
 
-            Parameters += "CFLAGS=\"" + Architectures  +  "\" "
+            ParameterString += "CFLAGS=\"" + Architectures  +  "\" "
             "CXXFLAGS=\"" + Architectures + "\" "
 
         ConfigureScriptPath = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory + "/configure")
