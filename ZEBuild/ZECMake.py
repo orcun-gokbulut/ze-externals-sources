@@ -21,20 +21,26 @@ class ZECMake:
 
         ParameterString += "-DCMAKE_INSTALL_PREFIX=\"" + ZEBuild.CurrentLibrary.InstallDirectory + "\" "
 
-        if (ZEPlatform.Platform == "MacOSX" or ZEPlatform.Platform == "iOS" or ZEPlatform.Platform == "iOS-Simulator"):
-            if (ZEPlatform.Platform == "MacOSX"):
-                Architectures = "i386;x86_64"
-            elif (ZEPlatform.Platform == "iOS"):
-                Architectures = "armv6;armv7"
-            elif (ZEPlatform.Platform == "iOS-Simulator"):
-                Architectures = "i386"
-
-            ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"x86_64;i386\""
-            if (ZEPlatform.SDKRoot != None):
-                ParameterString += " -DCMAKE_OSX_SYSROOT:STRING=\"" + ZEBuild.SDKRoot + "\""
+        if (ZEPlatform.Platform == "MacOSX"):
+            if (ZEPlatform.Architecture == "x86"):
+                ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"i386\""
+            elif (ZEPlatform.Architecture == "x64"):
+                    ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"x86_64\""
+        
+        elif (ZEPlatform.Platform == "iOS"):
+            ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"armv7\""
+            
+        elif (ZEPlatform.Platform == "iOS-Simulator"):
+            if (ZEPlatform.Architecture == "x86"):
+                ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"i386\""
+            elif (ZEPlatform.Architecture == "x64"):
+                    ParameterString += " -DCMAKE_OSX_ARCHITECTURES:STRING=\"x86_64\""
 
         elif (ZEPlatform.Platform == "Linux"):
-            ParameterString += " -DCMAKE_TOOLCHAIN_FILE:STRING=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + ZEPlatform.Architecture + ".cmake"
+            ParameterString += " -DCMAKE_TOOLCHAIN_FILE:STRING=" + ZEBuild.RootDirectory + "/CMake/toolchain-linux-" + str.lower(ZEPlatform.Architecture) + ".cmake"
+        
+        if (ZEPlatform.SDKRoot != None):
+            ParameterString += " -DCMAKE_OSX_SYSROOT:STRING=\"" + ZEBuild.SDKRoot + "\""
 
         FullSourceDirectory = os.path.normpath(Library.SourceDirectory + "/" + SourceDirectory)
         Arguments = ""

@@ -3,6 +3,7 @@ import os
 from ZEBuild import *
 from ZELog import *
 from ZEOperations import *
+from ZECMakeLists import *
 
 class ZELibrary:
     LogFile = None
@@ -40,11 +41,12 @@ class ZELibrary:
         else:
             ZELog.Log("Gathering outputs... Configuration : " + ("Debug" if Configuration == ZEBuild.CONFIG_DEBUG else "Release"))
 
-    def GenerateCMakeList(Configuration):
-        if (Configuration == ZEBuild.CONFIG_NONE):
-            ZELog.Log("Generating CMakeFiles.txt...")
-        else:
-            ZELog.Log("Generating CMakeFiles.txt... Configuration : " + ("Debug" if Configuration == ZEBuild.CONFIG_DEBUG else "Release"))
+    def GenerateCMakeList(self):
+        ZELog.Log("Generating CMakeFiles.txt...")
+        Script = ZELibraryCMakeLists()
+        Script.Begin(self)
+        Script.AddSubLibrary()
+        Script.End()
 
 
     def Build(self):

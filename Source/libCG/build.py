@@ -1,4 +1,5 @@
 class libCG(ZEPrebuildLibrary):
     pass
 
-ZEBuildDriver.BuildLibrary(libCG("libCG", ""))
+if (ZEPlatform.Platform == "Windows" or ZEPlatform.Platform == "Linux"):
+    ZEBuildDriver.BuildLibrary(libCG("libCG", ""))

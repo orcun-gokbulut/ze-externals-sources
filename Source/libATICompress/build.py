@@ -1,4 +1,5 @@
 class libATICompress(ZEPrebuildLibrary):
     pass
 
-ZEBuildDriver.BuildLibrary(libATICompress("libATICompress", ""))
+if (ZEPlatform.Platform == "Windows"):
+    ZEBuildDriver.BuildLibrary(libATICompress("libATICompress", ""))

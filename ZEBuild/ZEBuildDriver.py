@@ -40,12 +40,12 @@ class ZEBuildDriver:
             ZEPlatform.MultiConfiguration = True
         else:
             ZEPlatform.MultiConfiguration = False
-
+           
         ZEBuild.RootDirectory = ZEOperations.GetWorkingDirectory()
         if (ZEBuild.OutputDirectory != None):
-            ZEBuild.OutputDirectory = os.path.abspath(ZEBuild.OutputDirectory)
+            ZEBuild.OutputDirectory = os.path.abspath(ZEBuild.OutputDirectory) + "/" + ZEPlatform.PlatformString
         else:
-            ZEBuild.OutputDirectory = ZEBuild.RootDirectory + "/Output"
+            ZEBuild.OutputDirectory = ZEBuild.RootDirectory + "/Output" +"/" + ZEPlatform.PlatformString
 
         if (ZEPlatform.Platform == "Windows"):
             ZEPlatform.LibExtension = ".lib"

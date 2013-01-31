@@ -1,4 +1,5 @@
 class libPhysX2(ZEPrebuildLibrary):
     pass
 
-ZEBuildDriver.BuildLibrary(libPhysX2("libPhysX2", ""))
+if (ZEPlatform.Platform == "Windows"):
+    ZEBuildDriver.BuildLibrary(libPhysX2("libPhysX2", ""))

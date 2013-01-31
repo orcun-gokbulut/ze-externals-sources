@@ -1,4 +1,5 @@
 class libDirectX(ZEPrebuildLibrary):
     pass
 
-ZEBuildDriver.BuildLibrary(libDirectX("libDirectX", ""))
+if (ZEPlatform.Platform == "Windows"):
+    ZEBuildDriver.BuildLibrary(libDirectX("libDirectX", ""))

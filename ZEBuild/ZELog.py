@@ -12,14 +12,14 @@ class ZELog:
 
     @staticmethod
     def Output(Level, Text):
-	OutputText = ZELog.OutputStr(Level, Text)
-	
-	if (ZEBuild.CurrentLibrary != None and ZEBuild.CurrentLibrary.LogFile != None and ZEBuild.CurrentLibrary.LogFile.closed == False):
+        OutputText = ZELog.OutputStr(Level, Text)
+
+        if (ZEBuild.CurrentLibrary != None and ZEBuild.CurrentLibrary.LogFile != None and ZEBuild.CurrentLibrary.LogFile.closed == False):
             ZEBuild.CurrentLibrary.LogFile.write(OutputText + "\n")
             ZEBuild.CurrentLibrary.LogFile.flush()
 
-	if (Level != "Debug"):
-	    print(OutputText)
+        if (Level != "Debug"):
+            print(OutputText)
 
     @staticmethod
     def Error(Text):
@@ -35,4 +35,4 @@ class ZELog:
 
     @staticmethod
     def DebugLog(Text):
-	ZELog.Output("Debug", Text)
+        ZELog.Output("Debug", Text)
