@@ -1,2 +1,0 @@
-Name : BulletPhysics
-Varsion : 2.78

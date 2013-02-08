@@ -1,2 +1,0 @@
-Name : OpenAL 
-Version : 1.13

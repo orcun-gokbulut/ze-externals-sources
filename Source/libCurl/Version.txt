@@ -1,0 +1,2 @@
+Name : libCurl
+Varsion : 7.26.0

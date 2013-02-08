@@ -15,11 +15,12 @@ class ZERootCMakeLists:
     def Begin():
         ZERootCMakeLists.File = open(ZEBuild.OutputDirectory + "/CMakeLists.txt", mode="w")
         ZERootCMakeLists.File.write("cmake_minimum_required (VERSION 2.8)\n\n");
-        ZERootCMakeLists.File.write("ze_externals_initialize(" + ZERootCMakeLists.GetPlatformCheckParameters() + ")\n\n");
+        ZERootCMakeLists.File.write("ze_external_initialize(" + ZERootCMakeLists.GetPlatformCheckParameters() + ")\n\n");
 
     @staticmethod 
     def AddLibrary(Library):
-        ZERootCMakeLists.File.write("ze_externals_add_sub_directory(" + os.path.relpath(Library.OutputDirectory, start = ZEBuild.OutputDirectory) + ")\n")
+        ZERootCMakeLists.File.write("add_subdirectory(" + os.path.relpath(Library.OutputDirectory, start = ZEBuild.OutputDirectory) + ")\n")
+        ZERootCMakeLists.File.flush()
     
     @staticmethod 
     def End():
@@ -32,31 +33,32 @@ class ZELibraryCMakeLists:
         self.File.write("cmake_minimum_required (VERSION 2.8)\n\n")
         
         
-    def AddSubLibrary(self, Libs = None, DLLs = None, IncludeFolder = None , LibFolder = None, DLLFolder = None, NonCombinable = False, SystemLibs = None):
+    def AddSubLibrary(self, Name, Libs = None, DLLs = None, IncludeFolder = None , LibFolder = None, DLLFolder = None, NonCombinable = False, SystemLibs = None):
         Parameters = ""
         
         if (Libs != None):
-            Parameters += " LIBS " + Libs
+            Parameters += "\n\tLIBS " + Libs
         
         if (DLLs != None):
-            Parameter += " DLLS " + DLLs
+            Parameters += "\n\tDLLS " + DLLs
         
         if (SystemLibs != None):
-            Parameters += " SYSTEM_LIBS " + SystemLibs
+            Parameters += "\n\tSYSTEM_LIBS " + SystemLibs
         
         if (IncludeFolder != None):
-            Parameters += " LIB_FOLDER " + IncludeFolder
+            Parameters += "\n\tLIB_FOLDER " + IncludeFolder
 
-        if (Libs != None):
-            Parameters += " INCLUDE_FOLDER " + Libs
+        if (LibFolder != None):
+            Parameters += "\n\tINCLUDE_FOLDER " + LibFolder
 
         if (DLLFolder != None):
-            Parameters += " DLL_FOLDER " + DLLFolder
+            Parameters += "\n\tDLL_FOLDER " + DLLFolder
 
         if (NonCombinable):
-            Parameters += " NON_COMBINABLE"
+            Parameters += "\n\tNON_COMBINABLE"
         
-        self.File.write("ze_externals_register_library(" + self.Library.Name + Parameters + " " + ZERootCMakeLists.GetPlatformCheckParameters() + ")\n")
+        self.File.write("ze_external_register_library(" + Name + Parameters + "\n\t" + ZERootCMakeLists.GetPlatformCheckParameters() + ")\n\n")
+        self.File.flush()
     
     def End(self):
         self.File.close()

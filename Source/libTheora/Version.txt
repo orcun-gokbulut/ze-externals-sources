@@ -1,0 +1,3 @@
+Name : libTheora
+Version : 1.1.1
+Dependency : libOGG (1.3.0)

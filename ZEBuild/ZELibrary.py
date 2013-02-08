@@ -45,10 +45,13 @@ class ZELibrary:
         ZELog.Log("Generating CMakeFiles.txt...")
         Script = ZELibraryCMakeLists()
         Script.Begin(self)
-        Script.AddSubLibrary()
+        Script.AddSubLibrary(self.Name)
         Script.End()
 
-
+    def CopyVersionTxt(self):
+        ZELog.Log("Copying Version.txt...")
+        ZEOperations.CopyFile(self.RootDirectory + "/Version.txt", self.OutputDirectory + "/Version.txt")
+        
     def Build(self):
         try:
             ZEOperations.CreateDirectory(self.LogDirectory)
@@ -56,13 +59,13 @@ class ZELibrary:
 
             ZELog.Log("Building platform library " + self.Name)          
 
-            self.Check()
             self.CleanOutput()
+            self.Check()
+            self.CopyVersionTxt()
 
             if (ZEPlatform.MultiConfiguration == False):
 
                 ZEBuild.Configration = ZEBuild.CONFIG_NONE
-
                 self.Clean()
                 self.Configure(ZEBuild.CONFIG_NONE)
                 self.Compile(ZEBuild.CONFIG_NONE)
@@ -71,7 +74,7 @@ class ZELibrary:
                 ZELog.Log("Building Debug configuration...")
 
                 ZEBuild.Configration = ZEBuild.CONFIG_DEBUG
-
+                
                 self.Clean()
                 self.Configure(ZEBuild.CONFIG_DEBUG)
                 self.Compile(ZEBuild.CONFIG_DEBUG)
@@ -87,9 +90,11 @@ class ZELibrary:
                 self.Gather(ZEBuild.CONFIG_RELEASE)
 
             self.GenerateCMakeList()
+            self.BuildResult = True
             ZELog.Log(self.Name + " library has been successfully build.")
 
         except ZEBuildException as e:
+            self.BuildResult = False
             ZELog.Error(e.ErrorText)
             raise ZEBuildException("Building library has failed.")
 

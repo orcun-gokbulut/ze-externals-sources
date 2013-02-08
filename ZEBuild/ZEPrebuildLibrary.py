@@ -6,9 +6,9 @@ from ZELibrary import *
 class ZEPrebuildLibrary(ZELibrary):
     def Check(self):
         ZELibrary.Check(self)
-        DirectoryList = os.listdir(self.SourceDirectory)
+        DirectoryList = os.listdir(self.RootDirectory + "/Prebuild")
         for Directory in DirectoryList:
-            if (os.path.isdir(self.SourceDirectory + "/" + Directory)):
+            if (os.path.isdir(self.RootDirectory + "/Prebuild/" + Directory)):
                 if (Directory == ZEPlatform.PlatformString):
                     return
 
@@ -16,4 +16,4 @@ class ZEPrebuildLibrary(ZELibrary):
 
     def Gather(self, Configuration):
         if (Configuration == ZEBuild.CONFIG_NONE or Configuration == ZEBuild.CONFIG_RELEASE):
-            ZEOperations.CopyDirectory(self.SourceDirectory + "/" + ZEPlatform.PlatformString, self.OutputDirectory)
+            ZEOperations.CopyDirectory(self.RootDirectory + "/Prebuild/" + ZEPlatform.PlatformString, self.OutputDirectory)
