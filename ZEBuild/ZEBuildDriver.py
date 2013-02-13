@@ -95,17 +95,17 @@ class ZEBuildDriver:
     def Build():
         ZEBuildDriver.ParseArguments()
 
+        ZEOperations.CreateDirectory(ZEBuild.OutputDirectory)
+        ZEOperations.CopyFile(ZEBuild.RootDirectory + "/Version.txt", ZEBuild.OutputDirectory + "/Version.txt")
+        
         ZEBuild.Libraries = []
 
         DirectoryBase = os.getcwd()
         if (ZEBuild.TargetLibraries == None):
             DirectoryList = os.listdir(os.getcwd() + "/Source")
+            ZERootCMakeLists.Begin()
         else:
             DirectoryList = ZEBuild.TargetLibraries
-
-        ZEOperations.CreateDirectory(ZEBuild.OutputDirectory)
-        ZEOperations.CopyFile(ZEBuild.RootDirectory + "/Version.txt", ZEBuild.OutputDirectory + "/Version.txt")
-        ZERootCMakeLists.Begin()
 
         ZELog.Log("Scanning directories...")
         for Directory in DirectoryList:
@@ -119,5 +119,7 @@ class ZEBuildDriver:
             #except Exception as e:
             #    ZELog.Error("Unknown Exception occured: " + e.message)
         
-        ZERootCMakeLists.End()
+        if (ZEBuild.TargetLibraries == None):
+            ZERootCMakeLists.End()
+        
         ZEBuildDriver.ShowResults()

@@ -3,7 +3,7 @@ class libDirectX(ZEPrebuildLibrary):
       ZELibrary.GenerateCMakeList(self)
       Script = ZELibraryCMakeLists()
       Script.Begin(self)
-      Script.AddSubLibrary("libDirectSound", "dsound")
+      Script.AddSubLibrary("libDirectSound", "dsound dxguid")
       Script.AddSubLibrary("libDirect3DCompiler", "d3dcompiler")
       Script.AddSubLibrary("libDirect3D9", "d3d9 d3dx9")
       Script.AddSubLibrary("libDirect3D10", "d3d10 d3dx10")
