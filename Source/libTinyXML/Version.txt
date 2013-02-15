@@ -1,0 +1,2 @@
+Name : libTinyXML
+Version : 2.6.2 + Custom Build System (CMake)

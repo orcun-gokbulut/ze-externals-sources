@@ -1,2 +1,2 @@
 Name : libmpg123
-Version : 1.14.4
+Version : 1.14.4 + Custom Build System (CMake)

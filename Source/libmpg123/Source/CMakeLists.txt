@@ -27,8 +27,13 @@ set(Sources
 	synth_real.c
 	synth_s32.c
 	tabinit.c)
+	
+add_definitions(
+	-D_CRT_SECURE_NO_WARNINGS
+	-DBUILD_MPG123_DLL
+	-DOPT_GENERIC)
 
-if (WIN32)
+if (WIN32 AND (NOT CMAKE_CL_64))
 	set(AssemblySources
 		dct36_3dnow.S
 		dct36_3dnowext.S
@@ -51,8 +56,26 @@ if (WIN32)
 		synth_stereo_sse_float.S
 		synth_stereo_sse_s32.S
 		tabinit_mmx.S)
+	
+	add_definitions(
+		-D_CRT_SECURE_NO_WARNINGS
+		-DBUILD_MPG123_DLL
+		-DOPT_MULTI
+		-DOPT_I386
+		-DOPT_I586
+		-DOPT_MMX
+		-DOPT_3DNOW
+		-DOPT_3DNOWEXT
+		-DOPT_SSE)
 	set(Sources ${Sources} dct64_i386.c)
-elseif (ARM)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+	add_definitions(
+		-D_CRT_SECURE_NO_WARNINGS
+		-DBUILD_MPG123_DLL
+		-DOPT_MULTI
+		-DOPT_ARM
+		-DOPT_NEON)
+
 	set (AssemblySources
 		dct36_3dnow.S
 		dct64_neon.S
@@ -67,7 +90,7 @@ elseif (ARM)
 		synth_stereo_neon_accurate.S
 		synth_stereo_neon_float.S
 		synth_stereo_neon_s32.S)
-elseif (POWERPC)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "ppc")
 	set(Sources ${Sources} dct64_altivec.c synth_altivec.c)
 endif()
 
@@ -76,17 +99,6 @@ include_directories(${CMAKE_SOURCE_DIR})
 if (WIN32)
 	include_directories(${CMAKE_SOURCE_DIR}/platform/windows)
 	set(Sources ${Sources} platform/windows/msvc.c)
-	add_definitions(
-		-D_CRT_SECURE_NO_WARNINGS
-		-DBUILD_MPG123_DLL
-		-DOPT_MULTI
-		-DOPT_GENERIC
-		-DOPT_I386
-		-DOPT_I586
-		-DOPT_MMX
-		-DOPT_3DNOW
-		-DOPT_3DNOWEXT
-		-DOPT_SSE)
 endif()
 
 set(Sources ${Sources} ${AssemblySources})
@@ -109,7 +121,7 @@ endif()
 if (WIN32)
 	install(TARGETS libmpg123 RUNTIME DESTINATION DLL)
 	install(TARGETS libmpg123 ARCHIVE DESTINATION Lib)
-	install(FILES makefile.h.in platform/windows/mpg123.h platform/windows/config.h DESTINATION Include)
+	install(FILES mpg123.h.in platform/windows/mpg123.h platform/windows/config.h DESTINATION Include)
 else()
 	install(TARGETS libmpg123 LIBRARY DESTINATION DLL)
 	install(FILES mpg123.h DESTINATION Include)

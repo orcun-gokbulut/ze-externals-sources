@@ -1,0 +1,2 @@
+Name : libVRPN
+Version : 2010-07-15

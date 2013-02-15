@@ -1,0 +1,15 @@
+Index: lib/CMakeLists.txt
+===================================================================
+--- lib/CMakeLists.txt	(revision 113)
++++ lib/CMakeLists.txt	(working copy)
+@@ -98,6 +98,10 @@
+ 
+ if(WIN32)
+   add_definitions( -D_USRDLL )
++  if (CMAKE_CL_64)
++	set_property(TARGET ${LIB_NAME} APPEND PROPERTY STATIC_LIBRARY_FLAGS "/MACHINE:X64")
++	message("büllük")
++  endif()
+ endif()
+ 
+ set_target_properties(${LIB_NAME} PROPERTIES COMPILE_DEFINITIONS BUILDING_LIBCURL)

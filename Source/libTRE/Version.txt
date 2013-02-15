@@ -1,0 +1,2 @@
+Name : libTRE
+Version : 0.8.0 + Custom Build System (CMake)

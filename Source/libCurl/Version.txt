@@ -1,2 +1,2 @@
 Name : libCurl
-Varsion : 7.26.0
+Varsion : 7.26.0 + Patches
