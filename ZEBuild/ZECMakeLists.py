@@ -1,7 +1,8 @@
 from os.path import *
 from ZEBuild import *
 
-class ZERootCMakeLists:   
+class ZERootCMakeLists:
+    File = None
     @staticmethod
     def GetPlatformCheckParameters():
         if (ZEPlatform.Platform == "iOS"):
@@ -62,4 +63,5 @@ class ZELibraryCMakeLists:
     
     def End(self):
         self.File.close()
-        ZERootCMakeLists.AddLibrary(self.Library)
+        if (ZERootCMakeLists.File != None):
+            ZERootCMakeLists.AddLibrary(self.Library)

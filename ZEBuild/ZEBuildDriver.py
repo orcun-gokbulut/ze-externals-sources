@@ -17,6 +17,9 @@ class ZEBuildDriver:
         parser = optparse.OptionParser()
         parser.add_option("-l", "--library", dest="Libraries", action="append", type="string",
                           help="Library name that will be build. If not given Source directory will be scanned and found libraries will be build. [Optional. Can be used multiple times if you want to build multiple libraries.]")
+        parser.add_option("-e", "--exclude", dest="Excludeds", action="append", type="string",
+                          help="Library name that will be excluded from the build. You can use this parameter to exclude big libraries or already build libraries. [Optional. Can be used multiple times if you want to exclude multiple libraries.]")
+                          
         parser.add_option("-p", "--platform", dest="Platform", action="store", type="string",
                           help="Platform name (Windows, Linux, MacOSX, PS3, XBox360, iOS, iOS-Simulator, Android) [Mandatory]")
         parser.add_option("-a", "--architecture", dest="Architecture", action="store", type="string",
@@ -36,6 +39,7 @@ class ZEBuildDriver:
         ZEPlatform.SDKRoot = Options.SDKRoot
         ZEBuild.OutputDirectory = Options.OutputDirectory
         ZEBuild.TargetLibraries = Options.Libraries
+        ZEBuild.ExcludedLibraries = Options.Excludeds
         
         ZEPlatform.PlatformString = ZEPlatform.Platform
         if (ZEPlatform.Architecture != None):
@@ -112,7 +116,8 @@ class ZEBuildDriver:
             CurrentDirectory = DirectoryBase + "/Source/" + Directory
             try:
                 if (os.path.isdir(CurrentDirectory)):
-                    ZEBuildDriver.BuildDirectory(CurrentDirectory)
+                    if ((ZEBuild.ExcludedLibraries == None) or (not (Directory in ZEBuild.ExcludedLibraries))):
+                        ZEBuildDriver.BuildDirectory(CurrentDirectory)
         
             except ZEBuildException as e:
                 ZELog.Error(e.ErrorText)
