@@ -59,8 +59,14 @@ class ZELibrary:
 
             ZELog.Log("Building platform library " + self.Name)          
 
-            self.CleanOutput()
             self.Check()
+            
+            if (ZEBuild.GenerateCMakeListsOnly):
+                self.GenerateCMakeList()
+                return
+            
+            self.CleanOutput()
+
             self.CopyVersionTxt()
 
             if (ZEPlatform.MultiConfiguration == False):
@@ -71,10 +77,13 @@ class ZELibrary:
                 self.Compile(ZEBuild.CONFIG_NONE)
                 self.Gather(ZEBuild.CONFIG_NONE)
             else:
+                MainBuildDirectory = self.BuildDirectory
+                
                 ZELog.Log("Building Debug configuration...")
 
                 ZEBuild.Configration = ZEBuild.CONFIG_DEBUG
-                
+                self.BuildDirectory = MainBuildDirectory + "/Debug"
+                self.InstallDirectory = self.BuildDirectory + "/ZEInstall"                
                 self.Clean()
                 self.Configure(ZEBuild.CONFIG_DEBUG)
                 self.Compile(ZEBuild.CONFIG_DEBUG)
@@ -83,12 +92,15 @@ class ZELibrary:
                 ZELog.Log("Building Release configuration...")
 
                 ZEBuild.Configration = ZEBuild.CONFIG_RELEASE
-
+                self.BuildDirectory = MainBuildDirectory + "/Release"
+                self.InstallDirectory = self.BuildDirectory + "/ZEInstall"
                 self.Clean()
                 self.Configure(ZEBuild.CONFIG_RELEASE)
                 self.Compile(ZEBuild.CONFIG_RELEASE)
                 self.Gather(ZEBuild.CONFIG_RELEASE)
-
+            
+                self.BuildDirectory = MainBuildDirectory
+            
             self.GenerateCMakeList()
             self.BuildResult = True
             ZELog.Log(self.Name + " library has been successfully build.")

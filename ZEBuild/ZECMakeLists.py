@@ -6,11 +6,11 @@ class ZERootCMakeLists:
     @staticmethod
     def GetPlatformCheckParameters():
         if (ZEPlatform.Platform == "iOS"):
-            return "PLATFORM iOS ARCHITECTURE ArmV7"
+            return "PLATFORMS iOS ARCHITECTURES ArmV7"
         elif (ZEPlatform.Platform == "iOS-Simulator"):
-            return "PLATFORM iOS-Simulator ARCHITECTURE x86"
+            return "PLATFORMS iOS-Simulator ARCHITECTURES x86"
         else:
-            return "PLATFORM " + ZEPlatform.Platform + " ARCHITECTURE " + ZEPlatform.Architecture
+            return "PLATFORMS " + ZEPlatform.Platform + " ARCHITECTURES " + ZEPlatform.Architecture
             
     @staticmethod
     def Begin():

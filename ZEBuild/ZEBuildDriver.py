@@ -31,6 +31,9 @@ class ZEBuildDriver:
         parser.add_option("-o", "--output-directory", dest="OutputDirectory", action="store", type="string",
                           help="Output directory path. (For Expl: Output/Windows-x86 or SomeRepositoryFolder/Apple/iPhone)")
 
+        parser.add_option("-g", "--generate-cmakelists-only", dest="GenerateCMakeListsOnly", action="store_true", 
+                          help="Does not build libraries only generates CMakeLists.txt.")
+
         (Options, args) = parser.parse_args()
 
         ZEPlatform.Platform = Options.Platform
@@ -38,6 +41,7 @@ class ZEBuildDriver:
         ZEPlatform.CMakeGenerator = Options.CMakeGenerator
         ZEPlatform.SDKRoot = Options.SDKRoot
         ZEBuild.OutputDirectory = Options.OutputDirectory
+        ZEBuild.GenerateCMakeListsOnly = Options.GenerateCMakeListsOnly;
         ZEBuild.TargetLibraries = Options.Libraries
         ZEBuild.ExcludedLibraries = Options.Excludeds
         

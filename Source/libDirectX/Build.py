@@ -1,6 +1,6 @@
 class libDirectX(ZEPrebuildLibrary):
    def GenerateCMakeList(self):
-      ZELibrary.GenerateCMakeList(self)
+      ZELog.Log("Generating CMakeFiles.txt...")
       Script = ZELibraryCMakeLists()
       Script.Begin(self)
       Script.AddSubLibrary("libDirectSound", "dsound dxguid")
@@ -13,4 +13,4 @@ class libDirectX(ZEPrebuildLibrary):
       Script.End()
 
 if (ZEPlatform.Platform == "Windows"):
-    ZEBuildDriver.BuildLibrary(libDirectX("libDirectX", ""))
+   ZEBuildDriver.BuildLibrary(libDirectX("libDirectX", ""))
