@@ -1,8 +1,7 @@
 from os.path import *
 from ZEBuild import *
 
-class ZERootCMakeLists:
-    File = None
+class ZELibraryCMakeLists:
     @staticmethod
     def GetPlatformCheckParameters():
         if (ZEPlatform.Platform == "iOS"):
@@ -11,23 +10,7 @@ class ZERootCMakeLists:
             return "PLATFORMS iOS-Simulator ARCHITECTURES x86"
         else:
             return "PLATFORMS " + ZEPlatform.Platform + " ARCHITECTURES " + ZEPlatform.Architecture
-            
-    @staticmethod
-    def Begin():
-        ZERootCMakeLists.File = open(ZEBuild.OutputDirectory + "/CMakeLists.txt", mode="w")
-        ZERootCMakeLists.File.write("cmake_minimum_required (VERSION 2.8)\n\n");
-        ZERootCMakeLists.File.write("ze_external_initialize(" + ZERootCMakeLists.GetPlatformCheckParameters() + ")\n\n");
-
-    @staticmethod 
-    def AddLibrary(Library):
-        ZERootCMakeLists.File.write("add_subdirectory(" + os.path.relpath(Library.OutputDirectory, start = ZEBuild.OutputDirectory) + ")\n")
-        ZERootCMakeLists.File.flush()
-    
-    @staticmethod 
-    def End():
-        ZERootCMakeLists.File.close()
-
-class ZELibraryCMakeLists:   
+        
     def Begin(self, Library):
         self.Library = Library
         self.File = open(self.Library.OutputDirectory + "/CMakeLists.txt", mode="w")
@@ -58,10 +41,8 @@ class ZELibraryCMakeLists:
         if (NonCombinable):
             Parameters += "\n\tNON_COMBINABLE"
         
-        self.File.write("ze_external_register_library(" + Name + Parameters + "\n\t" + ZERootCMakeLists.GetPlatformCheckParameters() + ")\n\n")
+        self.File.write("ze_external_register_library(" + Name + Parameters + "\n\t" + ZELibraryCMakeLists.GetPlatformCheckParameters() + ")\n\n")
         self.File.flush()
     
     def End(self):
         self.File.close()
-        if (ZERootCMakeLists.File != None):
-            ZERootCMakeLists.AddLibrary(self.Library)

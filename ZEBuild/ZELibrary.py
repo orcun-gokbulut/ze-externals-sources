@@ -60,11 +60,7 @@ class ZELibrary:
             ZELog.Log("Building platform library " + self.Name)          
 
             self.Check()
-            
-            if (ZEBuild.GenerateCMakeListsOnly):
-                self.GenerateCMakeList()
-                return
-            
+        
             self.CleanOutput()
 
             self.CopyVersionTxt()
