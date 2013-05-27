@@ -41,8 +41,15 @@ set(ANGELSCRIPT_SOURCE
 
 if(MSVC AND CMAKE_CL_64)
             enable_language(ASM_MASM)
-            if(CMAKE_ASM_MASM_COMPILER_WORKS)
+            if(CMAKE_ASM_MASM_COMPILER_WORKS)		
                             set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_x64_msvc_asm.asm)
+							add_custom_command(
+								OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/as_callfunc_x64_msvc_asm.obj
+								DEPENDS ../../source/as_callfunc_x64_msvc_asm.asm
+								COMMAND "ml64"
+								ARGS "/c"  "/nologo" "/W3" "/Zi" "${CMAKE_CURRENT_SOURCE_DIR}/../../source/as_callfunc_x64_msvc_asm.asm"
+								WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+                            set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} "${CMAKE_CURRENT_BINARY_DIR}/as_callfunc_x64_msvc_asm.obj")
             else()
                             message(FATAL ERROR "MSVC x86_64 target requires a working assembler")
             endif()

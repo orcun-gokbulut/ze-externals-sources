@@ -1,2 +1,5 @@
 Name : libAngelScript
-Version : 2.26.3 + CMakeLists.txt Patch
+Version : 2.26.3 + Patches
+Patch(es):
+	FIX: MSVC 64bit ASM compile problem has been fixed.
+	CHG: Output directories has been reconfigured for ZEBuild.
