@@ -1,2 +1,2 @@
 Name : libAngelScript
-Varsion : 2.25.1
+Version : 2.26.3 + CMakeLists.txt Patch

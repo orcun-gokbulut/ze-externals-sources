@@ -1,0 +1,41 @@
+--- C:/Users/Orcun/Desktop/CMakeLists.txt	Çar Eyl 12 18:28:06 2012
++++ C:/Users/Orcun/Desktop/Projects/Zinek Engine/Repository/ZEExternalSource/Source/libAngelScript/Source/projects/cmake/CMakeLists.txt	Pzt May 27 14:37:18 2013
+@@ -2,7 +2,8 @@
+ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+ cmake_policy(SET CMP0003 NEW)
+ 
+-project(Angelscript)
++#project(Angelscript)
++project(libAngelscript)
+ 
+ set(ANGELSCRIPT_SOURCE
+         ../../source/as_atomic.cpp
+@@ -102,17 +103,22 @@
+         add_definitions(-fPIC)
+ endif()
+ 
+-add_library(Angelscript STATIC ${ANGELSCRIPT_SOURCE} ${ANGELSCRIPT_HEADERS})
+-set(LIBRARY_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/../../lib)
++add_library(libAngelScript STATIC ${ANGELSCRIPT_SOURCE} ${ANGELSCRIPT_HEADERS})
++#set(LIBRARY_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/../../lib)
+ 
+ find_package(Threads)
+-target_link_libraries(Angelscript ${CMAKE_THREAD_LIBS_INIT})
++target_link_libraries(libAngelScript ${CMAKE_THREAD_LIBS_INIT})
+ 
+ if(MSVC)
+-        set_target_properties(Angelscript PROPERTIES COMPILE_FLAGS "/MP")
++        set_target_properties(libAngelScript PROPERTIES COMPILE_FLAGS "/MP")
+ endif(MSVC)
++#set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
+ 
+-set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
++#add_subdirectory(../../../samples/game/projects/cmake/ ./game)
+ 
+-add_subdirectory(../../../samples/game/projects/cmake/ ./game)
++#ZEExternalFixes
++set_target_properties(libAngelScript PROPERTIES PREFIX "")
+ 
++install(TARGETS libAngelScript DESTINATION Lib)
++install(FILES ../../include/angelscript.h DESTINATION Include)
++
