@@ -1,0 +1,11 @@
+--- C:/vn/vnccpplib-0.2.2/include/vn200.h	Sal May 28 18:45:58 2013
++++ C:/Users/Orcun/Desktop/Projects/Zinek Engine/Repository/ZEExternalSource/Source/libVectorNav/Source/include/vn200.h	Per May 30 18:44:59 2013
+@@ -37,6 +37,8 @@
+ 
+ #if EXPORT_TO_DLL
+ 	#define DLL_EXPORT __declspec(dllexport)
++#else
++	#define DLL_EXPORT
+ #endif
+ 
+ #ifdef __cplusplus

@@ -1,0 +1,2 @@
+Name : libVectorNav
+Version : 0.2.2 + Patched
