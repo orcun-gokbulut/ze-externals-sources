@@ -1,0 +1,2 @@
+Name : libXSense
+Version : 4.2381 (2012-11-12) + Patched
