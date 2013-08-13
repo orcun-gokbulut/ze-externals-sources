@@ -12,6 +12,8 @@ else()
 	set(Sources ${Sources} arch/linux/vncp_services.c)
 endif()
 
+add_definitions(/Z7)
+
 add_library(libVectorNav ${Sources})
 
 set_target_properties(libVectorNav PROPERTIES PREFIX "")

@@ -30,16 +30,19 @@ class ZEBuildDriver:
                   help="Platform SDK root path. [Optional For MacOSX. Mandatory For iOS and iOS-Simulator. For only MacOSX, iOS and iOS-Simulator]")
         parser.add_option("-o", "--output-directory", dest="OutputDirectory", action="store", type="string",
                           help="Output directory path. (For Expl: Output/Windows-x86 or SomeRepositoryFolder/Apple/iPhone)")
-
+        parser.add_option("-t", "--toolset", dest="Toolset", action="store", type="string", 
+                          help="Toolset name. For Expl: v110 for MSVC, 4.4 for GCC")
         (Options, args) = parser.parse_args()
 
         ZEPlatform.Platform = Options.Platform
         ZEPlatform.Architecture = Options.Architecture
         ZEPlatform.CMakeGenerator = Options.CMakeGenerator
         ZEPlatform.SDKRoot = Options.SDKRoot
+        ZEPlatform.Toolset = Options.Toolset
         ZEBuild.OutputDirectory = Options.OutputDirectory
         ZEBuild.TargetLibraries = Options.Libraries
         ZEBuild.ExcludedLibraries = Options.Excludeds
+        
         
         ZEPlatform.PlatformString = ZEPlatform.Platform
         if (ZEPlatform.Architecture != None):
@@ -47,9 +50,17 @@ class ZEBuildDriver:
 
         if (ZEPlatform.CMakeGenerator[:6] == "Visual" or ZEPlatform.CMakeGenerator == "Xcode"):
             ZEPlatform.MultiConfiguration = True
+            if(ZEPlatform.CMakeGenerator[:6] == "Visual"):
+                ZEPlatform.PlatformString += "-MSVC"
         else:
             ZEPlatform.MultiConfiguration = False
-           
+        
+        if(ZEPlatform.CMakeGenerator[:4] == "Unix"):
+            ZEPlatform.PlatformString += "-GCC"
+        
+        if(ZEPlatform.Toolset != None):
+            ZEPlatform.PlatformString += ZEPlatform.Toolset
+        
         ZEBuild.RootDirectory = ZEOperations.GetWorkingDirectory()
         if (ZEBuild.OutputDirectory != None):
             ZEBuild.OutputDirectory = os.path.abspath(ZEBuild.OutputDirectory) + "/" + ZEPlatform.PlatformString

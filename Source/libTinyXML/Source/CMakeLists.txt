@@ -1,14 +1,19 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
-project(TinyXml)
+project(libTinyXml)
 
-set(LIBRARY_OUTPUT_PATH lib/${CMAKE_BUILD_TYPE})
+set(Sources
+	tinystr.cpp
+	tinystr.h
+	tinyxml.cpp
+	tinyxml.h
+	tinyxmlerror.cpp
+	tinyxmlparser.cpp)
 
-include_directories(./)
+add_definitions(/Z7)
 
-file(GLOB_RECURSE source_files *.h *.cpp)
+add_library(libTinyXML STATIC ${Sources})
 
-add_library(libTinyXML STATIC ${source_files})
 set_target_properties(libTinyXML PROPERTIES PREFIX "")
 
 install(TARGETS libTinyXML DESTINATION Lib)

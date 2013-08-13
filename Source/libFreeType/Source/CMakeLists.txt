@@ -74,6 +74,7 @@ include_directories("src/raster")
 include_directories("src/psaux")
 include_directories("src/psnames")
 
+add_definitions(/Z7)
 
 add_library(libFreeType STATIC ${BASE_SRCS})
 set_target_properties(libFreeType PROPERTIES PREFIX "")

@@ -32,6 +32,8 @@ add_subdirectory(Metadata)
 add_subdirectory(ZLib)
 add_subdirectory(FreeImageToolkit)
 
+add_definitions(/Z7)
+
 add_library(libFreeImage ${Sources})
 set_target_properties(libFreeImage PROPERTIES PREFIX "")
 

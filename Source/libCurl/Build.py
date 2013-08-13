@@ -59,10 +59,7 @@ class libCurl(ZELibrary):
 
     def Gather(self, Configuration):
         ZELibrary.Gather(self, Configuration)
-        if (ZEPlatform.Platform == "Linux"):
-            ZEAutoTools.Install(self, Configuration)
-            ZEOperations.CopyInstallToOutput(self, Configuration, "include", "lib")
-        else:
+        if (ZEPlatform.Platform == "Windows"):
             if (Configuration == ZEBuild.CONFIG_NONE):
                 ZEOperations.CopyDirectory(self.SourceDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
                 ZEOperations.CopyDirectory(self.BuildDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
@@ -75,5 +72,8 @@ class libCurl(ZELibrary):
                 ZEOperations.CopyDirectory(self.BuildDirectory + "/include/curl", self.OutputDirectory + "/Include/curl")
                 ZEOperations.CreateDirectory(self.OutputDirectory + "/Lib/Release")
                 ZEOperations.CopyFile(self.BuildDirectory + "/lib/Release/libcurl" + ZEPlatform.LibExtension, self.OutputDirectory + "/Lib/Release/libCurl" + ZEPlatform.LibExtension)
+        else:
+            ZEAutoTools.Install(self, Configuration)
+            ZEOperations.CopyInstallToOutput(self, Configuration, "include", "lib")
     
 ZEBuildDriver.BuildLibrary(libCurl("libCurl", ""))

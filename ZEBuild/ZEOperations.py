@@ -103,11 +103,23 @@ class ZEOperations:
             raise ZEBuildException("Can not remove directory. Directory Name : \"" + DirectoryName + "\".")
 
     @staticmethod
+    def NormalizePath(DirectoryName):
+        return os.path.normpath(DirectoryName)
+
+    @staticmethod
     def IsDirectoryExists(DirectoryName):
-        if os.path.exists(os.path.normpath(DirectoryName)):
+        if (os.path.exists(ZEOperations.NormalizePath(DirectoryName))):
             return True
         else:
             return False
+
+    @staticmethod
+    def IsDirectory(DirectoryName):
+        if (ZEOperations.IsDirectoryExists(DirectoryName) and os.path.isdir(ZEOperations.NormalizePath(DirectoryName))):
+            return True
+        else:
+            return False
+
 
     @staticmethod
     def SetWorkingDirectory(DirectoryName):

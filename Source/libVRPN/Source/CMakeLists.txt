@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.2)
 project(VRPN)
 
+add_definitions(/Z7)
+
 # Changes made by:
 # 2009-2010 Ryan Pavlik <rpavlik@iastate.edu>
 # http://academic.cleardefinition.com
