@@ -18,7 +18,8 @@ class libISense(ZELibrary):
             ConfigurationString = "/Release"
         else:
             ConfigurationString = ""
-        ZEOperations.CopyDirectory(self.RootDirectory + "/Prebuild/" + ZEPlatform.PlatformString + "/DLL", self.OutputDirectory + "/DLL" + ConfigurationString)
+           
+        ZEOperations.CopyDirectory(self.RootDirectory + "/Prebuild/" + ZEPlatform.PlatformStringNoToolset + "/DLL", self.OutputDirectory + "/DLL" + ConfigurationString)
 
 if (ZEPlatform.Platform == "Windows" or ZEPlatform.Platform == "Linux" or ZEPlatform.Platform == "MacOSX"):
     ZEBuildDriver.BuildLibrary(libISense("libISense", ""))
