@@ -1,0 +1,6 @@
+Name : Clang
+Version : 3.5 - http://llvm.org/svn/llvm-project/cfe/tags/RELEASE_350/final:216957
+
+Name : LLVM
+Version : 3.5 - http://llvm.org/svn/llvm-project/llvm/tags/RELEASE_350/final:216956
+
