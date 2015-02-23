@@ -1,0 +1,2 @@
+Name: libMSVCR-v100
+Version : Visual Studio 2010 (v100)
