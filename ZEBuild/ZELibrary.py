@@ -65,8 +65,7 @@ class ZELibrary:
 
             self.CopyVersionTxt()
 
-            if (ZEPlatform.MultiConfiguration == False):
-
+            if (self.SingleConfiguration or ZEPlatform.MultiConfiguration == False):
                 ZEBuild.Configration = ZEBuild.CONFIG_NONE
                 self.Clean()
                 self.Configure(ZEBuild.CONFIG_NONE)
@@ -111,12 +110,12 @@ class ZELibrary:
                 self.LogFile.close()
 
     def __init__(self, Name, ExtraLibraries):
+        self.SingleConfiguration = False
         self.Name = Name
-        self.RootDirectory = os.getcwd();
+        self.RootDirectory = os.getcwd()
         self.SourceDirectory = self.RootDirectory + "/Source"
         self.LogDirectory = os.path.normpath(ZEBuild.RootDirectory + "/Log/" + self.Name)
         self.OutputDirectory = os.path.normpath(ZEBuild.OutputDirectory + "/" + self.Name)
         self.BuildDirectory = os.path.normpath(ZEBuild.RootDirectory + "/Build/" + self.Name)
         self.InstallDirectory = os.path.normpath(self.BuildDirectory + "/ZEInstall")
-
         self.ExtraLibraries = ExtraLibraries

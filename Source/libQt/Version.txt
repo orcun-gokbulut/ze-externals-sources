@@ -1,2 +1,2 @@
-Name: libQt
-Version : 4.8.0
+Name : libQt
+Version : 5.6 

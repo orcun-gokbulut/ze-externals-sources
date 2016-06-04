@@ -1,0 +1,4 @@
+Removed everything except QtBase.
+QtBase/tests removed.
+QtBase/examples removed.
+Dumy QtBase/tests/cmake folder added for fixing build problem.

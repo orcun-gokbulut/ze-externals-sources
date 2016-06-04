@@ -44,5 +44,9 @@ class ZELibraryCMakeLists:
         self.File.write("ze_external_register_library(" + Name + Parameters + "\n\t" + ZELibraryCMakeLists.GetPlatformCheckParameters() + ")\n\n")
         self.File.flush()
     
+    def AddText(self, Text):
+        self.File.write(Text)
+        self.File.flush()
+
     def End(self):
         self.File.close()
