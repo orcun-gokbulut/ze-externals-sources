@@ -28,7 +28,7 @@ class libQt(ZELibrary):
         os.environ["PATH"] = OldPath
         
         if (ZEPlatform.Platform == "Windows"):
-            self.MakeUtility = "nmake"
+            self.MakeUtility = self.RootDirectory + "\Tool\jom.exe"
         else:
             self.MakeUtility = "make"
 
