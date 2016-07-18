@@ -1,0 +1,134 @@
+ DirectXTex/BC.h                  |  6 +++---
+ DirectXTex/CMakeLists.txt        | 31 +++++++++++++++++++++++++++++++
+ DirectXTex/DirectXTex.h          |  2 +-
+ DirectXTex/DirectXTexConvert.cpp | 10 +++++++---
+ DirectXTex/DirectXTexDDS.cpp     |  6 +++---
+ 5 files changed, 45 insertions(+), 10 deletions(-)
+
+diff --git a/DirectXTex/BC.h b/DirectXTex/BC.h
+index c386895..c65427a 100644
+--- a/DirectXTex/BC.h
++++ b/DirectXTex/BC.h
+@@ -72,7 +72,7 @@ class LDRColorA
+ public:
+     uint8_t r, g, b, a;
+ 
+-    LDRColorA() = default;
++	LDRColorA() {}
+     LDRColorA(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a) : r(_r), g(_g), b(_b), a(_a) {}
+ 
+     const uint8_t& operator [] (_In_range_(0,3) size_t uElement) const
+@@ -144,7 +144,7 @@ public:
+     float r, g, b, a;
+ 
+ public:
+-    HDRColorA() = default;
++    HDRColorA() {}
+     HDRColorA(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
+     HDRColorA(const HDRColorA& c) : r(c.r), g(c.g), b(c.b), a(c.a) {}
+     HDRColorA(const LDRColorA& c)
+@@ -308,7 +308,7 @@ public:
+     int pad;
+ 
+ public:
+-    INTColor() = default;
++    INTColor() {}
+     INTColor(int nr, int ng, int nb) {r = nr; g = ng; b = nb;}
+     INTColor(const INTColor& c) {r = c.r; g = c.g; b = c.b;}
+ 
+diff --git a/DirectXTex/CMakeLists.txt b/DirectXTex/CMakeLists.txt
+new file mode 100644
+index 0000000..b4760af
+--- /dev/null
++++ b/DirectXTex/CMakeLists.txt
+@@ -0,0 +1,31 @@
++cmake_minimum_required(VERSION 2.8.10)
++project(DirectXTex)
++
++SET(Sources 
++	BC.h BC.cpp 
++	BCDirectCompute.h BCDirectCompute.cpp 
++	DDS.h 
++	DirectXTex.h 
++	DirectXTexP.h
++	Filters.h 
++	scoped.h 
++	DirectXTex.inl 
++	BC4BC5.cpp 
++	BC6HBC7.cpp 
++	DirectXTexCompress.cpp 
++	DirectXTexCompressGPU.cpp 
++	DirectXTexConvert.cpp 
++	DirectXTexD3D11.cpp 
++	DirectXTexDDS.cpp 
++	DirectXTexFlipRotate.cpp 
++	DirectXTexImage.cpp 
++	DirectXTexMipmaps.cpp 
++	DirectXTexMisc.cpp 
++	DirectXTexNormalMaps.cpp 
++	DirectXTexPMAlpha.cpp 
++	DirectXTexResize.cpp 
++	DirectXTexTGA.cpp 
++	DirectXTexUtil.cpp 
++	DirectXTexWIC.cpp)
++
++add_library(libDirectXTex ${Sources})
+\ No newline at end of file
+diff --git a/DirectXTex/DirectXTex.h b/DirectXTex/DirectXTex.h
+index 3b67d7e..ed8d782 100644
+--- a/DirectXTex/DirectXTex.h
++++ b/DirectXTex/DirectXTex.h
+@@ -564,7 +564,7 @@ namespace DirectX
+         size_t w;
+         size_t h;
+ 
+-        Rect() = default;
++		Rect() {}
+         Rect( size_t _x, size_t _y, size_t _w, size_t _h ) : x(_x), y(_y), w(_w), h(_h) {}
+     };
+ 
+diff --git a/DirectXTex/DirectXTexConvert.cpp b/DirectXTex/DirectXTexConvert.cpp
+index 0d954f1..950290a 100644
+--- a/DirectXTex/DirectXTexConvert.cpp
++++ b/DirectXTex/DirectXTexConvert.cpp
+@@ -185,9 +185,13 @@ namespace
+         fi.i = 0x83000000 - (exp << 23);
+         float ScaleR = fi.f;
+ 
+-        pDestination->xm = static_cast<uint32_t>( lroundf(x * ScaleR) );
+-        pDestination->ym = static_cast<uint32_t>( lroundf(y * ScaleR) );
+-        pDestination->zm = static_cast<uint32_t>( lroundf(z * ScaleR) );
++		float X = x * ScaleR;
++		float Y = y * ScaleR;
++		float Z = z * ScaleR;
++
++		pDestination->xm = static_cast<uint32_t>( (X > 0) ? floor(X + 0.5f) : ceil(X - 0.5f) );
++		pDestination->ym = static_cast<uint32_t>( (Y > 0) ? floor(Y + 0.5f) : ceil(Y - 0.5f) );
++		pDestination->zm = static_cast<uint32_t>( (Z > 0) ? floor(Z + 0.5f) : ceil(Z - 0.5f) );
+     }
+ #endif
+ };
+diff --git a/DirectXTex/DirectXTexDDS.cpp b/DirectXTex/DirectXTexDDS.cpp
+index 931eb5d..13ee54d 100644
+--- a/DirectXTex/DirectXTexDDS.cpp
++++ b/DirectXTex/DirectXTexDDS.cpp
+@@ -24,9 +24,6 @@ namespace
+     public:
+         auto_delete_file(HANDLE hFile) : m_handle(hFile) {}
+ 
+-        auto_delete_file(const auto_delete_file&) = delete;
+-        auto_delete_file& operator=(const auto_delete_file&) = delete;
+-
+         ~auto_delete_file()
+         {
+             if (m_handle)
+@@ -41,6 +38,9 @@ namespace
+ 
+     private:
+         HANDLE m_handle;
++
++		auto_delete_file(const auto_delete_file&);
++		auto_delete_file& operator=(const auto_delete_file&);
+     };
+ }
+ 

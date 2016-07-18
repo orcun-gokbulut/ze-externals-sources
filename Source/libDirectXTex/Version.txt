@@ -1,0 +1,4 @@
+Name: libDirectXTex
+Source: https://github.com/Microsoft/DirectXTex
+Source Version/Tag: jun2016
+Patch: Removed C++11 specific codes, Custom Build System (CMake)
