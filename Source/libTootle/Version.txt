@@ -1,0 +1,4 @@
+Name : libTootle
+Version : 2.3.163
+Source: https://github.com/GPUOpen-Tools/amd-tootle (b4d15559db41a02e31803d50f097ef4c8616bead -  27 May 2016)
+Customization: Install commands in CMake scripts. Renamed target name to libTootle in CMake scripts.
