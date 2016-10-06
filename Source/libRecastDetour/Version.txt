@@ -1,0 +1,6 @@
+Name : libRecastDetour
+Version : Master (15ebb8bd25e952215d2ff140d5ec01fa50294275) Last Version: 1.5.1
+GIT: https://github.com/recastnavigation/recastnavigation.git
+Chages:
+* Migrated to CMake Build
+* Removed unnecessary codes (Demo, Docs and Test)
