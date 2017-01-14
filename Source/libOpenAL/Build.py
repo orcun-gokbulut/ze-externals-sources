@@ -1,7 +1,13 @@
 class libOpenAL(ZELibrary):
     def Configure(self, Configuration):
         ZELibrary.Configure(self, Configuration)
-        ZECMake.Configure(self, "", None)
+        Parameters = [ZECMakeParameter("CURL_STATICLIB", "BOOL", "YES"),
+            ZECMakeParameter("ALSOFT_CONFIG", "BOOL", "NO"),
+            ZECMakeParameter("ALSOFT_EXAMPLES", "BOOL", "NO"),
+            ZECMakeParameter("ALSOFT_TESTS", "BOOL", "NO"),
+            ZECMakeParameter("ALSOFT_UTILS", "BOOL", "NO")]
+            
+        ZECMake.Configure(self, "", Parameters)
 
     def Compile(self, Configuration):
         ZELibrary.Compile(self, Configuration)

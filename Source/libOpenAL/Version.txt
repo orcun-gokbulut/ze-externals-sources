@@ -1,2 +1,3 @@
-Name : libOpenAL 
-Version : 1.13
+Name : libOpenAL (OpenAL Soft)
+Version : 1.17.2
+URL: http://kcat.strangesoft.net/openal-releases/openal-soft-1.17.2.tar.bz2
