@@ -96,6 +96,28 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
     return self;
 }
 
+- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
+{
+    Q_ASSERT(m_menu->nsMenu() == menu);
+    return menu.numberOfItems;
+}
+
+- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
+{
+    Q_UNUSED(index);
+    Q_ASSERT(m_menu->nsMenu() == menu);
+    if (shouldCancel) {
+        // TODO detach all submenus
+        return NO;
+    }
+
+    QCocoaMenuItem *menuItem = reinterpret_cast<QCocoaMenuItem *>(item.tag);
+    if (m_menu->items().contains(menuItem)) {
+        if (QCocoaMenu *itemSubmenu = menuItem->menu())
+            itemSubmenu->setAttachedItem(item);
+    }
+    return YES;
+}
 
 - (void)menu:(NSMenu*)menu willHighlightItem:(NSMenuItem*)item
 {
@@ -109,12 +131,14 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
 - (void) menuWillOpen:(NSMenu*)m
 {
     Q_UNUSED(m);
+    m_menu->setIsOpen(true);
     emit m_menu->aboutToShow();
 }
 
 - (void) menuDidClose:(NSMenu*)m
 {
     Q_UNUSED(m);
+    m_menu->setIsOpen(false);
     // wrong, but it's the best we can do
     emit m_menu->aboutToHide();
 }
@@ -130,10 +154,10 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
-    if (![menuItem tag])
+    QCocoaMenuItem *cocoaItem = reinterpret_cast<QCocoaMenuItem *>(menuItem.tag);
+    if (!cocoaItem)
         return YES;
 
-    QCocoaMenuItem* cocoaItem = reinterpret_cast<QCocoaMenuItem *>([menuItem tag]);
     return cocoaItem->isEnabled();
 }
 
@@ -228,37 +252,32 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
 QT_BEGIN_NAMESPACE
 
 QCocoaMenu::QCocoaMenu() :
-    m_enabled(true),
-    m_visible(true),
+    m_attachedItem(0),
     m_tag(0),
-    m_menuBar(0),
-    m_containingMenuItem(0)
+    m_enabled(true),
+    m_parentEnabled(true),
+    m_visible(true),
+    m_isOpen(false)
 {
     QMacAutoReleasePool pool;
 
-    m_delegate = [[QCocoaMenuDelegate alloc] initWithMenu:this];
-    m_nativeItem = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
     m_nativeMenu = [[NSMenu alloc] initWithTitle:@"Untitled"];
     [m_nativeMenu setAutoenablesItems:YES];
-    m_nativeMenu.delegate = (QCocoaMenuDelegate *) m_delegate;
-    [m_nativeItem setSubmenu:m_nativeMenu];
+    m_nativeMenu.delegate = [[QCocoaMenuDelegate alloc] initWithMenu:this];
 }
 
 QCocoaMenu::~QCocoaMenu()
 {
     foreach (QCocoaMenuItem *item, m_menuItems) {
-        if (COCOA_MENU_ANCESTOR(item) == this)
-            SET_COCOA_MENU_ANCESTOR(item, 0);
+        if (item->menuParent() == this)
+            item->setMenuParent(0);
     }
 
-    if (m_containingMenuItem)
-        m_containingMenuItem->clearMenu(this);
-
     QMacAutoReleasePool pool;
-    [m_nativeItem setSubmenu:nil];
+    NSObject *delegate = m_nativeMenu.delegate;
+    m_nativeMenu.delegate = nil;
+    [delegate release];
     [m_nativeMenu release];
-    [m_delegate release];
-    [m_nativeItem release];
 }
 
 void QCocoaMenu::setText(const QString &text)
@@ -266,7 +285,6 @@ void QCocoaMenu::setText(const QString &text)
     QMacAutoReleasePool pool;
     QString stripped = qt_mac_removeAmpersandEscapes(text);
     [m_nativeMenu setTitle:QCFString::toNSString(stripped)];
-    [m_nativeItem setTitle:QCFString::toNSString(stripped)];
 }
 
 void QCocoaMenu::setMinimumWidth(int width)
@@ -307,17 +325,17 @@ void QCocoaMenu::insertMenuItem(QPlatformMenuItem *menuItem, QPlatformMenuItem *
 
 void QCocoaMenu::insertNative(QCocoaMenuItem *item, QCocoaMenuItem *beforeItem)
 {
-    [item->nsItem() setTarget:m_delegate];
+    item->nsItem().target = m_nativeMenu.delegate;
     if (!item->menu())
         [item->nsItem() setAction:@selector(itemFired:)];
+    else if (isOpen() && item->nsItem()) // Someone's adding new items after aboutToShow() was emitted
+        item->menu()->setAttachedItem(item->nsItem());
+
+    item->setParentEnabled(isEnabled());
 
     if (item->isMerged())
         return;
 
-    if ([item->nsItem() menu]) {
-        qWarning("Menu item is already in a menu, remove it from the other menu first before inserting");
-        return;
-    }
     // if the item we're inserting before is merged, skip along until
     // we find a non-merged real item to insert ahead of.
     while (beforeItem && beforeItem->isMerged()) {
@@ -334,7 +352,17 @@ void QCocoaMenu::insertNative(QCocoaMenuItem *item, QCocoaMenuItem *beforeItem)
     } else {
         [m_nativeMenu addItem: item->nsItem()];
     }
-    SET_COCOA_MENU_ANCESTOR(item, this);
+    item->setMenuParent(this);
+}
+
+bool QCocoaMenu::isOpen() const
+{
+    return m_isOpen;
+}
+
+void QCocoaMenu::setIsOpen(bool isOpen)
+{
+    m_isOpen = isOpen;
 }
 
 void QCocoaMenu::removeMenuItem(QPlatformMenuItem *menuItem)
@@ -346,8 +374,11 @@ void QCocoaMenu::removeMenuItem(QPlatformMenuItem *menuItem)
         return;
     }
 
-    if (COCOA_MENU_ANCESTOR(menuItem) == this)
-        SET_COCOA_MENU_ANCESTOR(menuItem, 0);
+    if (cocoaItem->menuParent() == this)
+        cocoaItem->setMenuParent(0);
+
+    // Ignore any parent enabled state
+    cocoaItem->setParentEnabled(true);
 
     m_menuItems.removeOne(cocoaItem);
     if (!cocoaItem->isMerged()) {
@@ -439,18 +470,21 @@ void QCocoaMenu::syncSeparatorsCollapsible(bool enable)
 
 void QCocoaMenu::setEnabled(bool enabled)
 {
+    if (m_enabled == enabled)
+        return;
     m_enabled = enabled;
-    syncModalState(!m_enabled);
+    const bool wasParentEnabled = m_parentEnabled;
+    propagateEnabledState(m_enabled);
+    m_parentEnabled = wasParentEnabled; // Reset to the parent value
 }
 
 bool QCocoaMenu::isEnabled() const
 {
-    return [m_nativeItem isEnabled];
+    return m_attachedItem ? [m_attachedItem isEnabled] : m_enabled && m_parentEnabled;
 }
 
 void QCocoaMenu::setVisible(bool visible)
 {
-    [m_nativeItem setSubmenu:(visible ? m_nativeMenu : nil)];
     m_visible = visible;
 }
 
@@ -580,44 +614,40 @@ QList<QCocoaMenuItem *> QCocoaMenu::merged() const
     return result;
 }
 
-void QCocoaMenu::syncModalState(bool modal)
+void QCocoaMenu::propagateEnabledState(bool enabled)
 {
-    QMacAutoReleasePool pool;
+    QMacAutoReleasePool pool; // FIXME Is this still needed for Creator? See 6a0bb4206a2928b83648
 
-    if (!m_enabled)
-        modal = true;
-
-    [m_nativeItem setEnabled:!modal];
+    m_parentEnabled = enabled;
+    if (!m_enabled && enabled) // Some ancestor was enabled, but this menu is not
+        return;
 
     foreach (QCocoaMenuItem *item, m_menuItems) {
-        if (item->menu()) { // recurse into submenus
-            item->menu()->syncModalState(modal);
-            continue;
-        }
-
-        item->syncModalState(modal);
+        if (QCocoaMenu *menu = item->menu())
+            menu->propagateEnabledState(enabled);
+        else
+            item->setParentEnabled(enabled);
     }
 }
 
-void QCocoaMenu::setMenuBar(QCocoaMenuBar *menuBar)
+void QCocoaMenu::setAttachedItem(NSMenuItem *item)
 {
-    m_menuBar = menuBar;
-    SET_COCOA_MENU_ANCESTOR(this, menuBar);
+    if (item == m_attachedItem)
+        return;
+
+    if (m_attachedItem)
+        m_attachedItem.submenu = nil;
+
+    m_attachedItem = item;
+
+    if (m_attachedItem)
+        m_attachedItem.submenu = m_nativeMenu;
+
 }
 
-QCocoaMenuBar *QCocoaMenu::menuBar() const
+NSMenuItem *QCocoaMenu::attachedItem() const
 {
-    return m_menuBar;
-}
-
-void QCocoaMenu::setContainingMenuItem(QCocoaMenuItem *menuItem)
-{
-    m_containingMenuItem = menuItem;
-}
-
-QCocoaMenuItem *QCocoaMenu::containingMenuItem() const
-{
-    return m_containingMenuItem;
+    return m_attachedItem;
 }
 
 QT_END_NAMESPACE

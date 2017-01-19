@@ -13,6 +13,7 @@ class libQt(ZELibrary):
         Arguments += "-nomake examples "
         Arguments += "-nomake tests "
         Arguments += "-no-ssl "
+        Arguments += "-qtlibinfix \"-Zinek\" "
 
         OldPath = os.environ["PATH"];
         if (ZEPlatform.Platform == "Windows"):

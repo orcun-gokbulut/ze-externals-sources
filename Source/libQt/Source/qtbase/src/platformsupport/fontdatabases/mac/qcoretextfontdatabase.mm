@@ -206,6 +206,12 @@ void QCoreTextFontDatabase::populateFontDatabase()
         if (familyName.startsWith(QLatin1Char('.')) || familyName == QLatin1String("LastResort"))
             continue;
 
+#if defined(Q_OS_IOS) || defined(Q_OS_TVOS)
+        // Skip font families with no corresponding fonts
+        if (![UIFont fontNamesForFamilyName:(NSString*)familyNameRef].count)
+            continue;
+#endif
+
         QPlatformFontDatabase::registerFontFamily(familyName);
 
 #if defined(Q_OS_OSX)
@@ -367,7 +373,7 @@ static QByteArray filenameForCFUrl(CFURLRef url)
 
     if (!CFURLGetFileSystemRepresentation(url, true, buffer, sizeof(buffer))) {
         qWarning("QCoreTextFontDatabase::filenameForCFUrl: could not resolve file for URL %s",
-                 qPrintable(QString::fromCFString(CFURLGetString(url))));
+                 url ? qPrintable(QString::fromCFString(CFURLGetString(url))) : "(null)");
     } else {
         QCFType<CFStringRef> scheme = CFURLCopyScheme(url);
         if (QString::fromCFString(scheme) == QLatin1String("qrc"))
@@ -518,9 +524,6 @@ QStringList QCoreTextFontDatabase::fallbacksForFamily(const QString &family, QFo
         if (&CTFontCopyDefaultCascadeListForLanguages)
   #endif
         {
-            if (fallbackLists.contains(family))
-                return fallbackLists.value(family);
-
             QCFType<CFMutableDictionaryRef> attributes = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
             CFDictionaryAddValue(attributes, kCTFontFamilyNameAttribute, QCFString(family));
             if (QCFType<CTFontDescriptorRef> fontDescriptor = CTFontDescriptorCreateWithAttributes(attributes)) {
@@ -548,12 +551,9 @@ QStringList QCoreTextFontDatabase::fallbacksForFamily(const QString &family, QFo
                             fallbackList.append(QStringLiteral("Arial Unicode MS"));
 #endif
 
-                        fallbackLists[family] = fallbackList;
+                        return fallbackList;
                     }
                 }
-
-                if (fallbackLists.contains(family))
-                    return fallbackLists.value(family);
             }
         }
 #endif
@@ -588,8 +588,7 @@ QStringList QCoreTextFontDatabase::fallbacksForFamily(const QString &family, QFo
                     fallbackList.append(familyNameFromPostScriptName(item));
             }
 
-            if (QCoreTextFontEngine::supportsColorGlyphs())
-                fallbackList.append(QLatin1String("Apple Color Emoji"));
+            fallbackList.append(QLatin1String("Apple Color Emoji"));
 
             // Since we are only returning a list of default fonts for the current language, we do not
             // cover all unicode completely. This was especially an issue for some of the common script

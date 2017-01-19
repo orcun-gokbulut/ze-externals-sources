@@ -48,6 +48,7 @@
 
 #include <QtPlatformHeaders/qxcbwindowfunctions.h>
 #include <QtPlatformHeaders/qxcbintegrationfunctions.h>
+#include <QtPlatformHeaders/qxcbscreenfunctions.h>
 
 #ifndef QT_NO_DBUS
 #include "QtPlatformSupport/private/qdbusmenuconnection_p.h"
@@ -76,7 +77,7 @@ static int resourceType(const QByteArray &key)
         QByteArrayLiteral("startupid"), QByteArrayLiteral("traywindow"),
         QByteArrayLiteral("gettimestamp"), QByteArrayLiteral("x11screen"),
         QByteArrayLiteral("rootwindow"),
-        QByteArrayLiteral("subpixeltype"), QByteArrayLiteral("antialiasingEnabled"),
+        QByteArrayLiteral("subpixeltype"), QByteArrayLiteral("antialiasingenabled"),
         QByteArrayLiteral("nofonthinting"),
         QByteArrayLiteral("atspibus")
     };
@@ -349,6 +350,9 @@ QFunctionPointer QXcbNativeInterface::platformFunction(const QByteArray &functio
     if (function == QXcbWindowFunctions::setWmWindowTypeIdentifier())
         return QFunctionPointer(QXcbWindowFunctions::SetWmWindowType(QXcbWindow::setWmWindowTypeStatic));
 
+    if (function == QXcbWindowFunctions::setWmWindowRoleIdentifier())
+        return QFunctionPointer(QXcbWindowFunctions::SetWmWindowRole(QXcbWindow::setWmWindowRoleStatic));
+
     if (function == QXcbWindowFunctions::setWmWindowIconTextIdentifier())
         return QFunctionPointer(QXcbWindowFunctions::SetWmWindowIconText(QXcbWindow::setWindowIconTextStatic));
 
@@ -367,6 +371,10 @@ QFunctionPointer QXcbNativeInterface::platformFunction(const QByteArray &functio
     if (function == QXcbWindowFunctions::visualIdIdentifier()) {
         return QFunctionPointer(QXcbWindowFunctions::VisualId(QXcbWindow::visualIdStatic));
     }
+
+    if (function == QXcbScreenFunctions::virtualDesktopNumberIdentifier())
+        return QFunctionPointer(QXcbScreenFunctions::VirtualDesktopNumber(QXcbScreen::virtualDesktopNumberStatic));
+
     return Q_NULLPTR;
 }
 

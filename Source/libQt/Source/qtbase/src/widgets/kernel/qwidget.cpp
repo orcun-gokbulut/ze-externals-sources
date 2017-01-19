@@ -274,6 +274,7 @@ QWidgetPrivate::QWidgetPrivate(int version)
 #endif
 #ifndef QT_NO_OPENGL
       , renderToTextureReallyDirty(1)
+      , renderToTextureComposeActive(0)
 #endif
 #if defined(Q_OS_WIN)
       , noPaintOnScreen(0)
@@ -1243,11 +1244,14 @@ void QWidgetPrivate::createRecursively()
 }
 
 
-
+// ### fixme: Qt 6: Remove parameter window from QWidget::create()
 
 /*!
-    Creates a new widget window if \a window is 0, otherwise sets the
-    widget's window to \a window.
+    Creates a new widget window.
+
+    The parameter \a window is ignored in Qt 5. Please use
+    QWindow::fromWinId() to create a QWindow wrapping a foreign
+    window and pass it to QWidget::createWindowContainer() instead.
 
     Initializes the window (sets the geometry etc.) if \a
     initializeWindow is true. If \a initializeWindow is false, no
@@ -1260,11 +1264,15 @@ void QWidgetPrivate::createRecursively()
 
     The QWidget constructor calls create(0,true,true) to create a
     window for this widget.
+
+    \sa createWindowContainer(), QWindow::fromWinId()
 */
 
 void QWidget::create(WId window, bool initializeWindow, bool destroyOldWindow)
 {
     Q_D(QWidget);
+    if (Q_UNLIKELY(window))
+        qWarning("QWidget::create(): Parameter 'window' does not have any effect.");
     if (testAttribute(Qt::WA_WState_Created) && window == 0 && internalWinId())
         return;
 
@@ -1288,7 +1296,7 @@ void QWidget::create(WId window, bool initializeWindow, bool destroyOldWindow)
             // We're about to create a native child widget that doesn't have a native parent;
             // enforce a native handle for the parent unless the Qt::WA_DontCreateNativeAncestors
             // attribute is set.
-            d->createWinId(window);
+            d->createWinId();
             // Nothing more to do.
             Q_ASSERT(testAttribute(Qt::WA_WState_Created));
             Q_ASSERT(internalWinId());
@@ -1419,6 +1427,7 @@ void QWidgetPrivate::create_sys(WId window, bool initializeWindow, bool destroyO
         win->setProperty("_q_showWithoutActivating", QVariant(true));
     if (q->testAttribute(Qt::WA_MacAlwaysShowToolWindow))
         win->setProperty("_q_macAlwaysShowToolWindow", QVariant::fromValue(QVariant(true)));
+    setNetWmWindowTypes(true); // do nothing if none of WA_X11NetWmWindowType* is set
     win->setFlags(data.window_flags);
     fixPosIncludesFrame();
     if (q->testAttribute(Qt::WA_Moved)
@@ -1463,6 +1472,9 @@ void QWidgetPrivate::create_sys(WId window, bool initializeWindow, bool destroyO
         win->handle()->setFrameStrutEventsEnabled(true);
 
     data.window_flags = win->flags();
+
+    if (!topData()->role.isNull())
+        QXcbWindowFunctions::setWmWindowRole(win, topData()->role.toLatin1());
 
     QBackingStore *store = q->backingStore();
 
@@ -1880,7 +1892,6 @@ void QWidgetPrivate::deleteTLSysExtra()
         if (extra->topextra->window) {
             extra->topextra->window->destroy();
         }
-        setWinId(0);
         delete extra->topextra->window;
         extra->topextra->window = 0;
 
@@ -2498,7 +2509,7 @@ QWidget *QWidget::find(WId id)
     If a widget is non-native (alien) and winId() is invoked on it, that widget
     will be provided a native handle.
 
-    On OS X, the type returned depends on which framework Qt was linked
+    On \macos, the type returned depends on which framework Qt was linked
     against. If Qt is using Carbon, the {WId} is actually an HIViewRef. If Qt
     is using Cocoa, {WId} is a pointer to an NSView.
 
@@ -2521,13 +2532,12 @@ WId QWidget::winId() const
     return data->winid;
 }
 
-
-void QWidgetPrivate::createWinId(WId winid)
+void QWidgetPrivate::createWinId()
 {
     Q_Q(QWidget);
 
 #ifdef ALIEN_DEBUG
-    qDebug() << "QWidgetPrivate::createWinId for" << q << winid;
+    qDebug() << "QWidgetPrivate::createWinId for" << q;
 #endif
     const bool forceNativeWindow = q->testAttribute(Qt::WA_NativeWindow);
     if (!q->testAttribute(Qt::WA_WState_Created) || (forceNativeWindow && !q->internalWinId())) {
@@ -2544,15 +2554,7 @@ void QWidgetPrivate::createWinId(WId winid)
                 QWidget *w = qobject_cast<QWidget *>(pd->children.at(i));
                 if (w && !w->isWindow() && (!w->testAttribute(Qt::WA_WState_Created)
                                             || (!w->internalWinId() && w->testAttribute(Qt::WA_NativeWindow)))) {
-                    if (w!=q) {
-                        w->create();
-                    } else {
-                        w->create(winid);
-                        // if the window has already been created, we
-                        // need to raise it to its proper stacking position
-                        if (winid)
-                            w->raise();
-                    }
+                    w->create();
                 }
             }
         } else {
@@ -2634,7 +2636,7 @@ QWindow *QWidget::windowHandle() const
     The style sheet contains a textual description of customizations to the
     widget's style, as described in the \l{Qt Style Sheets} document.
 
-    Since Qt 4.5, Qt style sheets fully supports OS X.
+    Since Qt 4.5, Qt style sheets fully supports \macos.
 
     \warning Qt style sheets are currently not supported for custom QStyle
     subclasses. We plan to address this in some future release.
@@ -5113,7 +5115,7 @@ void QWidget::render(QPaintDevice *target, const QPoint &targetOffset,
     Transformations and settings applied to the \a painter will be used
     when rendering.
 
-    \note The \a painter must be active. On OS X the widget will be
+    \note The \a painter must be active. On \macos the widget will be
     rendered into a QPixmap and then drawn by the \a painter.
 
     \sa QPainter::device()
@@ -5237,7 +5239,9 @@ QPixmap QWidget::grab(const QRect &rectangle)
     if (!r.intersects(rect()))
         return QPixmap();
 
-    QPixmap res(r.size());
+    const qreal dpr = devicePixelRatioF();
+    QPixmap res((QSizeF(r.size()) * dpr).toSize());
+    res.setDevicePixelRatio(dpr);
     if (!d->isOpaque)
         res.fill(Qt::transparent);
     d->render(&res, QPoint(), QRegion(r), renderFlags);
@@ -6255,7 +6259,7 @@ QString QWidget::windowIconText() const
     If the window title is set at any point, then the window title takes precedence and
     will be shown instead of the file path string.
 
-    Additionally, on OS X, this has an added benefit that it sets the
+    Additionally, on \macos, this has an added benefit that it sets the
     \l{http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGWindows/chapter_17_section_3.html}{proxy icon}
     for the window, assuming that the file path exists.
 
@@ -6328,13 +6332,11 @@ QString QWidget::windowRole() const
 */
 void QWidget::setWindowRole(const QString &role)
 {
-#if defined(Q_DEAD_CODE_FROM_QT4_X11)
     Q_D(QWidget);
+    d->createTLExtra();
     d->topData()->role = role;
-    d->setWindowRole();
-#else
-    Q_UNUSED(role)
-#endif
+    if (windowHandle())
+        QXcbWindowFunctions::setWmWindowRole(windowHandle(), role.toLatin1());
 }
 
 /*!
@@ -6415,13 +6417,13 @@ bool QWidget::hasFocus() const
     const QWidget* w = this;
     while (w->d_func()->extra && w->d_func()->extra->focus_proxy)
         w = w->d_func()->extra->focus_proxy;
-    if (QWidget *window = w->window()) {
 #ifndef QT_NO_GRAPHICSVIEW
+    if (QWidget *window = w->window()) {
         QWExtra *e = window->d_func()->extra;
         if (e && e->proxyWidget && e->proxyWidget->hasFocus() && window->focusWidget() == w)
             return true;
-#endif
     }
+#endif // !QT_NO_GRAPHICSVIEW
     return (QApplication::focusWidget() == w);
 }
 
@@ -7216,7 +7218,7 @@ void QWidgetPrivate::setGeometry_sys(int x, int y, int w, int h, bool isMove)
             if (q->isVisible())
                 hide_sys();
             data.crect = QRect(x, y, w, h);
-        } else if (q->isVisible() && q->testAttribute(Qt::WA_OutsideWSRange)) {
+        } else if (q->testAttribute(Qt::WA_OutsideWSRange)) {
             q->setAttribute(Qt::WA_OutsideWSRange, false);
             needsShow = true;
         }
@@ -7918,8 +7920,11 @@ void QWidgetPrivate::show_sys()
         invalidateBuffer(q->rect());
         q->setAttribute(Qt::WA_Mapped);
         // add our window the modal window list (native dialogs)
-        if ((q->isWindow() && (!extra || !extra->proxyWidget))
-            && q->windowModality() != Qt::NonModal && window) {
+        if (window && q->isWindow()
+#ifndef QT_NO_GRAPHICSVIEW
+            && (!extra || !extra->proxyWidget)
+#endif
+            && q->windowModality() != Qt::NonModal) {
             QGuiApplicationPrivate::showModalWindow(window);
         }
         return;
@@ -8053,8 +8058,11 @@ void QWidgetPrivate::hide_sys()
     if (q->testAttribute(Qt::WA_DontShowOnScreen)) {
         q->setAttribute(Qt::WA_Mapped, false);
         // remove our window from the modal window list (native dialogs)
-        if ((q->isWindow() && (!extra || !extra->proxyWidget))
-            && q->windowModality() != Qt::NonModal && window) {
+        if (window && q->isWindow()
+#ifndef QT_NO_GRAPHICSVIEW
+            && (!extra || !extra->proxyWidget)
+#endif
+            && q->windowModality() != Qt::NonModal) {
             QGuiApplicationPrivate::hideModalWindow(window);
         }
         // do not return here, if window non-zero, we must hide it
@@ -10332,14 +10340,13 @@ void QWidgetPrivate::setWindowFlags(Qt::WindowFlags flags)
         // the old type was a window and/or the new type is a window
         QPoint oldPos = q->pos();
         bool visible = q->isVisible();
+        const bool windowFlagChanged = (q->data->window_flags ^ flags) & Qt::Window;
         q->setParent(q->parentWidget(), flags);
 
         // if both types are windows or neither of them are, we restore
         // the old position
-        if (!((q->data->window_flags ^ flags) & Qt::Window)
-            && (visible || q->testAttribute(Qt::WA_Moved))) {
+        if (!windowFlagChanged && (visible || q->testAttribute(Qt::WA_Moved)))
             q->move(oldPos);
-        }
         // for backward-compatibility we change Qt::WA_QuitOnClose attribute value only when the window was recreated.
         adjustQuitOnCloseAttribute();
     } else {
@@ -11218,7 +11225,6 @@ void QWidget::setAttribute(Qt::WidgetAttribute attribute, bool on)
         break;
     }
 
-#ifdef Q_DEAD_CODE_FROM_QT4_X11
     case Qt::WA_X11NetWmWindowTypeDesktop:
     case Qt::WA_X11NetWmWindowTypeDock:
     case Qt::WA_X11NetWmWindowTypeToolBar:
@@ -11232,10 +11238,8 @@ void QWidget::setAttribute(Qt::WidgetAttribute attribute, bool on)
     case Qt::WA_X11NetWmWindowTypeNotification:
     case Qt::WA_X11NetWmWindowTypeCombo:
     case Qt::WA_X11NetWmWindowTypeDND:
-        if (testAttribute(Qt::WA_WState_Created))
-            d->setNetWmWindowTypes();
+        d->setNetWmWindowTypes();
         break;
-#endif
 
     case Qt::WA_StaticContents:
         if (QWidgetBackingStore *bs = d->maybeBackingStore()) {
@@ -11288,7 +11292,7 @@ bool QWidget::testAttribute_helper(Qt::WidgetAttribute attribute) const
 
   By default the value of this property is 1.0.
 
-  This feature is available on Embedded Linux, OS X, Windows,
+  This feature is available on Embedded Linux, \macos, Windows,
   and X11 platforms that support the Composite extension.
 
   This feature is not available on Windows CE.
@@ -11351,7 +11355,7 @@ void QWidgetPrivate::setWindowOpacity_sys(qreal level)
 
     A modified window is a window whose content has changed but has
     not been saved to disk. This flag will have different effects
-    varied by the platform. On OS X the close button will have a
+    varied by the platform. On \macos the close button will have a
     modified look; on other platforms, the window title will have an
     '*' (asterisk).
 
@@ -12341,6 +12345,53 @@ static inline bool canMapPosition(QWindow *window)
     return window->handle() && !qt_window_private(window)->resizeEventPending;
 }
 
+#ifndef QT_NO_GRAPHICSVIEW
+static inline QGraphicsProxyWidget *graphicsProxyWidget(const QWidget *w)
+{
+    QGraphicsProxyWidget *result = Q_NULLPTR;
+    const QWidgetPrivate *d = qt_widget_private(const_cast<QWidget *>(w));
+    if (d->extra)
+        result = d->extra->proxyWidget;
+    return result;
+}
+#endif // !QT_NO_GRAPHICSVIEW
+
+struct MapToGlobalTransformResult {
+    QTransform transform;
+    QWindow *window;
+};
+
+static MapToGlobalTransformResult mapToGlobalTransform(const QWidget *w)
+{
+    MapToGlobalTransformResult result;
+    result.window = Q_NULLPTR;
+    for ( ; w ; w = w->parentWidget()) {
+#ifndef QT_NO_GRAPHICSVIEW
+        if (QGraphicsProxyWidget *qgpw = graphicsProxyWidget(w)) {
+            if (const QGraphicsScene *scene = qgpw->scene()) {
+                const QList <QGraphicsView *> views = scene->views();
+                if (!views.isEmpty()) {
+                    result.transform *= qgpw->sceneTransform();
+                    result.transform *= views.first()->viewportTransform();
+                    w = views.first()->viewport();
+                }
+            }
+        }
+#endif // !QT_NO_GRAPHICSVIEW
+        QWindow *window = w->windowHandle();
+        if (window && canMapPosition(window)) {
+            result.window = window;
+            break;
+        }
+
+        const QPoint topLeft = w->geometry().topLeft();
+        result.transform.translate(topLeft.x(), topLeft.y());
+        if (w->isWindow())
+            break;
+    }
+    return result;
+}
+
 /*!
     \fn QPoint QWidget::mapToGlobal(const QPoint &pos) const
 
@@ -12352,29 +12403,9 @@ static inline bool canMapPosition(QWindow *window)
 */
 QPoint QWidget::mapToGlobal(const QPoint &pos) const
 {
-#ifndef QT_NO_GRAPHICSVIEW
-    Q_D(const QWidget);
-    if (d->extra && d->extra->proxyWidget && d->extra->proxyWidget->scene()) {
-        const QList <QGraphicsView *> views = d->extra->proxyWidget->scene()->views();
-        if (!views.isEmpty()) {
-            const QPointF scenePos = d->extra->proxyWidget->mapToScene(pos);
-            const QPoint viewPortPos = views.first()->mapFromScene(scenePos);
-            return views.first()->viewport()->mapToGlobal(viewPortPos);
-        }
-    }
-#endif // !QT_NO_GRAPHICSVIEW
-    int x = pos.x(), y = pos.y();
-    const QWidget *w = this;
-    while (w) {
-        QWindow *window = w->windowHandle();
-        if (window && canMapPosition(window))
-            return window->mapToGlobal(QPoint(x, y));
-
-        x += w->data->crect.x();
-        y += w->data->crect.y();
-        w = w->isWindow() ? 0 : w->parentWidget();
-    }
-    return QPoint(x, y);
+    const MapToGlobalTransformResult t = mapToGlobalTransform(this);
+    const QPoint g = t.transform.map(pos);
+    return t.window ? t.window->mapToGlobal(g) : g;
 }
 
 /*!
@@ -12387,29 +12418,9 @@ QPoint QWidget::mapToGlobal(const QPoint &pos) const
 */
 QPoint QWidget::mapFromGlobal(const QPoint &pos) const
 {
-#ifndef QT_NO_GRAPHICSVIEW
-    Q_D(const QWidget);
-    if (d->extra && d->extra->proxyWidget && d->extra->proxyWidget->scene()) {
-        const QList <QGraphicsView *> views = d->extra->proxyWidget->scene()->views();
-        if (!views.isEmpty()) {
-            const QPoint viewPortPos = views.first()->viewport()->mapFromGlobal(pos);
-            const QPointF scenePos = views.first()->mapToScene(viewPortPos);
-            return d->extra->proxyWidget->mapFromScene(scenePos).toPoint();
-        }
-    }
-#endif // !QT_NO_GRAPHICSVIEW
-    int x = pos.x(), y = pos.y();
-    const QWidget *w = this;
-    while (w) {
-        QWindow *window = w->windowHandle();
-        if (window && canMapPosition(window))
-            return window->mapFromGlobal(QPoint(x, y));
-
-        x -= w->data->crect.x();
-        y -= w->data->crect.y();
-        w = w->isWindow() ? 0 : w->parentWidget();
-    }
-    return QPoint(x, y);
+   const MapToGlobalTransformResult t = mapToGlobalTransform(this);
+   const QPoint windowLocal = t.window ? t.window->mapFromGlobal(pos) : pos;
+   return t.transform.inverted().map(windowLocal);
 }
 
 QWidget *qt_pressGrab = 0;
@@ -12490,7 +12501,7 @@ static void releaseMouseGrabOfWidget(QWidget *widget)
 
     \note On Windows, grabMouse() only works when the mouse is inside a window
     owned by the process.
-    On OS X, grabMouse() only works when the mouse is inside the frame of that widget.
+    On \macos, grabMouse() only works when the mouse is inside the frame of that widget.
 
     \sa releaseMouse(), grabKeyboard(), releaseKeyboard()
 */
@@ -12842,9 +12853,8 @@ void QWidget::setMask(const QRegion &newMask)
 void QWidgetPrivate::setMask_sys(const QRegion &region)
 {
     Q_Q(QWidget);
-    if (const QWindow *window = q->windowHandle())
-        if (QPlatformWindow *platformWindow = window->handle())
-            platformWindow->setMask(QHighDpi::toNativeLocalRegion(region, window));
+    if (QWindow *window = q->windowHandle())
+        window->setMask(region);
 }
 
 /*!
@@ -12895,6 +12905,47 @@ void QWidgetPrivate::setWidgetParentHelper(QObject *widgetAsObject, QObject *new
     Q_ASSERT(!newParent || newParent->isWidgetType());
     QWidget *widget = static_cast<QWidget*>(widgetAsObject);
     widget->setParent(static_cast<QWidget*>(newParent));
+}
+
+void QWidgetPrivate::setNetWmWindowTypes(bool skipIfMissing)
+{
+    Q_Q(QWidget);
+
+    if (!q->windowHandle())
+        return;
+
+    int wmWindowType = 0;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop))
+        wmWindowType |= QXcbWindowFunctions::Desktop;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeDock))
+        wmWindowType |= QXcbWindowFunctions::Dock;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeToolBar))
+        wmWindowType |= QXcbWindowFunctions::Toolbar;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeMenu))
+        wmWindowType |= QXcbWindowFunctions::Menu;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeUtility))
+        wmWindowType |= QXcbWindowFunctions::Utility;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeSplash))
+        wmWindowType |= QXcbWindowFunctions::Splash;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeDialog))
+        wmWindowType |= QXcbWindowFunctions::Dialog;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeDropDownMenu))
+        wmWindowType |= QXcbWindowFunctions::DropDownMenu;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypePopupMenu))
+        wmWindowType |= QXcbWindowFunctions::PopupMenu;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeToolTip))
+        wmWindowType |= QXcbWindowFunctions::Tooltip;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeNotification))
+        wmWindowType |= QXcbWindowFunctions::Notification;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeCombo))
+        wmWindowType |= QXcbWindowFunctions::Combo;
+    if (q->testAttribute(Qt::WA_X11NetWmWindowTypeDND))
+        wmWindowType |= QXcbWindowFunctions::Dnd;
+
+    if (wmWindowType == 0 && skipIfMissing)
+        return;
+
+    QXcbWindowFunctions::setWmWindowType(q->windowHandle(), static_cast<QXcbWindowFunctions::WmWindowType>(wmWindowType));
 }
 
 #ifndef QT_NO_DEBUG_STREAM
@@ -12963,7 +13014,7 @@ QDebug operator<<(QDebug debug, const QWidget *widget)
     This function will return 0 if no painter context can be established, or if the handle
     could not be created.
 
-    \warning This function is only available on OS X.
+    \warning This function is only available on \macos.
 */
 /*! \fn Qt::HANDLE QWidget::macQDHandle() const
     \internal
@@ -12972,7 +13023,7 @@ QDebug operator<<(QDebug debug, const QWidget *widget)
     This function will return 0 if QuickDraw is not supported, or if the handle could
     not be created.
 
-    \warning This function is only available on OS X.
+    \warning This function is only available on \macos.
 */
 /*! \fn const QX11Info &QWidget::x11Info() const
     \internal

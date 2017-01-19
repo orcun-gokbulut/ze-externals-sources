@@ -927,7 +927,7 @@ QRegion QRegion::intersect(const QRect &r) const
        sort key and X as the minor sort key.
     \endlist
     \omit
-    Only some platforms have these restrictions (Qt for Embedded Linux, X11 and OS X).
+    Only some platforms have these restrictions (Qt for Embedded Linux, X11 and \macos).
     \endomit
 */
 
@@ -3735,7 +3735,7 @@ static QRegionPrivate *PolygonRegion(const QPoint *Pts, int Count, int rule)
 
 QRegionPrivate *qt_bitmapToRegion(const QBitmap& bitmap)
 {
-    QImage image = bitmap.toImage();
+    const QImage image = bitmap.toImage();
 
     QRegionPrivate *region = new QRegionPrivate;
 
@@ -3753,7 +3753,7 @@ QRegionPrivate *qt_bitmapToRegion(const QBitmap& bitmap)
     int x,
         y;
     for (y = 0; y < image.height(); ++y) {
-        uchar *line = image.scanLine(y);
+        const uchar *line = image.constScanLine(y);
         int w = image.width();
         uchar all = zero;
         int prev1 = -1;

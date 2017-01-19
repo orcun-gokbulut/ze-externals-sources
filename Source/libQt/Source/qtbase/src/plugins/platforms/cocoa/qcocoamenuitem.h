@@ -40,23 +40,33 @@
 
 //#define QT_COCOA_ENABLE_MENU_DEBUG
 
-#ifdef __OBJC__
-#define QT_FORWARD_DECLARE_OBJC_CLASS(__KLASS__) @class __KLASS__
-#else
-#define QT_FORWARD_DECLARE_OBJC_CLASS(__KLASS__) typedef struct objc_object __KLASS__
-#endif
-
-QT_FORWARD_DECLARE_OBJC_CLASS(NSMenuItem);
-QT_FORWARD_DECLARE_OBJC_CLASS(NSMenu);
-QT_FORWARD_DECLARE_OBJC_CLASS(NSObject);
-QT_FORWARD_DECLARE_OBJC_CLASS(NSView);
-
+Q_FORWARD_DECLARE_OBJC_CLASS(NSMenuItem);
+Q_FORWARD_DECLARE_OBJC_CLASS(NSMenu);
+Q_FORWARD_DECLARE_OBJC_CLASS(NSObject);
+Q_FORWARD_DECLARE_OBJC_CLASS(NSView);
 
 QT_BEGIN_NAMESPACE
 
 class QCocoaMenu;
 
-class QCocoaMenuItem : public QPlatformMenuItem
+class QCocoaMenuObject
+{
+public:
+    void setMenuParent(QObject *o)
+    {
+        parent = o;
+    }
+
+    QObject *menuParent() const
+    {
+        return parent;
+    }
+
+private:
+    QPointer<QObject> parent;
+};
+
+class QCocoaMenuItem : public QPlatformMenuItem, public QCocoaMenuObject
 {
 public:
     QCocoaMenuItem();
@@ -87,14 +97,13 @@ public:
     NSMenuItem *sync();
 
     void syncMerged();
-    void syncModalState(bool modal);
+    void setParentEnabled(bool enabled);
 
     inline bool isMerged() const { return m_merged; }
-    inline bool isEnabled() const { return m_enabled; }
+    inline bool isEnabled() const { return m_enabled && m_parentEnabled; }
     inline bool isSeparator() const { return m_isSeparator; }
 
     QCocoaMenu *menu() const { return m_menu; }
-    void clearMenu(QCocoaMenu *menu);
     MenuRole effectiveRole() const;
 
 private:
@@ -104,24 +113,22 @@ private:
     NSMenuItem *m_native;
     NSView *m_itemView;
     QString m_text;
-    bool m_textSynced;
     QIcon m_icon;
-    QCocoaMenu *m_menu;
-    bool m_isVisible;
-    bool m_enabled;
-    bool m_isSeparator;
+    QPointer<QCocoaMenu> m_menu;
     QFont m_font;
     MenuRole m_role;
     MenuRole m_detectedRole;
     QKeySequence m_shortcut;
-    bool m_checked;
-    bool m_merged;
     quintptr m_tag;
     int m_iconSize;
+    bool m_textSynced:1;
+    bool m_isVisible:1;
+    bool m_enabled:1;
+    bool m_parentEnabled:1;
+    bool m_isSeparator:1;
+    bool m_checked:1;
+    bool m_merged:1;
 };
-
-#define COCOA_MENU_ANCESTOR(m) ((m)->property("_qCocoaMenuAncestor").value<QObject *>())
-#define SET_COCOA_MENU_ANCESTOR(m, ancestor) (m)->setProperty("_qCocoaMenuAncestor", QVariant::fromValue<QObject *>(ancestor))
 
 QT_END_NAMESPACE
 

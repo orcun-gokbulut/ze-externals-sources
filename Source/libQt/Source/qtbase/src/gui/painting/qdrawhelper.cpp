@@ -1938,9 +1938,10 @@ static const uint * QT_FASTCALL fetchTransformedBilinearARGB32PM(uint *buffer, c
 
                 // intermediate_buffer[0] is a buffer of red-blue component of the pixel, in the form 0x00RR00BB
                 // intermediate_buffer[1] is the alpha-green component of the pixel, in the form 0x00AA00GG
+                // +1 for the last pixel to interpolate with, and +1 for rounding errors.
                 quint32 intermediate_buffer[2][buffer_size + 2];
                 // count is the size used in the intermediate_buffer.
-                int count = qCeil(length * data->m11) + 2; //+1 for the last pixel to interpolate with, and +1 for rounding errors.
+                int count = (qint64(length) * fdx + fixed_scale - 1) / fixed_scale + 2;
                 Q_ASSERT(count <= buffer_size + 2); //length is supposed to be <= buffer_size and data->m11 < 1 in this case
                 int f = 0;
                 int lim = count;
@@ -2448,12 +2449,13 @@ static const uint *QT_FASTCALL fetchTransformedBilinear(uint *buffer, const Oper
                 // The idea is first to do the interpolation between the row s1 and the row s2
                 // into an intermediate buffer, then we interpolate between two pixel of this buffer.
                 FetchPixelsFunc fetch = qFetchPixels[layout->bpp];
+                // +1 for the last pixel to interpolate with, and +1 for rounding errors.
                 uint buf1[buffer_size + 2];
                 uint buf2[buffer_size + 2];
                 const uint *ptr1;
                 const uint *ptr2;
 
-                int count = qCeil(length * data->m11) + 2; //+1 for the last pixel to interpolate with, and +1 for rounding errors.
+                int count = (qint64(length) * fdx + fixed_scale - 1) / fixed_scale + 2;
                 Q_ASSERT(count <= buffer_size + 2); //length is supposed to be <= buffer_size and data->m11 < 1 in this case
 
                 if (blendType == BlendTransformedBilinearTiled) {
@@ -2813,10 +2815,16 @@ static const QRgba64 *QT_FASTCALL fetchTransformedBilinear64(QRgba64 *buffer, co
                         sbuf2[i * 2 + 1] = ((const uint*)s2)[x2];
                         fx += fdx;
                     }
+                    int fastLen;
+                    if (fdx > 0)
+                        fastLen = qMin(len, int((image_x2 - (fx >> 16)) / data->m11));
+                    else
+                        fastLen = qMin(len, int((image_x1 - (fx >> 16)) / data->m11));
+                    fastLen -= 3;
 
                     const __m128i v_fdx = _mm_set1_epi32(fdx*4);
                     __m128i v_fx = _mm_setr_epi32(fx, fx + fdx, fx + fdx + fdx, fx + fdx + fdx + fdx);
-                    for (; i < len-3; i+=4) {
+                    for (; i < fastLen; i += 4) {
                         int offset = _mm_extract_epi16(v_fx, 1);
                         sbuf1[i * 2 + 0] = ((const uint*)s1)[offset];
                         sbuf1[i * 2 + 1] = ((const uint*)s1)[offset + 1];
@@ -3431,13 +3439,13 @@ static SourceFetchProc64 sourceFetch64[NBlendTypes][QImage::NImageFormats] = {
 static uint qt_gradient_pixel_fixed(const QGradientData *data, int fixed_pos)
 {
     int ipos = (fixed_pos + (FIXPT_SIZE / 2)) >> FIXPT_BITS;
-    return data->colorTable[qt_gradient_clamp(data, ipos)].toArgb32();
+    return data->colorTable32[qt_gradient_clamp(data, ipos)];
 }
 
 static const QRgba64& qt_gradient_pixel64_fixed(const QGradientData *data, int fixed_pos)
 {
     int ipos = (fixed_pos + (FIXPT_SIZE / 2)) >> FIXPT_BITS;
-    return data->colorTable[qt_gradient_clamp(data, ipos)];
+    return data->colorTable64[qt_gradient_clamp(data, ipos)];
 }
 
 static void QT_FASTCALL getLinearGradientValues(LinearGradientValues *v, const QSpanData *data)
@@ -5746,9 +5754,9 @@ static inline void rgbBlendPixel(quint32 *dst, int coverage, int sr, int sg, int
     dg = gamma[dg];
     db = gamma[db];
 
-    int nr = qt_div_255((sr - dr) * mr) + dr;
-    int ng = qt_div_255((sg - dg) * mg) + dg;
-    int nb = qt_div_255((sb - db) * mb) + db;
+    int nr = qt_div_255(sr * mr + dr * (255 - mr));
+    int ng = qt_div_255(sg * mg + dg * (255 - mg));
+    int nb = qt_div_255(sb * mb + db * (255 - mb));
 
     nr = invgamma[nr];
     ng = invgamma[ng];
@@ -5773,9 +5781,9 @@ static inline void grayBlendPixel(quint32 *dst, int coverage, int sr, int sg, in
 
     int alpha = coverage;
     int ialpha = 255 - alpha;
-    int nr = (sr * alpha + ialpha * dr) / 255;
-    int ng = (sg * alpha + ialpha * dg) / 255;
-    int nb = (sb * alpha + ialpha * db) / 255;
+    int nr = qt_div_255(sr * alpha + dr * ialpha);
+    int ng = qt_div_255(sg * alpha + dg * ialpha);
+    int nb = qt_div_255(sb * alpha + db * ialpha);
 
     nr = invgamma[nr];
     ng = invgamma[ng];

@@ -69,6 +69,8 @@ using namespace ABI::Windows::UI::Xaml::Controls;
 
 QT_BEGIN_NAMESPACE
 
+Q_LOGGING_CATEGORY(lcQpaWindows, "qt.qpa.windows");
+
 static void setUIElementVisibility(IUIElement *uiElement, bool visibility)
 {
     Q_ASSERT(uiElement);
@@ -101,13 +103,11 @@ QWinRTWindow::QWinRTWindow(QWindow *window)
     , d_ptr(new QWinRTWindowPrivate)
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this;
 
     d->surface = EGL_NO_SURFACE;
     d->display = EGL_NO_DISPLAY;
     d->screen = static_cast<QWinRTScreen *>(screen());
-    setWindowFlags(window->flags());
-    setWindowState(window->windowState());
-    setWindowTitle(window->title());
     handleContentOrientationChange(window->contentOrientation());
 
     d->surfaceFormat.setAlphaBufferSize(0);
@@ -155,12 +155,17 @@ QWinRTWindow::QWinRTWindow(QWindow *window)
     });
     Q_ASSERT_SUCCEEDED(hr);
 
+    setWindowFlags(window->flags());
+    setWindowState(window->windowState());
+    setWindowTitle(window->title());
+
     setGeometry(window->geometry());
 }
 
 QWinRTWindow::~QWinRTWindow()
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this;
 
     HRESULT hr;
     hr = QEventDispatcherWinRT::runOnXamlThread([d]() {
@@ -184,8 +189,12 @@ QWinRTWindow::~QWinRTWindow()
     });
     RETURN_VOID_IF_FAILED("Failed to completely destroy window resources, likely because the application is shutting down");
 
+    d->screen->removeWindow(window());
+
     if (!d->surface)
         return;
+
+    qCDebug(lcQpaWindows) << __FUNCTION__ << ": Destroying surface";
 
     EGLBoolean value = eglDestroySurface(d->display, d->surface);
     d->surface = EGL_NO_SURFACE;
@@ -214,12 +223,15 @@ bool QWinRTWindow::isExposed() const
 void QWinRTWindow::setGeometry(const QRect &rect)
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this << rect;
 
     const Qt::WindowFlags windowFlags = window()->flags();
     const Qt::WindowFlags windowType = windowFlags & Qt::WindowType_Mask;
     if (window()->isTopLevel() && (windowType == Qt::Window || windowType == Qt::Dialog)) {
-        QPlatformWindow::setGeometry(windowFlags & Qt::MaximizeUsingFullscreenGeometryHint
-                                     ? d->screen->geometry() : d->screen->availableGeometry());
+        const QRect screenRect = windowFlags & Qt::MaximizeUsingFullscreenGeometryHint
+                                    ? d->screen->geometry() : d->screen->availableGeometry();
+        qCDebug(lcQpaWindows) << __FUNCTION__ << "top-level, overwrite" << screenRect;
+        QPlatformWindow::setGeometry(screenRect);
         QWindowSystemInterface::handleGeometryChange(window(), geometry());
     } else {
         QPlatformWindow::setGeometry(rect);
@@ -243,6 +255,8 @@ void QWinRTWindow::setGeometry(const QRect &rect)
         Q_ASSERT_SUCCEEDED(hr);
         hr = frameworkElement->put_Height(size.height());
         Q_ASSERT_SUCCEEDED(hr);
+        qCDebug(lcQpaWindows) << __FUNCTION__ << "(setGeometry Xaml)" << this
+                             << topLeft << size;
         return S_OK;
     });
     Q_ASSERT_SUCCEEDED(hr);
@@ -251,6 +265,8 @@ void QWinRTWindow::setGeometry(const QRect &rect)
 void QWinRTWindow::setVisible(bool visible)
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this << visible;
+
     if (!window()->isTopLevel())
         return;
     if (visible) {
@@ -266,12 +282,15 @@ void QWinRTWindow::setWindowTitle(const QString &title)
 {
     Q_D(QWinRTWindow);
     d->windowTitle = title;
-    d->screen->updateWindowTitle();
+
+    if (d->screen->topWindow() == window())
+        d->screen->updateWindowTitle(title);
 }
 
 void QWinRTWindow::raise()
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this;
     if (!window()->isTopLevel())
         return;
     d->screen->raise(window());
@@ -280,6 +299,7 @@ void QWinRTWindow::raise()
 void QWinRTWindow::lower()
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this;
     if (!window()->isTopLevel())
         return;
     d->screen->lower(window());
@@ -299,17 +319,64 @@ qreal QWinRTWindow::devicePixelRatio() const
 void QWinRTWindow::setWindowState(Qt::WindowState state)
 {
     Q_D(QWinRTWindow);
+    qCDebug(lcQpaWindows) << __FUNCTION__ << this << state;
+
     if (d->state == state)
         return;
 
-#ifdef Q_OS_WINPHONE
-    d->screen->setStatusBarVisibility(state == Qt::WindowMaximized || state == Qt::WindowNoState, window());
-#endif
+#if _MSC_VER >= 1900
+    if (state == Qt::WindowFullScreen) {
+        HRESULT hr;
+        boolean success;
+        hr = QEventDispatcherWinRT::runOnXamlThread([&hr, &success]() {
+            ComPtr<IApplicationViewStatics2> applicationViewStatics;
+            hr = RoGetActivationFactory(HString::MakeReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
+                                        IID_PPV_ARGS(&applicationViewStatics));
+            RETURN_HR_IF_FAILED("Could not access application view statics.");
+            ComPtr<IApplicationView> view;
+            hr = applicationViewStatics->GetForCurrentView(&view);
+            RETURN_HR_IF_FAILED("Could not access application view.");
+            ComPtr<IApplicationView3> view3;
+            hr = view.As(&view3);
+            Q_ASSERT_SUCCEEDED(hr);
+            hr = view3->TryEnterFullScreenMode(&success);
+            return hr;
+        });
+        if (FAILED(hr) || !success) {
+            qCDebug(lcQpaWindows) << "Failed to enter full screen mode.";
+            return;
+        }
+        d->state = state;
+        return;
+    }
+
+    if (d->state == Qt::WindowFullScreen) {
+        HRESULT hr;
+        hr = QEventDispatcherWinRT::runOnXamlThread([&hr]() {
+            ComPtr<IApplicationViewStatics2> applicationViewStatics;
+            hr = RoGetActivationFactory(HString::MakeReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
+                                        IID_PPV_ARGS(&applicationViewStatics));
+            RETURN_HR_IF_FAILED("Could not access application view statics.");
+            ComPtr<IApplicationView> view;
+            hr = applicationViewStatics->GetForCurrentView(&view);
+            RETURN_HR_IF_FAILED("Could not access application view.");
+            ComPtr<IApplicationView3> view3;
+            hr = view.As(&view3);
+            Q_ASSERT_SUCCEEDED(hr);
+            hr = view3->ExitFullScreenMode();
+            return hr;
+        });
+        if (FAILED(hr)) {
+            qCDebug(lcQpaWindows) << "Failed to exit full screen mode.";
+            return;
+        }
+    }
+#endif // _MSC_VER >= 1900
 
     if (state == Qt::WindowMinimized)
         setUIElementVisibility(d->uiElement.Get(), false);
 
-    if (d->state == Qt::WindowMinimized)
+    if (d->state == Qt::WindowMinimized || state == Qt::WindowNoState || state == Qt::WindowActive)
         setUIElementVisibility(d->uiElement.Get(), true);
 
     d->state = state;

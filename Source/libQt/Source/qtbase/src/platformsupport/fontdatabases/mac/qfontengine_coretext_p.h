@@ -101,24 +101,10 @@ public:
     bool supportsTransformation(const QTransform &transform) const Q_DECL_OVERRIDE;
 
     QFontEngine *cloneWithSize(qreal pixelSize) const Q_DECL_OVERRIDE;
+    Qt::HANDLE handle() const Q_DECL_OVERRIDE;
     int glyphMargin(QFontEngine::GlyphFormat format) Q_DECL_OVERRIDE { Q_UNUSED(format); return 0; }
 
     QFontEngine::Properties properties() const Q_DECL_OVERRIDE;
-
-    static bool supportsColorGlyphs()
-    {
-#if defined(Q_OS_IOS)
-        return true;
-#elif MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
-  #if MAC_OS_X_VERSION_MIN_REQUIRED < 1070
-        return &CTFontDrawGlyphs;
-  #else
-        return true;
-  #endif
-#else
-        return false;
-#endif
-    }
 
     static bool ct_getSfntTable(void *user_data, uint tag, uchar *buffer, uint *length);
     static QFont::Weight qtWeightFromCFWeight(float value);

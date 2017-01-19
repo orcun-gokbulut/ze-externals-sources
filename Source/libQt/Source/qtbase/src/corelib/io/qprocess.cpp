@@ -106,11 +106,13 @@ QT_BEGIN_NAMESPACE
     \macro QT_NO_PROCESS_COMBINED_ARGUMENT_START
     \relates QProcess
 
-    Disables the QProcess::start() overload taking a single string.
+    Disables the
+    \l {QProcess::start(const QString &, OpenMode)}{QProcess::start()}
+    overload taking a single string.
     In most cases where it is used, the user intends for the first argument
     to be treated atomically as per the other overload.
 
-    \sa QProcess::start()
+    \sa QProcess::start(const QString &command, OpenMode mode)
 */
 
 /*!
@@ -1049,7 +1051,6 @@ bool QProcessPrivate::_q_canReadStandardError()
 */
 bool QProcessPrivate::_q_canWrite()
 {
-    Q_Q(QProcess);
     if (stdinChannel.notifier)
         stdinChannel.notifier->setEnabled(false);
 
@@ -1060,31 +1061,13 @@ bool QProcessPrivate::_q_canWrite()
         return false;
     }
 
-    qint64 written = writeToStdin(stdinChannel.buffer.readPointer(),
-                                      stdinChannel.buffer.nextDataBlockSize());
-    if (written < 0) {
-        closeChannel(&stdinChannel);
-        setErrorAndEmit(QProcess::WriteError);
-        return false;
-    }
+    const bool writeSucceeded = writeToStdin();
 
-#if defined QPROCESS_DEBUG
-    qDebug("QProcessPrivate::canWrite(), wrote %d bytes to the process input", int(written));
-#endif
-
-    if (written != 0) {
-        stdinChannel.buffer.free(written);
-        if (!emittedBytesWritten) {
-            emittedBytesWritten = true;
-            emit q->bytesWritten(written);
-            emittedBytesWritten = false;
-        }
-    }
     if (stdinChannel.notifier && !stdinChannel.buffer.isEmpty())
         stdinChannel.notifier->setEnabled(true);
     if (stdinChannel.buffer.isEmpty() && stdinChannel.closed)
         closeWriteChannel();
-    return true;
+    return writeSucceeded;
 }
 
 /*!
@@ -1134,17 +1117,6 @@ bool QProcessPrivate::_q_processDied()
     if (crashed) {
         exitStatus = QProcess::CrashExit;
         setErrorAndEmit(QProcess::Crashed);
-    } else {
-#ifdef QPROCESS_USE_SPAWN
-        // if we're using posix_spawn, waitForStarted always succeeds.
-        // POSIX documents that the sub-process launched by posix_spawn will exit with code
-        // 127 if anything prevents the target program from starting.
-        // http://pubs.opengroup.org/onlinepubs/009695399/functions/posix_spawn.html
-        if (exitStatus == QProcess::NormalExit && exitCode == 127) {
-            setError(QProcess::FailedToStart,
-                     QProcess::tr("Process failed to start (spawned process exited with code 127)"));
-        }
-#endif
     }
 
     bool wasRunning = (processState == QProcess::Running);
@@ -1920,7 +1892,7 @@ void QProcess::setProcessState(ProcessState state)
 
 /*!
   This function is called in the child process context just before the
-    program is executed on Unix or OS X (i.e., after \c fork(), but before
+    program is executed on Unix or \macos (i.e., after \c fork(), but before
     \c execve()). Reimplement this function to do last minute initialization
     of the child process. Example:
 
@@ -1931,7 +1903,7 @@ void QProcess::setProcessState(ProcessState state)
     execution, your workaround is to emit finished() and then call
     exit().
 
-    \warning This function is called by QProcess on Unix and OS X
+    \warning This function is called by QProcess on Unix and \macos
     only. On Windows and QNX, it is not called.
 */
 void QProcess::setupChildProcess()
@@ -2118,10 +2090,7 @@ void QProcess::start(const QString &program, const QStringList &arguments, OpenM
         return;
     }
     if (program.isEmpty()) {
-        Q_D(QProcess);
-        d->processError = QProcess::FailedToStart;
-        setErrorString(tr("No program defined"));
-        emit error(d->processError);
+        d->setErrorAndEmit(QProcess::FailedToStart, tr("No program defined"));
         return;
     }
 
@@ -2148,10 +2117,7 @@ void QProcess::start(OpenMode mode)
         return;
     }
     if (d->program.isEmpty()) {
-        Q_D(QProcess);
-        d->processError = QProcess::FailedToStart;
-        setErrorString(tr("No program defined"));
-        emit error(d->processError);
+        d->setErrorAndEmit(QProcess::FailedToStart, tr("No program defined"));
         return;
     }
 
@@ -2391,7 +2357,7 @@ void QProcess::setArguments(const QStringList &arguments)
 
     On Windows, terminate() posts a WM_CLOSE message to all top-level windows
     of the process and then to the main thread of the process itself. On Unix
-    and OS X the \c SIGTERM signal is sent.
+    and \macos the \c SIGTERM signal is sent.
 
     Console applications on Windows that do not run an event loop, or whose
     event loop does not handle the WM_CLOSE message, can only be terminated by
@@ -2408,7 +2374,7 @@ void QProcess::terminate()
 /*!
     Kills the current process, causing it to exit immediately.
 
-    On Windows, kill() uses TerminateProcess, and on Unix and OS X, the
+    On Windows, kill() uses TerminateProcess, and on Unix and \macos, the
     SIGKILL signal is sent to the process.
 
     \sa terminate()
@@ -2549,7 +2515,7 @@ bool QProcess::startDetached(const QString &program,
     After the \a command string has been split and unquoted, this function
     behaves like the overload which takes the arguments as a string list.
 
-    \sa start()
+    \sa start(const QString &command, OpenMode mode)
 */
 bool QProcess::startDetached(const QString &command)
 {

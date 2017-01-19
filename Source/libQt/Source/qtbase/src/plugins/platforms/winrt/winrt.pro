@@ -1,10 +1,6 @@
 TARGET = qwinrt
-CONFIG -= precompile_header
 
-PLUGIN_TYPE = platforms
-PLUGIN_CLASS_NAME = QWinRTIntegrationPlugin
-!equals(TARGET, $$QT_DEFAULT_QPA_PLUGIN): PLUGIN_EXTENDS = -
-load(qt_plugin)
+CONFIG -= precompile_header
 
 QT += core-private gui-private platformsupport-private
 
@@ -16,7 +12,9 @@ INCLUDEPATH += $$QT_SOURCE_TREE/src/3rdparty/freetype/include
 SOURCES = \
     main.cpp  \
     qwinrtbackingstore.cpp \
+    qwinrtclipboard.cpp \
     qwinrtcursor.cpp \
+    qwinrtdrag.cpp \
     qwinrteglcontext.cpp \
     qwinrteventdispatcher.cpp \
     qwinrtfiledialoghelper.cpp \
@@ -33,7 +31,9 @@ SOURCES = \
 
 HEADERS = \
     qwinrtbackingstore.h \
+    qwinrtclipboard.h \
     qwinrtcursor.h \
+    qwinrtdrag.h \
     qwinrteglcontext.h \
     qwinrteventdispatcher.h \
     qwinrtfiledialoghelper.h \
@@ -48,3 +48,17 @@ HEADERS = \
     qwinrtwindow.h
 
 OTHER_FILES += winrt.json
+
+WINRT_SDK_VERSION_STRING = $$(UCRTVersion)
+WINRT_SDK_VERSION = $$member($$list($$split(WINRT_SDK_VERSION_STRING, .)), 2)
+lessThan(WINRT_SDK_VERSION, 14322): DEFINES += QT_WINRT_LIMITED_DRAGANDDROP
+
+*-msvc2013|contains(DEFINES, QT_NO_DRAGANDDROP) {
+    SOURCES -= qwinrtdrag.cpp
+    HEADERS -= qwinrtdrag.h
+}
+
+PLUGIN_TYPE = platforms
+PLUGIN_CLASS_NAME = QWinRTIntegrationPlugin
+!equals(TARGET, $$QT_DEFAULT_QPA_PLUGIN): PLUGIN_EXTENDS = -
+load(qt_plugin)

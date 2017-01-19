@@ -43,7 +43,7 @@ QT_BEGIN_NAMESPACE
 
 class QCocoaMenuBar;
 
-class QCocoaMenu : public QPlatformMenu
+class QCocoaMenu : public QPlatformMenu, public QCocoaMenuObject
 {
 public:
     QCocoaMenu();
@@ -65,7 +65,7 @@ public:
 
     void syncSeparatorsCollapsible(bool enable) Q_DECL_OVERRIDE;
 
-    void syncModalState(bool modal);
+    void propagateEnabledState(bool enabled);
 
     void setIcon(const QIcon &icon) Q_DECL_OVERRIDE { Q_UNUSED(icon) }
 
@@ -75,8 +75,6 @@ public:
 
     inline NSMenu *nsMenu() const
         { return m_nativeMenu; }
-    inline NSMenuItem *nsMenuItem() const
-        { return m_nativeItem; }
 
     inline bool isVisible() const { return m_visible; }
 
@@ -85,11 +83,12 @@ public:
 
     QList<QCocoaMenuItem *> items() const;
     QList<QCocoaMenuItem *> merged() const;
-    void setMenuBar(QCocoaMenuBar *menuBar);
-    QCocoaMenuBar *menuBar() const;
 
-    void setContainingMenuItem(QCocoaMenuItem *menuItem);
-    QCocoaMenuItem *containingMenuItem() const;
+    void setAttachedItem(NSMenuItem *item);
+    NSMenuItem *attachedItem() const;
+
+    bool isOpen() const;
+    void setIsOpen(bool isOpen);
 
 private:
     QCocoaMenuItem *itemOrNull(int index) const;
@@ -97,13 +96,12 @@ private:
 
     QList<QCocoaMenuItem *> m_menuItems;
     NSMenu *m_nativeMenu;
-    NSMenuItem *m_nativeItem;
-    NSObject *m_delegate;
-    bool m_enabled;
-    bool m_visible;
+    NSMenuItem *m_attachedItem;
     quintptr m_tag;
-    QCocoaMenuBar *m_menuBar;
-    QCocoaMenuItem *m_containingMenuItem;
+    bool m_enabled:1;
+    bool m_parentEnabled:1;
+    bool m_visible:1;
+    bool m_isOpen:1;
 };
 
 QT_END_NAMESPACE

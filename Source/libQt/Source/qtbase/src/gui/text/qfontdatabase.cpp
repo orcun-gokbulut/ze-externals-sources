@@ -691,7 +691,9 @@ static QStringList familyList(const QFontDef &req)
         return family_list;
 
     QStringList list = req.family.split(QLatin1Char(','));
-    for (int i = 0; i < list.size(); ++i) {
+    const int numFamilies = list.size();
+    family_list.reserve(numFamilies);
+    for (int i = 0; i < numFamilies; ++i) {
         QString str = list.at(i).trimmed();
         if ((str.startsWith(QLatin1Char('"')) && str.endsWith(QLatin1Char('"')))
             || (str.startsWith(QLatin1Char('\'')) && str.endsWith(QLatin1Char('\''))))
@@ -1607,6 +1609,7 @@ QStringList QFontDatabase::styles(const QString &family) const
         }
     }
 
+    l.reserve(allStyles.count);
     for (int i = 0; i < allStyles.count; i++) {
         l.append(allStyles.styles[i]->styleName.isEmpty() ?
                  styleStringHelper(allStyles.styles[i]->key.weight,
@@ -2040,7 +2043,7 @@ bool QFontDatabase::hasFamily(const QString &family) const
 
     Returns \c true if and only if the \a family font family is private.
 
-    This happens, for instance, on OS X and iOS, where the system UI fonts are not
+    This happens, for instance, on \macos and iOS, where the system UI fonts are not
     accessible to the user. For completeness, QFontDatabase::families() returns all
     font families, including the private ones. You should use this function if you
     are developing a font selection control in order to keep private fonts hidden.
@@ -2727,8 +2730,6 @@ void QFontDatabase::load(const QFontPrivate *d, int script)
     }
     if (req.pointSize < 0)
         req.pointSize = req.pixelSize*72.0/d->dpi;
-    if (req.weight == 0)
-        req.weight = QFont::Normal;
     if (req.stretch == 0)
         req.stretch = 100;
 
@@ -2798,6 +2799,7 @@ void QFontDatabase::load(const QFontPrivate *d, int script)
         req.fallBackFamilies.clear();
     }
 
+    Q_ASSERT(fe);
     if (fe->symbol || (d->request.styleStrategy & QFont::NoFontMerging)) {
         for (int i = 0; i < QChar::ScriptCount; ++i) {
             if (!d->engineData->engines[i]) {

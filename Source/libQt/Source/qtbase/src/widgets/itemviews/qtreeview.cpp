@@ -1017,7 +1017,11 @@ void QTreeView::keyboardSearch(const QString &search)
 
     bool skipRow = false;
     bool keyboardTimeWasValid = d->keyboardInputTime.isValid();
-    qint64 keyboardInputTimeElapsed = d->keyboardInputTime.restart();
+    qint64 keyboardInputTimeElapsed;
+    if (keyboardTimeWasValid)
+        keyboardInputTimeElapsed = d->keyboardInputTime.restart();
+    else
+        d->keyboardInputTime.start();
     if (search.isEmpty() || !keyboardTimeWasValid
         || keyboardInputTimeElapsed > QApplication::keyboardInputInterval()) {
         d->keyboardInput = search;
@@ -2310,8 +2314,8 @@ QModelIndex QTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifie
                     int visualColumn = d->header->visualIndex(current.column()) + 1;
                     while (visualColumn < d->model->columnCount(current.parent()) && isColumnHidden(d->header->logicalIndex(visualColumn)))
                         visualColumn++;
-
-                    QModelIndex next = current.sibling(current.row(), visualColumn);
+                    const int newColumn = d->header->logicalIndex(visualColumn);
+                    const QModelIndex next = current.sibling(current.row(), newColumn);
                     if (next.isValid())
                         return next;
                 }
@@ -2564,7 +2568,7 @@ void QTreeView::rowsInserted(const QModelIndex &parent, int start, int end)
     if (((parentItem != -1) && d->viewItems.at(parentItem).expanded)
         || (parent == d->root)) {
         d->doDelayedItemsLayout();
-    } else if (parentItem != -1 && (d->model->rowCount(parent) == end - start + 1)) {
+    } else if (parentItem != -1 && parentRowCount == delta) {
         // the parent just went from 0 children to more. update to re-paint the decoration
         d->viewItems[parentItem].hasChildren = true;
         viewport()->update();
@@ -3240,7 +3244,8 @@ void QTreeViewPrivate::drawAnimatedOperation(QPainter *painter) const
 QPixmap QTreeViewPrivate::renderTreeToPixmapForAnimation(const QRect &rect) const
 {
     Q_Q(const QTreeView);
-    QPixmap pixmap(rect.size());
+    QPixmap pixmap(rect.size() * q->devicePixelRatio());
+    pixmap.setDevicePixelRatio(q->devicePixelRatio());
     if (rect.size().isEmpty())
         return pixmap;
     pixmap.fill(Qt::transparent); //the base might not be opaque, and we don't want uninitialized pixels.

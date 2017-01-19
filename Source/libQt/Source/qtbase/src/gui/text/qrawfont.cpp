@@ -79,7 +79,7 @@ QT_BEGIN_NAMESPACE
    also have accessors to some relevant data in the physical font.
 
    QRawFont only provides support for the main font technologies: GDI and DirectWrite on Windows
-   platforms, FreeType on Linux platforms and CoreText on OS X. For other
+   platforms, FreeType on Linux platforms and CoreText on \macos. For other
    font back-ends, the APIs will be disabled.
 
    QRawFont can be constructed in a number of ways:
@@ -607,8 +607,7 @@ QByteArray QRawFont::fontTable(const char *tagName) const
     if (!d->isValid())
         return QByteArray();
 
-    const quint32 *tagId = reinterpret_cast<const quint32 *>(tagName);
-    return d->fontEngine->getSfntTable(qToBigEndian(*tagId));
+    return d->fontEngine->getSfntTable(MAKE_TAG(tagName[0], tagName[1], tagName[2], tagName[3]));
 }
 
 /*!
@@ -628,18 +627,18 @@ QList<QFontDatabase::WritingSystem> QRawFont::supportedWritingSystems() const
     if (d->isValid()) {
         QByteArray os2Table = fontTable("OS/2");
         if (os2Table.size() > 86) {
-            char *data = os2Table.data();
-            quint32 *bigEndianUnicodeRanges = reinterpret_cast<quint32 *>(data + 42);
-            quint32 *bigEndianCodepageRanges = reinterpret_cast<quint32 *>(data + 78);
+            const uchar * const data = reinterpret_cast<const uchar *>(os2Table.constData());
+            const uchar * const bigEndianUnicodeRanges  = data + 42;
+            const uchar * const bigEndianCodepageRanges = data + 78;
 
             quint32 unicodeRanges[4];
             quint32 codepageRanges[2];
 
-            for (int i=0; i<4; ++i) {
-                if (i < 2)
-                    codepageRanges[i] = qFromBigEndian(bigEndianCodepageRanges[i]);
-                unicodeRanges[i] = qFromBigEndian(bigEndianUnicodeRanges[i]);
-            }
+            for (size_t i = 0; i < sizeof unicodeRanges / sizeof *unicodeRanges; ++i)
+                unicodeRanges[i] = qFromBigEndian<quint32>(bigEndianUnicodeRanges + i * sizeof(quint32));
+
+            for (size_t i = 0; i < sizeof codepageRanges / sizeof *codepageRanges; ++i)
+                codepageRanges[i] = qFromBigEndian<quint32>(bigEndianCodepageRanges + i * sizeof(quint32));
 
             QSupportedWritingSystems ws = QPlatformFontDatabase::writingSystemsFromTrueTypeBits(unicodeRanges, codepageRanges);
             for (int i = 0; i < QFontDatabase::WritingSystemsCount; ++i) {

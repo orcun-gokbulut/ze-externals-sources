@@ -33,15 +33,6 @@
 
 #ifndef QT_NO_DIRECTWRITE
 
-#if WINVER < 0x0600
-#  undef WINVER
-#  define WINVER 0x0600
-#endif
-#if _WIN32_WINNT < 0x0600
-#undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
-#endif
-
 #include "qwindowsfontenginedirectwrite.h"
 #include "qwindowsfontdatabase.h"
 #include "qwindowscontext.h"
@@ -360,8 +351,9 @@ void QWindowsFontEngineDirectWrite::recalcAdvances(QGlyphLayout *glyphs, QFontEn
                                                               glyphIndices.size(),
                                                               glyphMetrics.data());
     if (SUCCEEDED(hr)) {
+        qreal stretch = fontDef.stretch / 100.0;
         for (int i = 0; i < glyphs->numGlyphs; ++i)
-            glyphs->advances[i] = DESIGN_TO_LOGICAL(glyphMetrics[i].advanceWidth);
+            glyphs->advances[i] = DESIGN_TO_LOGICAL(glyphMetrics[i].advanceWidth * stretch);
         if (fontDef.styleStrategy & QFont::ForceIntegerMetrics) {
             for (int i = 0; i < glyphs->numGlyphs; ++i)
                 glyphs->advances[i] = glyphs->advances[i].round();
@@ -444,7 +436,7 @@ glyph_metrics_t QWindowsFontEngineDirectWrite::boundingBox(glyph_t g)
                                width,
                                height,
                                advanceWidth,
-                               advanceHeight);
+                               0);
     } else {
         qErrnoWarning("%s: GetDesignGlyphMetrics failed", __FUNCTION__);
     }
@@ -493,7 +485,7 @@ QImage QWindowsFontEngineDirectWrite::alphaMapForGlyph(glyph_t glyph, QFixed sub
     QImage alphaMap(im.width(), im.height(), QImage::Format_Alpha8);
 
     for (int y=0; y<im.height(); ++y) {
-        uint *src = (uint*) im.scanLine(y);
+        const uint *src = reinterpret_cast<const uint *>(im.constScanLine(y));
         uchar *dst = alphaMap.scanLine(y);
         for (int x=0; x<im.width(); ++x) {
             *dst = 255 - (m_fontEngineData->pow_gamma[qGray(0xffffffff - *src)] * 255. / 2047.);
@@ -518,7 +510,7 @@ bool QWindowsFontEngineDirectWrite::supportsSubPixelPositions() const
 QImage QWindowsFontEngineDirectWrite::imageForGlyph(glyph_t t,
                                              QFixed subPixelPosition,
                                              int margin,
-                                             const QTransform &xform)
+                                             const QTransform &originalTransform)
 {
     UINT16 glyphIndex = t;
     FLOAT glyphAdvance = 0;
@@ -536,6 +528,10 @@ QImage QWindowsFontEngineDirectWrite::imageForGlyph(glyph_t t,
     glyphRun.isSideways = false;
     glyphRun.bidiLevel = 0;
     glyphRun.glyphOffsets = &glyphOffset;
+
+    QTransform xform = originalTransform;
+    if (fontDef.stretch != 100)
+        xform.scale(fontDef.stretch / 100.0, 1.0);
 
     DWRITE_MATRIX transform;
     transform.dx = subPixelPosition.toReal();
@@ -648,70 +644,15 @@ QFontEngine *QWindowsFontEngineDirectWrite::cloneWithSize(qreal pixelSize) const
     return fontEngine;
 }
 
-// Dynamically resolve GetUserDefaultLocaleName, which is available from Windows
-// Vista onwards. ### fixme 5.7: Consider reverting to direct linking.
-typedef int (WINAPI *GetUserDefaultLocaleNamePtr)(LPWSTR, int);
-
-static inline GetUserDefaultLocaleNamePtr resolveGetUserDefaultLocaleName()
+Qt::HANDLE QWindowsFontEngineDirectWrite::handle() const
 {
-    QSystemLibrary library(QStringLiteral("kernel32"));
-    return (GetUserDefaultLocaleNamePtr)library.resolve("GetUserDefaultLocaleName");
+    return m_directWriteFontFace;
 }
 
 void QWindowsFontEngineDirectWrite::initFontInfo(const QFontDef &request,
-                                                 int dpi, IDWriteFont *font)
+                                                 int dpi)
 {
     fontDef = request;
-
-    IDWriteFontFamily *fontFamily = NULL;
-    HRESULT hr = font->GetFontFamily(&fontFamily);
-
-    IDWriteLocalizedStrings *familyNames = NULL;
-    if (SUCCEEDED(hr))
-        hr = fontFamily->GetFamilyNames(&familyNames);
-
-    UINT32 index = 0;
-
-    if (SUCCEEDED(hr)) {
-        BOOL exists = false;
-
-        wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
-        static const GetUserDefaultLocaleNamePtr getUserDefaultLocaleName = resolveGetUserDefaultLocaleName();
-        const int defaultLocaleSuccess = getUserDefaultLocaleName
-            ? getUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) : 0;
-        if (defaultLocaleSuccess)
-            hr = familyNames->FindLocaleName(localeName, &index, &exists);
-
-        if (SUCCEEDED(hr) && !exists)
-            hr = familyNames->FindLocaleName(L"en-us", &index, &exists);
-
-        if (!exists)
-            index = 0;
-    }
-
-    // Get the family name.
-    if (SUCCEEDED(hr)) {
-        UINT32 length = 0;
-
-        hr = familyNames->GetStringLength(index, &length);
-
-        if (SUCCEEDED(hr)) {
-            QVarLengthArray<wchar_t, 128> name(length+1);
-
-            hr = familyNames->GetString(index, name.data(), name.size());
-
-            if (SUCCEEDED(hr))
-                fontDef.family = QString::fromWCharArray(name.constData());
-        }
-    }
-
-    if (familyNames != NULL)
-        familyNames->Release();
-    if (fontFamily)
-        fontFamily->Release();
-
-    if (FAILED(hr))
-        qErrnoWarning(hr, "initFontInfo: Failed to get family name");
 
     if (fontDef.pointSize < 0)
         fontDef.pointSize = fontDef.pixelSize * 72. / dpi;
@@ -728,10 +669,15 @@ QString QWindowsFontEngineDirectWrite::fontNameSubstitute(const QString &familyN
 
 glyph_metrics_t QWindowsFontEngineDirectWrite::alphaMapBoundingBox(glyph_t glyph,
                                                                    QFixed subPixelPosition,
-                                                                   const QTransform &matrix,
+                                                                   const QTransform &originalTransform,
                                                                    GlyphFormat format)
 {
     Q_UNUSED(format);
+
+    QTransform matrix = originalTransform;
+    if (fontDef.stretch != 100)
+        matrix.scale(fontDef.stretch / 100.0, 1.0);
+
     glyph_metrics_t bbox = QFontEngine::boundingBox(glyph, matrix); // To get transformed advance
 
     UINT16 glyphIndex = glyph;

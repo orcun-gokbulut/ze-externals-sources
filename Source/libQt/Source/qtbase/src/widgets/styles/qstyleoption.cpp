@@ -198,7 +198,7 @@ void QStyleOption::init(const QWidget *widget)
     if (!(state & QStyle::State_Active) && !qt_mac_can_clickThrough(widget))
         state &= ~QStyle::State_Enabled;
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_OSX) && !defined(QT_NO_STYLE_MAC)
     switch (QMacStyle::widgetSizePolicy(widget)) {
     case QMacStyle::SizeSmall:
         state |= QStyle::State_Small;
@@ -1744,7 +1744,7 @@ QStyleOptionMenuItem::QStyleOptionMenuItem(int version)
     \value DefaultItem A menu item that is the default action as specified with \l QMenu::defaultAction().
     \value Separator A menu separator.
     \value SubMenu Indicates the menu item points to a sub-menu.
-    \value Scroller A popup menu scroller (currently only used on OS X).
+    \value Scroller A popup menu scroller (currently only used on \macos).
     \value TearOff A tear-off handle for the menu.
     \value Margin The margin of the menu.
     \value EmptyArea The empty area of the menu.

@@ -797,9 +797,9 @@ void QXcbKeyboard::updateXKBStateFromCore(quint16 state)
     }
 }
 
+#ifdef XCB_USE_XINPUT22
 void QXcbKeyboard::updateXKBStateFromXI(void *modInfo, void *groupInfo)
 {
-#ifdef XCB_USE_XINPUT22
     if (m_config && !connection()->hasXKB()) {
         xXIModifierInfo *mods = static_cast<xXIModifierInfo *>(modInfo);
         xXIGroupInfo *group = static_cast<xXIGroupInfo *>(groupInfo);
@@ -815,12 +815,8 @@ void QXcbKeyboard::updateXKBStateFromXI(void *modInfo, void *groupInfo)
             //qWarning("TODO: Support KeyboardLayoutChange on QPA (QTBUG-27681)");
         }
     }
-#else
-    Q_UNUSED(modInfo);
-    Q_UNUSED(groupInfo);
-    Q_ASSERT(false); // this can't be
-#endif
 }
+#endif
 
 quint32 QXcbKeyboard::xkbModMask(quint16 state)
 {
@@ -977,10 +973,21 @@ QList<int> QXcbKeyboard::possibleKeys(const QKeyEvent *event) const
     xkb_layout_index_t lockedLayout = xkb_state_serialize_layout(xkb_state, XKB_STATE_LAYOUT_LOCKED);
     xkb_mod_mask_t latchedMods = xkb_state_serialize_mods(xkb_state, XKB_STATE_MODS_LATCHED);
     xkb_mod_mask_t lockedMods = xkb_state_serialize_mods(xkb_state, XKB_STATE_MODS_LOCKED);
+    xkb_mod_mask_t depressedMods = xkb_state_serialize_mods(xkb_state, XKB_STATE_MODS_DEPRESSED);
 
-    xkb_state_update_mask(kb_state, 0, latchedMods, lockedMods, 0, 0, lockedLayout);
-
+    xkb_state_update_mask(kb_state, depressedMods, latchedMods, lockedMods, 0, 0, lockedLayout);
     quint32 keycode = event->nativeScanCode();
+    // handle shortcuts for level three and above
+    xkb_layout_index_t layoutIndex = xkb_state_key_get_layout(kb_state, keycode);
+    xkb_level_index_t levelIndex = 0;
+    if (layoutIndex != XKB_LAYOUT_INVALID) {
+        levelIndex = xkb_state_key_get_level(kb_state, keycode, layoutIndex);
+        if (levelIndex == XKB_LEVEL_INVALID)
+            levelIndex = 0;
+    }
+    if (levelIndex <= 1)
+        xkb_state_update_mask(kb_state, 0, latchedMods, lockedMods, 0, 0, lockedLayout);
+
     xkb_keysym_t sym = xkb_state_key_get_one_sym(kb_state, keycode);
     if (sym == XKB_KEY_NoSymbol) {
         xkb_state_unref(kb_state);
@@ -1000,7 +1007,6 @@ QList<int> QXcbKeyboard::possibleKeys(const QKeyEvent *event) const
     Q_ASSERT(shiftMod < 32);
     Q_ASSERT(altMod < 32);
     Q_ASSERT(controlMod < 32);
-    Q_ASSERT(metaMod < 32);
 
     xkb_mod_mask_t depressed;
     int qtKey = 0;
@@ -1021,7 +1027,7 @@ QList<int> QXcbKeyboard::possibleKeys(const QKeyEvent *event) const
                     depressed |= (1 << shiftMod);
                 if (neededMods & Qt::ControlModifier)
                     depressed |= (1 << controlMod);
-                if (neededMods & Qt::MetaModifier)
+                if (metaMod < 32 && neededMods & Qt::MetaModifier)
                     depressed |= (1 << metaMod);
                 xkb_state_update_mask(kb_state, depressed, latchedMods, lockedMods, 0, 0, lockedLayout);
                 sym = xkb_state_key_get_one_sym(kb_state, keycode);

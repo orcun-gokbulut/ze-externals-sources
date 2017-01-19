@@ -204,6 +204,8 @@ QWindow::~QWindow()
 {
     destroy();
     QGuiApplicationPrivate::window_list.removeAll(this);
+    if (!QGuiApplicationPrivate::is_app_closing)
+        QGuiApplicationPrivate::instance()->modalWindowList.removeOne(this);
 }
 
 void QWindowPrivate::init()
@@ -369,7 +371,7 @@ void QWindowPrivate::setTopLevelScreen(QScreen *newScreen, bool recreate)
 {
     Q_Q(QWindow);
     if (parentWindow) {
-        qWarning() << this << '(' << newScreen << "): Attempt to set a screen on a child window.";
+        qWarning() << q << '(' << newScreen << "): Attempt to set a screen on a child window.";
         return;
     }
     if (newScreen != topLevelScreen) {
@@ -951,7 +953,7 @@ void QWindow::setMask(const QRegion &region)
     Q_D(QWindow);
     if (!d->platformWindow)
         return;
-    d->platformWindow->setMask(region);
+    d->platformWindow->setMask(QHighDpi::toNativeLocalRegion(region, this));
     d->mask = region;
 }
 
@@ -2109,6 +2111,17 @@ bool QWindow::event(QEvent *ev)
         break;
     }
 
+    case QEvent::PlatformSurface: {
+        if ((static_cast<QPlatformSurfaceEvent *>(ev))->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed) {
+#ifndef QT_NO_OPENGL
+            QOpenGLContext *context = QOpenGLContext::currentContext();
+            if (context && context->surface() == static_cast<QSurface *>(this))
+                context->doneCurrent();
+#endif
+        }
+        break;
+    }
+
     default:
         return QObject::event(ev);
     }
@@ -2147,6 +2160,9 @@ void QWindowPrivate::deliverUpdateRequest()
 */
 void QWindow::requestUpdate()
 {
+    Q_ASSERT_X(QThread::currentThread() == QCoreApplication::instance()->thread(),
+        "QWindow", "Updates can only be scheduled from the GUI (main) thread");
+
     Q_D(QWindow);
     if (d->updateRequestPending || !d->platformWindow)
         return;
@@ -2298,7 +2314,7 @@ QPoint QWindow::mapToGlobal(const QPoint &pos) const
     // QTBUG-43252, prefer platform implementation for foreign windows.
     if (d->platformWindow
         && (type() == Qt::ForeignWindow || d->platformWindow->isEmbedded())) {
-        return d->platformWindow->mapToGlobal(pos);
+        return QHighDpi::fromNativeLocalPosition(d->platformWindow->mapToGlobal(QHighDpi::toNativeLocalPosition(pos, this)), this);
     }
     return pos + d->globalPosition();
 }
@@ -2318,7 +2334,7 @@ QPoint QWindow::mapFromGlobal(const QPoint &pos) const
     // QTBUG-43252, prefer platform implementation for foreign windows.
     if (d->platformWindow
         && (type() == Qt::ForeignWindow || d->platformWindow->isEmbedded())) {
-        return d->platformWindow->mapFromGlobal(pos);
+        return QHighDpi::fromNativeLocalPosition(d->platformWindow->mapFromGlobal(QHighDpi::toNativeLocalPosition(pos, this)), this);
     }
     return pos - d->globalPosition();
 }

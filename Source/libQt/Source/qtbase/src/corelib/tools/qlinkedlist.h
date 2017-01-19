@@ -99,7 +99,7 @@ public:
     inline void detach()
     { if (d->ref.isShared()) detach_helper2(this->e); }
     inline bool isDetached() const { return !d->ref.isShared(); }
-#if QT_SUPPORTS(UNSHARABLE_CONTAINERS)
+#if !defined(QT_NO_UNSHARABLE_CONTAINERS)
     inline void setSharable(bool sharable) { if (!sharable) detach(); if (d != &QLinkedListData::shared_null) d->sharable = sharable; }
 #endif
     inline bool isSharedWith(const QLinkedList<T> &other) const { return d == other.d; }
@@ -128,7 +128,7 @@ public:
         typedef T *pointer;
         typedef T &reference;
         Node *i;
-        inline iterator() : i(0) {}
+        inline iterator() : i(Q_NULLPTR) {}
         inline iterator(Node *n) : i(n) {}
         inline iterator(const iterator &o) : i(o.i) {}
         inline iterator &operator=(const iterator &o) { i = o.i; return *this; }
@@ -161,7 +161,7 @@ public:
         typedef const T *pointer;
         typedef const T &reference;
         Node *i;
-        inline const_iterator() : i(0) {}
+        inline const_iterator() : i(Q_NULLPTR) {}
         inline const_iterator(Node *n) : i(n) {}
         inline const_iterator(const const_iterator &o) : i(o.i){}
         inline const_iterator(iterator ci) : i(ci.i){}

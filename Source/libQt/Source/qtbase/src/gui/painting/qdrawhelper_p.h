@@ -268,7 +268,8 @@ struct QGradientData
 #define GRADIENT_STOPTABLE_SIZE 1024
 #define GRADIENT_STOPTABLE_SIZE_SHIFT 10
 
-    QRgba64* colorTable; //[GRADIENT_STOPTABLE_SIZE];
+    const QRgba64 *colorTable64; //[GRADIENT_STOPTABLE_SIZE];
+    const QRgb *colorTable32; //[GRADIENT_STOPTABLE_SIZE];
 
     uint alphaColor : 1;
 };
@@ -376,13 +377,13 @@ static inline uint qt_gradient_clamp(const QGradientData *data, int ipos)
 static inline uint qt_gradient_pixel(const QGradientData *data, qreal pos)
 {
     int ipos = int(pos * (GRADIENT_STOPTABLE_SIZE - 1) + qreal(0.5));
-    return data->colorTable[qt_gradient_clamp(data, ipos)].toArgb32();
+    return data->colorTable32[qt_gradient_clamp(data, ipos)];
 }
 
 static inline const QRgba64& qt_gradient_pixel64(const QGradientData *data, qreal pos)
 {
     int ipos = int(pos * (GRADIENT_STOPTABLE_SIZE - 1) + qreal(0.5));
-    return data->colorTable[qt_gradient_clamp(data, ipos)];
+    return data->colorTable64[qt_gradient_clamp(data, ipos)];
 }
 
 static inline qreal qRadialDeterminant(qreal a, qreal b, qreal c)
@@ -550,7 +551,7 @@ public:
             delta_det4_vec.v = Simd::v_add(delta_det4_vec.v, v_delta_delta_det16); \
             b_vec.v = Simd::v_add(b_vec.v, v_delta_b4); \
             for (int i = 0; i < 4; ++i) \
-                *buffer++ = (extended_mask | v_buffer_mask.i[i]) & data->gradient.colorTable[index_vec.i[i]].toArgb32(); \
+                *buffer++ = (extended_mask | v_buffer_mask.i[i]) & data->gradient.colorTable32[index_vec.i[i]]; \
         }
 
 #define FETCH_RADIAL_LOOP(FETCH_RADIAL_LOOP_CLAMP) \
@@ -704,6 +705,7 @@ static Q_ALWAYS_INLINE uint BYTE_MUL_RGB16_32(uint x, uint a) {
     return t;
 }
 
+// qt_div_255 is a fast rounded division by 255 using an approximation that is accurate for all positive 16-bit integers
 static Q_DECL_CONSTEXPR Q_ALWAYS_INLINE int qt_div_255(int x) { return (x + (x>>8) + 0x80) >> 8; }
 static Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_div_65535(uint x) { return (x + (x>>16) + 0x8000U) >> 16; }
 

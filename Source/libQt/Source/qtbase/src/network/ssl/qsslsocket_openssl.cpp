@@ -277,7 +277,6 @@ int q_X509Callback(int ok, X509_STORE_CTX *ctx)
         qCDebug(lcSsl) << QSslCertificatePrivate::QSslCertificate_from_X509(q_X509_STORE_CTX_get_current_cert(ctx)).toPem();
         qCDebug(lcSsl) << "dumping chain";
         foreach (QSslCertificate cert, QSslSocketBackendPrivate::STACKOFX509_to_QSslCertificates(q_X509_STORE_CTX_get_chain(ctx))) {
-            QString certFormat(QStringLiteral("O=%1 CN=%2 L=%3 OU=%4 C=%5 ST=%6"));
             qCDebug(lcSsl) << "Issuer:" << "O=" << cert.issuerInfo(QSslCertificate::Organization)
                 << "CN=" << cert.issuerInfo(QSslCertificate::CommonName)
                 << "L=" << cert.issuerInfo(QSslCertificate::LocalityName)
@@ -390,6 +389,10 @@ bool QSslSocketBackendPrivate::initSslContext()
         if (!ace.isEmpty()
             && !QHostAddress().setAddress(tlsHostName)
             && !(configuration.sslOptions & QSsl::SslOptionDisableServerNameIndication)) {
+            // We don't send the trailing dot from the host header if present see
+            // https://tools.ietf.org/html/rfc6066#section-3
+            if (ace.endsWith('.'))
+                ace.chop(1);
             if (!q_SSL_ctrl(ssl, SSL_CTRL_SET_TLSEXT_HOSTNAME, TLSEXT_NAMETYPE_host_name, ace.data()))
                 qCWarning(lcSsl, "could not set SSL_CTRL_SET_TLSEXT_HOSTNAME, Server Name Indication disabled");
         }
@@ -639,10 +642,12 @@ void QSslSocketPrivate::resetDefaultCiphers()
                 // Unconditionally exclude ADH and AECDH ciphers since they offer no MITM protection
                 if (!ciph.name().toLower().startsWith(QLatin1String("adh")) &&
                     !ciph.name().toLower().startsWith(QLatin1String("exp-adh")) &&
-                    !ciph.name().toLower().startsWith(QLatin1String("aecdh")))
+                    !ciph.name().toLower().startsWith(QLatin1String("aecdh"))) {
                     ciphers << ciph;
-                if (ciph.usedBits() >= 128)
-                    defaultCiphers << ciph;
+
+                    if (ciph.usedBits() >= 128)
+                        defaultCiphers << ciph;
+                }
             }
         }
     }
@@ -1235,6 +1240,11 @@ bool QSslSocketBackendPrivate::startHandshake()
 #endif
         if (!checkSslErrors())
             return false;
+        // A slot, attached to sslErrors signal can call
+        // abort/close/disconnetFromHost/etc; no need to
+        // continue handshake then.
+        if (q->state() != QAbstractSocket::ConnectedState)
+            return false;
     } else {
         sslErrors.clear();
     }
@@ -1363,8 +1373,12 @@ void QSslSocketBackendPrivate::_q_caRootLoaded(QSslCertificate cert, QSslCertifi
     if (plainSocket)
         plainSocket->resume();
     paused = false;
-    if (checkSslErrors() && ssl)
+    if (checkSslErrors() && ssl) {
+        bool willClose = (autoStartHandshake && pendingClose);
         continueHandshake();
+        if (!willClose)
+            transmit();
+    }
 }
 
 class QWindowsCaRootFetcherThread : public QThread

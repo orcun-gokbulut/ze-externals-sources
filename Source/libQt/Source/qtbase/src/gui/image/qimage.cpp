@@ -98,34 +98,21 @@ QImageData::QImageData()
 {
 }
 
-/*! \fn QImageData * QImageData::create(const QSize &size, QImage::Format format, int numColors)
+/*! \fn QImageData * QImageData::create(const QSize &size, QImage::Format format)
 
     \internal
 
     Creates a new image data.
     Returns 0 if invalid parameters are give or anything else failed.
 */
-QImageData * QImageData::create(const QSize &size, QImage::Format format, int numColors)
+QImageData * QImageData::create(const QSize &size, QImage::Format format)
 {
-    if (!size.isValid() || numColors < 0 || format == QImage::Format_Invalid)
+    if (!size.isValid() || format == QImage::Format_Invalid)
         return 0;                                // invalid parameter(s)
 
     uint width = size.width();
     uint height = size.height();
     uint depth = qt_depthForFormat(format);
-
-    switch (format) {
-    case QImage::Format_Mono:
-    case QImage::Format_MonoLSB:
-        numColors = 2;
-        break;
-    case QImage::Format_Indexed8:
-        numColors = qBound(0, numColors, 256);
-        break;
-    default:
-        numColors = 0;
-        break;
-    }
 
     const int bytes_per_line = ((width * depth + 31) >> 5) << 2; // bytes per scanline (must be multiple of 4)
 
@@ -138,13 +125,16 @@ QImageData * QImageData::create(const QSize &size, QImage::Format format, int nu
         return 0;
 
     QScopedPointer<QImageData> d(new QImageData);
-    d->colortable.resize(numColors);
-    if (depth == 1) {
+
+    switch (format) {
+    case QImage::Format_Mono:
+    case QImage::Format_MonoLSB:
+        d->colortable.resize(2);
         d->colortable[0] = QColor(Qt::black).rgba();
         d->colortable[1] = QColor(Qt::white).rgba();
-    } else {
-        for (int i = 0; i < numColors; ++i)
-            d->colortable[i] = 0;
+        break;
+    default:
+        break;
     }
 
     d->width = width;
@@ -180,6 +170,9 @@ QImageData::~QImageData()
     data = 0;
 }
 
+#if defined(_M_ARM)
+#pragma optimize("", off)
+#endif
 
 bool QImageData::checkForAlphaPixels() const
 {
@@ -287,6 +280,9 @@ bool QImageData::checkForAlphaPixels() const
 
     return has_alpha_pixels;
 }
+#if defined(_M_ARM)
+#pragma optimize("", on)
+#endif
 
 /*!
     \class QImage
@@ -773,7 +769,7 @@ QImage::QImage() Q_DECL_NOEXCEPT
 QImage::QImage(int width, int height, Format format)
     : QPaintDevice()
 {
-    d = QImageData::create(QSize(width, height), format, 0);
+    d = QImageData::create(QSize(width, height), format);
 }
 
 /*!
@@ -788,7 +784,7 @@ QImage::QImage(int width, int height, Format format)
 QImage::QImage(const QSize &size, Format format)
     : QPaintDevice()
 {
-    d = QImageData::create(size, format, 0);
+    d = QImageData::create(size, format);
 }
 
 
@@ -2121,7 +2117,7 @@ static QImage convertWithPalette(const QImage &src, QImage::Format format,
 */
 QImage QImage::convertToFormat(Format format, const QVector<QRgb> &colorTable, Qt::ImageConversionFlags flags) const
 {
-    if (d->format == format)
+    if (!d || d->format == format)
         return *this;
 
     if (format <= QImage::Format_Indexed8 && depth() == 32) {
@@ -2230,13 +2226,30 @@ QRgb QImage::pixel(int x, int y) const
     }
 
     const uchar *s = d->data + y * d->bytes_per_line;
-    switch(d->format) {
+
+    int index = -1;
+    switch (d->format) {
     case Format_Mono:
-        return d->colortable.at((*(s + (x >> 3)) >> (~x & 7)) & 1);
+        index = (*(s + (x >> 3)) >> (~x & 7)) & 1;
+        break;
     case Format_MonoLSB:
-        return d->colortable.at((*(s + (x >> 3)) >> (x & 7)) & 1);
+        index = (*(s + (x >> 3)) >> (x & 7)) & 1;
+        break;
     case Format_Indexed8:
-        return d->colortable.at((int)s[x]);
+        index = s[x];
+        break;
+    default:
+        break;
+    }
+    if (index >= 0) {    // Indexed format
+        if (index >= d->colortable.size()) {
+            qWarning("QImage::pixel: color table index %d out of range.", index);
+            return 0;
+        }
+        return d->colortable.at(index);
+    }
+
+    switch (d->format) {
     case Format_RGB32:
         return 0xff000000 | reinterpret_cast<const QRgb *>(s)[x];
     case Format_ARGB32: // Keep old behaviour.
@@ -3100,6 +3113,8 @@ void QImage::mirrored_inplace(bool horizontal, bool vertical)
         return;
 
     detach();
+    if (!d->own_data)
+        *this = copy();
 
     do_mirror(d, d, horizontal, vertical);
 }
@@ -3246,6 +3261,8 @@ void QImage::rgbSwapped_inplace()
         return;
 
     detach();
+    if (!d->own_data)
+        *this = copy();
 
     switch (d->format) {
     case Format_Invalid:
@@ -4214,6 +4231,8 @@ void QImage::setAlphaChannel(const QImage &alphaChannel)
 
     } else {
         const QImage sourceImage = alphaChannel.convertToFormat(QImage::Format_RGB32);
+        if (sourceImage.isNull())
+            return;
         const uchar *src_data = sourceImage.d->data;
         uchar *dest_data = d->data;
         for (int y=0; y<h; ++y) {
@@ -4411,7 +4430,8 @@ QImage QImage::smoothScaled(int w, int h) const {
             src = src.convertToFormat(QImage::Format_RGB32);
     }
     src = qSmoothScaleImage(src, w, h);
-    copyMetadata(src.d, d);
+    if (!src.isNull())
+        copyMetadata(src.d, d);
     return src;
 }
 
@@ -4729,7 +4749,7 @@ bool QImageData::convertInPlace(QImage::Format newFormat, Qt::ImageConversionFla
         return true;
 
     // No in-place conversion if we have to detach
-    if (ref.load() > 1 || ro_data)
+    if (ref.load() > 1 || !own_data)
         return false;
 
     InPlace_Image_Converter converter = qimage_inplace_converter_map[format][newFormat];

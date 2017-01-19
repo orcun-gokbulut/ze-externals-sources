@@ -533,9 +533,6 @@ void QMapDataBase::freeData(QMapDataBase *d)
 
     Constructs a copy of \a other.
 
-    This function is only available if Qt is configured with STL
-    compatibility enabled.
-
     \sa toStdMap()
 */
 
@@ -552,9 +549,6 @@ void QMapDataBase::freeData(QMapDataBase *d)
 /*! \fn std::map<Key, T> QMap::toStdMap() const
 
     Returns an STL map equivalent to this QMap.
-
-    This function is only available if Qt is configured with STL
-    compatibility enabled.
 */
 
 /*! \fn QMap::~QMap()
@@ -1175,7 +1169,7 @@ void QMapDataBase::freeData(QMapDataBase *d)
 /*!
   \fn QPair<iterator, iterator> QMap::equal_range(const Key &key)
 
-  Returns a pair of iterators delimiting the range of values that
+  Returns a pair of iterators delimiting the range of values \c{[first, second)}, that
   are stored under \a key.
 */
 

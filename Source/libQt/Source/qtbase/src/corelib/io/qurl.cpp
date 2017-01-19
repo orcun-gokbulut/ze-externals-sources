@@ -978,10 +978,12 @@ inline bool QUrlPrivate::setScheme(const QString &value, int len, bool doSetErro
             needsLowercasing = i;
             continue;
         }
-        if (p[i] >= '0' && p[i] <= '9' && i > 0)
-            continue;
-        if (p[i] == '+' || p[i] == '-' || p[i] == '.')
-            continue;
+        if (i) {
+            if (p[i] >= '0' && p[i] <= '9')
+                continue;
+            if (p[i] == '+' || p[i] == '-' || p[i] == '.')
+                continue;
+        }
 
         // found something else
         // don't call setError needlessly:
@@ -1046,7 +1048,7 @@ inline void QUrlPrivate::setAuthority(const QString &auth, int from, int end, QU
 
         if (colonIndex == end - 1) {
             // found a colon but no digits after it
-            setError(PortEmptyError, auth, colonIndex + 1);
+            port = -1;
         } else if (uint(colonIndex) < uint(end)) {
             unsigned long x = 0;
             for (int i = colonIndex + 1; i < end; ++i) {
@@ -1176,7 +1178,7 @@ inline void QUrlPrivate::appendHost(QString &appendTo, QUrl::FormattingOptions o
     } else {
         // this is either an IPv4Address or a reg-name
         // if it is a reg-name, it is already stored in Unicode form
-        if (options == QUrl::EncodeUnicode)
+        if (options & QUrl::EncodeUnicode && !(options & 0x4000000))
             appendTo += qt_ACE_do(host, ToAceOnly, AllowLeadingDot);
         else
             appendTo += host;
@@ -3165,8 +3167,8 @@ QUrl QUrl::resolved(const QUrl &relative) const
     if (!relative.d) return *this;
 
     QUrl t;
-    // be non strict and allow scheme in relative url
-    if (!relative.d->scheme.isEmpty() && relative.d->scheme != d->scheme) {
+    // Compatibility hack (mostly for qtdeclarative) : treat "file:relative.txt" as relative even though QUrl::isRelative() says false
+    if (!relative.d->scheme.isEmpty() && (!relative.isLocalFile() || QDir::isAbsolutePath(relative.d->path))) {
         t = relative;
         t.detach();
     } else {

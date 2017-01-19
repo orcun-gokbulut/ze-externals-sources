@@ -1038,6 +1038,10 @@ void QCompleter::setModel(QAbstractItemModel *model)
 {
     Q_D(QCompleter);
     QAbstractItemModel *oldModel = d->proxy->sourceModel();
+#ifndef QT_NO_FILESYSTEMMODEL
+    if (qobject_cast<const QFileSystemModel *>(oldModel))
+        setCompletionRole(Qt::EditRole); // QTBUG-54642, clear FileNameRole set by QFileSystemModel
+#endif
     d->proxy->setSourceModel(model);
     if (d->popup)
         setPopup(d->popup); // set the model and make new connections
@@ -1879,5 +1883,7 @@ QStringList QCompleter::splitPath(const QString& path) const
 QT_END_NAMESPACE
 
 #include "moc_qcompleter.cpp"
+
+#include "moc_qcompleter_p.cpp"
 
 #endif // QT_NO_COMPLETER

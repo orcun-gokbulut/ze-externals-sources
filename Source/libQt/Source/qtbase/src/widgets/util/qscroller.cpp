@@ -187,7 +187,7 @@ class QScrollTimer : public QAbstractAnimation
 {
 public:
     QScrollTimer(QScrollerPrivate *_d)
-        : d(_d), ignoreUpdate(false), skip(0)
+        : QAbstractAnimation(_d), d(_d), ignoreUpdate(false), skip(0)
     { }
 
     int duration() const Q_DECL_OVERRIDE
@@ -558,7 +558,7 @@ void QScroller::stop()
 
     \note Please note that this value should be physically correct. The actual DPI settings
     that Qt returns for the display may be reported wrongly on purpose by the underlying
-    windowing system, for example on OS X.
+    windowing system, for example on \macos.
 */
 QPointF QScroller::pixelPerMeter() const
 {
@@ -2048,3 +2048,6 @@ qreal QScrollerPrivate::nextSnapPos(qreal p, int dir, Qt::Orientation orientatio
 */
 
 QT_END_NAMESPACE
+
+#include "moc_qscroller.cpp"
+#include "moc_qscroller_p.cpp"

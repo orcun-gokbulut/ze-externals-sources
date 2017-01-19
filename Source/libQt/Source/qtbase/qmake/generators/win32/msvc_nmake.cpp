@@ -53,7 +53,7 @@ static QString nmakePathList(const QStringList &list)
         pathList.append(QDir::cleanPath(path));
 
     return QDir::toNativeSeparators(pathList.join(QLatin1Char(';')))
-            .replace('#', QStringLiteral("^#")).replace('$', QStringLiteral("$$"));
+            .replace('#', QLatin1String("^#")).replace('$', QLatin1String("$$"));
 }
 
 NmakeMakefileGenerator::NmakeMakefileGenerator() : Win32MakefileGenerator(), usePCH(false)
@@ -261,12 +261,9 @@ void NmakeMakefileGenerator::writeSubMakeCall(QTextStream &t, const QString &cal
 
 QString NmakeMakefileGenerator::defaultInstall(const QString &t)
 {
-    if((t != "target" && t != "dlltarget") ||
-       (t == "dlltarget" && (project->first("TEMPLATE") != "lib" || !project->isActiveConfig("shared"))) ||
-        project->first("TEMPLATE") == "subdirs")
-       return QString();
-
     QString ret = Win32MakefileGenerator::defaultInstall(t);
+    if (ret.isEmpty())
+        return ret;
 
     const QString root = installRoot();
     ProStringList &uninst = project->values(ProKey(t + ".uninstall"));
@@ -330,7 +327,7 @@ QString NmakeMakefileGenerator::var(const ProKey &value) const
             QString precompRule = QString("-c -FI%1 -Yu%2 -Fp%3")
                     .arg(precompH_f, precompH_f, escapeFilePath(precompPch));
             QString p = MakefileGenerator::var(value);
-            p.replace("-c", precompRule);
+            p.replace(QLatin1String("-c"), precompRule);
             // Cannot use -Gm with -FI & -Yu, as this gives an
             // internal compiler error, on the newer compilers
             // ### work-around for a VS 2003 bug. Move to some prf file or remove completely.
@@ -412,11 +409,14 @@ void NmakeMakefileGenerator::init()
         project->values("QMAKE_DISTCLEAN").append(tgt + ".lib");
     }
     if (project->isActiveConfig("debug_info")) {
-        QString pdbfile = tgt + ".pdb";
+        // Add the compiler's PDB file.
+        QString pdbfile = var("OBJECTS_DIR") + project->first("TARGET") + ".vc.pdb";
         QString escapedPdbFile = escapeFilePath(pdbfile);
         project->values("QMAKE_CFLAGS").append("/Fd" + escapedPdbFile);
         project->values("QMAKE_CXXFLAGS").append("/Fd" + escapedPdbFile);
-        project->values("QMAKE_DISTCLEAN").append(pdbfile);
+        project->values("QMAKE_CLEAN").append(pdbfile);
+        // Add the linker's PDB file to the distclean target.
+        project->values("QMAKE_DISTCLEAN").append(tgt + ".pdb");
     }
     if (project->isActiveConfig("debug")) {
         project->values("QMAKE_CLEAN").append(tgt + ".ilk");
@@ -425,6 +425,12 @@ void NmakeMakefileGenerator::init()
         ProStringList &defines = project->values("DEFINES");
         if (!defines.contains("NDEBUG"))
             defines.append("NDEBUG");
+    }
+
+    if (project->values("QMAKE_APP_FLAG").isEmpty() && project->isActiveConfig("dll")) {
+        ProStringList &defines = project->values("DEFINES");
+        if (!defines.contains("_WINDLL"))
+            defines.append("_WINDLL");
     }
 }
 

@@ -140,6 +140,7 @@ QTreeModel::QTreeModel(QTreeModelPrivate &dd, QTreeWidget *parent)
 QTreeModel::~QTreeModel()
 {
     clear();
+    headerItem->view = Q_NULLPTR;
     delete headerItem;
     rootItem->view = 0;
     delete rootItem;
@@ -3449,5 +3450,6 @@ bool QTreeWidget::event(QEvent *e)
 QT_END_NAMESPACE
 
 #include "moc_qtreewidget.cpp"
+#include "moc_qtreewidget_p.cpp"
 
 #endif // QT_NO_TREEWIDGET

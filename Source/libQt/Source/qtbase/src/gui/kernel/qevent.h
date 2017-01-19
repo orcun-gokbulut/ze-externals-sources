@@ -219,6 +219,8 @@ protected:
     uint ph : 2;
     uint src: 2;
     int reserved : 28;
+
+    friend class QApplication;
 };
 #endif
 
@@ -522,7 +524,7 @@ public:
     };
     class Attribute {
     public:
-        Attribute(AttributeType t, int s, int l, QVariant val) : type(t), start(s), length(l), value(qMove(val)) {}
+        Attribute(AttributeType typ, int s, int l, QVariant val) : type(typ), start(s), length(l), value(qMove(val)) {}
         AttributeType type;
 
         int start;
@@ -795,7 +797,7 @@ public:
         TouchPoint(const TouchPoint &other);
 #ifdef Q_COMPILER_RVALUE_REFS
         TouchPoint(TouchPoint &&other) Q_DECL_NOEXCEPT
-            : d(0)
+            : d(Q_NULLPTR)
         { qSwap(d, other.d); }
         TouchPoint &operator=(TouchPoint &&other) Q_DECL_NOEXCEPT
         { qSwap(d, other.d); return *this; }

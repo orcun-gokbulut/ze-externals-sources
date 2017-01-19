@@ -93,6 +93,11 @@ public:
     QPlatformFontDatabase *fontDatabase() const Q_DECL_OVERRIDE;
     QPlatformInputContext *inputContext() const Q_DECL_OVERRIDE;
     QPlatformServices *services() const Q_DECL_OVERRIDE;
+    QPlatformClipboard *clipboard() const Q_DECL_OVERRIDE;
+#ifndef QT_NO_DRAGANDDROP
+    QPlatformDrag *drag() const Q_DECL_OVERRIDE;
+#endif
+
     Qt::KeyboardModifiers queryKeyboardModifiers() const Q_DECL_OVERRIDE;
 
     QStringList themeNames() const Q_DECL_OVERRIDE;

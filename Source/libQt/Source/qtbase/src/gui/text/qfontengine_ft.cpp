@@ -63,7 +63,7 @@
 #include FT_CONFIG_OPTIONS_H
 #endif
 
-#if defined(FT_LCD_FILTER_H) && defined(FT_CONFIG_OPTION_SUBPIXEL_RENDERING)
+#if defined(FT_LCD_FILTER_H)
 #define QT_USE_FREETYPE_LCDFILTER
 #endif
 
@@ -1073,8 +1073,8 @@ QFontEngineFT::Glyph *QFontEngineFT::loadGlyph(QGlyphSet *set, uint glyph,
     if (glyph_buffer_size < pitch * info.height) {
         glyph_buffer_size = pitch * info.height;
         glyph_buffer.reset(new uchar[glyph_buffer_size]);
+        memset(glyph_buffer.data(), 0, glyph_buffer_size);
     }
-    memset(glyph_buffer.data(), 0, glyph_buffer_size);
 
     if (slot->format == FT_GLYPH_FORMAT_OUTLINE) {
         FT_Bitmap bitmap;
@@ -1716,11 +1716,11 @@ glyph_metrics_t QFontEngineFT::alphaMapBoundingBox(glyph_t glyph, QFixed subPixe
 
 static inline QImage alphaMapFromGlyphData(QFontEngineFT::Glyph *glyph, QFontEngine::GlyphFormat glyphFormat)
 {
-    if (glyph == Q_NULLPTR)
+    if (glyph == Q_NULLPTR || glyph->height == 0 || glyph->width == 0)
         return QImage();
 
-    QImage::Format format;
-    int bytesPerLine;
+    QImage::Format format = QImage::Format_Invalid;
+    int bytesPerLine = -1;
     switch (glyphFormat) {
     case QFontEngine::Format_Mono:
         format = QImage::Format_Mono;
@@ -1738,7 +1738,10 @@ static inline QImage alphaMapFromGlyphData(QFontEngineFT::Glyph *glyph, QFontEng
         Q_UNREACHABLE();
     };
 
-    return QImage(static_cast<const uchar *>(glyph->data), glyph->width, glyph->height, bytesPerLine, format);
+    QImage img(static_cast<const uchar *>(glyph->data), glyph->width, glyph->height, bytesPerLine, format);
+    if (format == QImage::Format_Mono)
+        img.setColor(1, QColor(Qt::white).rgba());  // Expands color table to 2 items; item 0 set to transparent.
+    return img;
 }
 
 QImage *QFontEngineFT::lockedAlphaMapForGlyph(glyph_t glyphIndex, QFixed subPixelPosition,
@@ -1761,10 +1764,14 @@ QImage *QFontEngineFT::lockedAlphaMapForGlyph(glyph_t glyphIndex, QFixed subPixe
 
     currentlyLockedAlphaMap = alphaMapFromGlyphData(glyph, neededFormat);
 
+    const bool glyphHasGeometry = glyph != Q_NULLPTR && glyph->height != 0 && glyph->width != 0;
     if (!cacheEnabled && glyph != &emptyGlyph) {
         currentlyLockedAlphaMap = currentlyLockedAlphaMap.copy();
         delete glyph;
     }
+
+    if (!glyphHasGeometry)
+        return Q_NULLPTR;
 
     if (currentlyLockedAlphaMap.isNull())
         return QFontEngine::lockedAlphaMapForGlyph(glyphIndex, subPixelPosition, neededFormat, t, offset);
@@ -1780,6 +1787,12 @@ void QFontEngineFT::unlockAlphaMapForGlyph()
     QFontEngine::unlockAlphaMapForGlyph();
 }
 
+static inline bool is2dRotation(const QTransform &t)
+{
+    return qFuzzyCompare(t.m11(), t.m22()) && qFuzzyCompare(t.m12(), -t.m21())
+        && qFuzzyCompare(t.m11()*t.m22() - t.m12()*t.m21(), 1.0);
+}
+
 QFontEngineFT::Glyph *QFontEngineFT::loadGlyphFor(glyph_t g,
                                                   QFixed subPixelPosition,
                                                   GlyphFormat format,
@@ -1793,7 +1806,7 @@ QFontEngineFT::Glyph *QFontEngineFT::loadGlyphFor(glyph_t g,
     Glyph *glyph = glyphSet != 0 ? glyphSet->getGlyph(g, subPixelPosition) : 0;
     if (!glyph || glyph->format != format || (!fetchBoundingBox && !glyph->data)) {
         QScopedValueRollback<HintStyle> saved_default_hint_style(default_hint_style);
-        if (t.type() >= QTransform::TxScale)
+        if (t.type() >= QTransform::TxScale && !is2dRotation(t))
             default_hint_style = HintNone; // disable hinting if the glyphs are transformed
 
         lockFace();
@@ -2003,6 +2016,11 @@ QFontEngine *QFontEngineFT::cloneWithSize(qreal pixelSize) const
     } else {
         return fe;
     }
+}
+
+Qt::HANDLE QFontEngineFT::handle() const
+{
+    return non_locked_face();
 }
 
 QT_END_NAMESPACE

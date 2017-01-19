@@ -192,7 +192,9 @@ void QUrlModel::setUrl(const QModelIndex &index, const QUrl &url, const QModelIn
 
         QIcon newIcon = qvariant_cast<QIcon>(dirIndex.data(Qt::DecorationRole));
         if (!dirIndex.isValid()) {
-            newIcon = fileSystemModel->iconProvider()->icon(QFileIconProvider::Folder);
+            const QFileIconProvider *provider = fileSystemModel->iconProvider();
+            if (provider)
+                newIcon = provider->icon(QFileIconProvider::Folder);
             newName = QFileInfo(url.toLocalFile()).fileName();
             if (!invalidUrls.contains(url))
                 invalidUrls.append(url);
@@ -460,6 +462,7 @@ void QSidebar::removeEntry()
     QList<QModelIndex> idxs = selectionModel()->selectedIndexes();
     QList<QPersistentModelIndex> indexes;
     const int numIndexes = idxs.count();
+    indexes.reserve(numIndexes);
     for (int i = 0; i < numIndexes; i++)
         indexes.append(idxs.at(i));
 
@@ -507,5 +510,7 @@ bool QSidebar::event(QEvent * event)
 }
 
 QT_END_NAMESPACE
+
+#include "moc_qsidebar_p.cpp"
 
 #endif

@@ -178,12 +178,12 @@ UnixMakefileGenerator::init()
             pchBaseName += project->first("QMAKE_ORIG_TARGET").toQString();
 
             // replace place holders
-            pchFlags.replace("${QMAKE_PCH_INPUT}",
+            pchFlags.replace(QLatin1String("${QMAKE_PCH_INPUT}"),
                              escapeFilePath(project->first("PRECOMPILED_HEADER").toQString()));
-            pchFlags.replace("${QMAKE_PCH_OUTPUT_BASE}", escapeFilePath(pchBaseName));
+            pchFlags.replace(QLatin1String("${QMAKE_PCH_OUTPUT_BASE}"), escapeFilePath(pchBaseName));
             if (project->isActiveConfig("icc_pch_style")) {
                 // icc style
-                pchFlags.replace("${QMAKE_PCH_OUTPUT}",
+                pchFlags.replace(QLatin1String("${QMAKE_PCH_OUTPUT}"),
                                  escapeFilePath(pchBaseName + project->first("QMAKE_PCH_OUTPUT_EXT")));
             } else {
                 // gcc style (including clang_pch_style)
@@ -197,7 +197,7 @@ UnixMakefileGenerator::init()
 
                 ProString language = project->first(ProKey("QMAKE_LANGUAGE_" + compiler));
                 if (!language.isEmpty()) {
-                    pchFlags.replace("${QMAKE_PCH_OUTPUT}",
+                    pchFlags.replace(QLatin1String("${QMAKE_PCH_OUTPUT}"),
                                      escapeFilePath(pchBaseName + language + headerSuffix));
                 }
             }
@@ -569,7 +569,7 @@ UnixMakefileGenerator::defaultInstall(const QString &t)
                 dst = escapeFilePath(filePrefixRoot(root, targetdir + src.section('/', -1)));
         if(!ret.isEmpty())
             ret += "\n\t";
-        ret += "-$(INSTALL_FILE) " + escapeFilePath(src) + ' ' + dst;
+        ret += "-$(INSTALL_FILE) " + escapeFilePath(Option::fixPathToTargetOS(src, false)) + ' ' + dst;
         if(!uninst.isEmpty())
             uninst.append("\n\t");
         uninst.append("-$(DEL_FILE) " + dst);
@@ -606,8 +606,11 @@ UnixMakefileGenerator::defaultInstall(const QString &t)
         } else if (project->first("TEMPLATE") == "lib" && project->isActiveConfig("staticlib")) {
             copy_cmd += "-$(INSTALL_FILE) " + src_targ + ' ' + dst_targ;
         } else if (!isAux) {
-            if (bundle == SlicedBundle)
-                ret += mkdir_p_asstring("\"`dirname " + dst_targ + "`\"", false) + "\n\t";
+            if (bundle == SlicedBundle) {
+                if (!ret.isEmpty())
+                    ret += "\n\t";
+                ret += mkdir_p_asstring("\"`dirname " + dst_targ + "`\"", false);
+            }
             copy_cmd += "-$(INSTALL_PROGRAM) " + src_targ + ' ' + dst_targ;
         }
         if(project->first("TEMPLATE") == "lib" && !project->isActiveConfig("staticlib")
